@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Revelio — Threat Intelligence</title>
+  <link href="../assets/fonts/fonts.css" rel="stylesheet"/>
+  <link href="popup-built.css" rel="stylesheet"/>
+</head>
+<body class="pg-shell bg-background text-on-surface min-h-[600px] w-[400px] flex flex-col font-body-md antialiased overflow-hidden border border-outline-variant/30">
+
+<!-- Global Header -->
+<header class="pg-header bg-surface border-b border-outline-variant flex justify-between items-center w-full px-container-padding py-stack-gap shrink-0 z-40 relative">
+  <div class="flex items-center gap-2 min-w-0">
+    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-primary-container flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.3)]">
+      <span class="material-symbols-outlined text-white text-[20px]" style="font-variation-settings: 'FILL' 1;">shield</span>
+    </div>
+    <div class="min-w-0">
+      <h1 class="text-headline-sm font-headline-sm font-bold text-on-surface flex items-center gap-2">
+        Revelio
+      </h1>
+      <p class="text-[10px] text-on-surface-variant font-medium -mt-1">Email Threat Intelligence</p>
+    </div>
+  </div>
+  <div class="pg-header-actions flex items-center gap-3">
+    <div id="ollama-status" class="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2 py-1 text-[10px] font-label-caps text-emerald-400">
+      <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.8)] animate-pulse"></div>
+      <span class="status-label">Connected</span>
+    </div>
+    <div class="flex gap-1 text-on-surface-variant">
+      <button id="theme-toggle" class="hover:text-primary transition-colors hover:bg-surface-variant/10 rounded p-1">
+        <span class="material-symbols-outlined text-[18px]">dark_mode</span>
+      </button>
+      <a href="../settings/settings.html" target="_blank" class="hover:text-primary transition-colors hover:bg-surface-variant/10 rounded p-1 flex">
+        <span class="material-symbols-outlined text-[18px]">settings</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="app-main" class="pg-main flex-1 flex flex-col overflow-hidden relative">
+
+  <!-- AUTO-DETECT BANNER -->
+  <div id="auto-detect-banner" style="display: none;" class="items-center justify-between px-container-padding py-2 text-[12px] z-30 shadow-sm shrink-0">
+    <div class="auto-detect-content flex items-center gap-2">
+      <span id="auto-detect-icon" class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;"></span>
+      <span id="auto-detect-text" class="font-bold tracking-wide"></span>
+    </div>
+    <button id="auto-detect-dismiss" class="hover:opacity-80 transition-opacity">
+      <span class="material-symbols-outlined text-[16px]">close</span>
+    </button>
+  </div>
+
+  <!-- HISTORY OVERLAY -->
+  <div id="history-overlay" hidden class="absolute inset-0 bg-surface z-50 flex flex-col">
+    <div class="flex justify-between items-center px-4 py-3 border-b border-outline-variant/50 bg-surface-container">
+      <h2 class="text-[14px] font-bold text-on-surface uppercase tracking-wider flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-[18px]">history</span> Analysis Log
+      </h2>
+      <button id="history-close-btn" class="hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+    <div id="history-list" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 custom-scrollbar"></div>
+    <div class="p-4 border-t border-outline-variant/50 bg-surface-container-low shrink-0">
+      <button id="clear-history-btn" class="w-full bg-error/10 border border-error/20 text-error rounded-lg py-2 font-bold hover:bg-error/20 transition-colors text-[12px] uppercase tracking-wider">Clear History</button>
+    </div>
+  </div>
+
+  <!-- ─── INPUT VIEW ───────────────────────────────────────────────────── -->
+  <section id="input-view" class="pg-input-view view flex flex-col h-full flex-1 p-container-padding gap-4 overflow-y-auto custom-scrollbar">
+    
+    <div class="flex flex-col gap-2">
+      <div class="flex justify-between items-end">
+        <label class="text-[13px] font-bold text-on-surface-variant uppercase tracking-wider">Email Content</label>
+        <label for="file-upload" class="text-[11px] text-primary hover:underline cursor-pointer flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]">upload</span> Upload .eml
+        </label>
+        <input type="file" id="file-upload" accept=".eml,.txt,.msg" class="hidden" />
+      </div>
+      <textarea id="email-input" class="w-full h-[240px] bg-surface-container rounded-lg border border-outline-variant/50 p-3 text-[13px] font-code-xs text-on-surface focus:outline-none focus:border-primary transition-colors custom-scrollbar resize-none placeholder-on-surface-variant/40" placeholder="Paste full email (headers + body) here..."></textarea>
+    </div>
+
+    <div class="input-actions relative">
+      <div class="flex gap-2">
+        <button id="analyze-btn" class="flex-1 bg-primary text-on-primary font-bold rounded-lg py-2.5 flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(142,213,255,0.2)]">
+          <span class="material-symbols-outlined text-[18px]">psychology</span> Analyze
+        </button>
+        <button id="sample-btn" class="bg-surface-variant text-on-surface-variant px-3 rounded-lg font-bold hover:brightness-110 active:scale-95 transition-all">
+          Sample
+        </button>
+        <button id="clear-btn" class="bg-surface-variant text-on-surface-variant px-4 rounded-lg font-bold hover:brightness-110 active:scale-95 transition-all">
+          Clear
+        </button>
+      </div>
+
+      <div id="sample-menu" class="hidden bg-surface-container border border-outline-variant/40 rounded-lg overflow-hidden shadow-xl">
+        <button class="dropdown-item block w-full text-left px-3 py-2 text-[12px] text-on-surface hover:bg-surface-variant/40" data-sample="classic-phishing">Classic phishing</button>
+        <button class="dropdown-item block w-full text-left px-3 py-2 text-[12px] text-on-surface hover:bg-surface-variant/40" data-sample="bec-ceo-fraud">BEC invoice</button>
+        <button class="dropdown-item block w-full text-left px-3 py-2 text-[12px] text-on-surface hover:bg-surface-variant/40" data-sample="legitimate-google">Legitimate Google</button>
+      </div>
+    </div>
+
+    <div class="bg-surface-container-low rounded-lg border border-outline-variant/30 p-3 mt-auto">
+      <div class="flex gap-2 items-center mb-2">
+        <span class="material-symbols-outlined text-[16px] text-primary">memory</span>
+        <span class="text-[12px] font-bold text-on-surface-variant uppercase">AI Provider</span>
+      </div>
+      <div class="flex gap-2">
+        <select id="ollama-model" class="flex-1 bg-surface-container border border-outline-variant/50 rounded p-1.5 text-[12px] text-on-surface focus:outline-none focus:border-primary">
+          <option value="deepseek-r1:8b">deepseek-r1:8b</option>
+          <option value="llama3.1">llama3.1</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─── LOADING VIEW ─────────────────────────────────────────────────── -->
+  <section id="loading-view" class="view hidden flex flex-col items-center justify-center h-full flex-1 relative bg-surface-container-lowest">
+    <div class="absolute inset-0 bg-primary/5 animate-pulse-ring blur-3xl rounded-full"></div>
+    <div class="relative z-10 flex flex-col items-center">
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-primary flex items-center justify-center shadow-[0_0_30px_rgba(56,189,248,0.5)] animate-shield-bob mb-6">
+        <span class="material-symbols-outlined text-white text-[36px]" style="font-variation-settings: 'FILL' 1;">shield</span>
+      </div>
+      <h2 id="loading-message" class="text-[16px] font-bold text-on-surface mb-2">Extracting Metadata...</h2>
+      <div class="w-48 h-1.5 bg-surface-variant rounded-full overflow-hidden mb-3">
+        <div id="progress-bar" class="h-full bg-primary w-1/3 rounded-full transition-all duration-500 ease-out"></div>
+      </div>
+      <p class="text-[11px] text-on-surface-variant uppercase tracking-wider font-code-xs">AI + Rule Engine Active</p>
+    </div>
+  </section>
+
+
+  <!-- ─── RESULTS VIEW ─────────────────────────────────────────────────── -->
+  <section id="results-view" class="pg-results-view view hidden flex flex-col h-full flex-1">
+    
+    <!-- Threat Meter Area -->
+    <div class="px-container-padding pt-2 pb-2 shrink-0">
+      <div class="bg-surface-container rounded-xl border border-white/5 p-4 flex gap-4 items-center relative overflow-hidden shadow-lg" id="threat-card-bg">
+        <div id="threat-glow" class="absolute -top-10 -right-10 w-32 h-32 bg-error/10 blur-[40px] rounded-full pointer-events-none transition-colors duration-1000"></div>
+        
+        <!-- Gauge -->
+        <div class="relative w-28 h-16 flex flex-col items-center justify-end pb-1 shrink-0">
+          <svg class="absolute top-0 left-0 w-full h-full overflow-visible drop-shadow-md" viewBox="0 0 100 50">
+            <path d="M 5 50 A 45 45 0 0 1 95 50" fill="none" stroke="#303539" stroke-linecap="round" stroke-width="8"></path>
+            <path id="gauge-arc" d="M 5 50 A 45 45 0 0 1 95 50" fill="none" stroke="#10b981" stroke-dasharray="141.37" stroke-dashoffset="141.37" stroke-linecap="round" stroke-width="8" class="transition-all duration-1000 ease-out"></path>
+          </svg>
+          <div class="relative z-10 flex flex-col items-center mt-2">
+            <span id="gauge-score-text" class="text-[32px] font-display-score text-on-surface leading-none font-bold">0</span>
+            <span class="text-[10px] font-label-caps text-on-surface-variant">/ 100</span>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div class="flex-1 flex flex-col items-end gap-1.5 justify-center">
+          <div id="verdict-badge" class="border px-3 py-1 rounded text-[11px] font-bold tracking-widest uppercase">SAFE</div>
+          <div class="text-[11px] text-on-surface-variant font-code-xs">
+            AI: <span id="ai-score-val">0</span> | Rules: <span id="rule-score-val">0</span>
+          </div>
+          <div id="risk-badges" class="flex gap-1 flex-wrap justify-end"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="flex justify-around items-center w-full px-container-padding bg-surface-container-lowest border-b border-outline-variant/30 pt-1 shrink-0 result-tabs z-20">
+      <button class="result-tab active text-primary border-b-2 border-primary font-bold pb-2 text-[13px] transition-colors" data-tab="summary">Summary</button>
+      <button class="result-tab text-on-secondary-container opacity-60 hover:text-primary-fixed pb-2 text-[13px] transition-colors" data-tab="findings">Findings</button>
+      <button class="result-tab text-on-secondary-container opacity-60 hover:text-primary-fixed pb-2 text-[13px] transition-colors" data-tab="urls">URLs</button>
+      <button class="result-tab text-on-secondary-container opacity-60 hover:text-primary-fixed pb-2 text-[13px] transition-colors" data-tab="headers">Headers</button>
+      <button class="result-tab text-on-secondary-container opacity-60 hover:text-primary-fixed pb-2 text-[13px] transition-colors" data-tab="remediation">Remediation</button>
+    </nav>
+
+    <!-- Scrollable Panels -->
+    <div class="flex-1 overflow-y-auto custom-scrollbar bg-background result-panels relative">
+      
+      <!-- TAB: SUMMARY -->
+      <div id="tab-summary" class="result-panel active p-container-padding flex flex-col gap-3">
+        <div class="bg-surface-container border border-white/5 rounded-xl p-4 flex flex-col relative overflow-hidden">
+          <div id="summary-edge-line" class="absolute left-0 top-0 bottom-0 w-[3px] bg-primary"></div>
+          <div class="flex justify-between items-start mb-2">
+            <h2 id="summary-verdict-text" class="text-[16px] font-bold text-on-surface">Analysis Complete</h2>
+            <span id="summary-confidence" class="border border-outline-variant/50 rounded-full px-2 py-0.5 text-[10px] text-on-surface-variant">Confidence</span>
+          </div>
+          <p id="summary-recommended-action" class="text-[13px] text-on-surface-variant leading-relaxed mb-4"></p>
+          <div id="category-bars" class="flex flex-col gap-2"></div>
+        </div>
+
+        <div id="analyst-note-wrap" class="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-3 hidden flex gap-3 items-start">
+          <span class="material-symbols-outlined text-indigo-400 text-[18px]">manage_search</span>
+          <p id="analyst-note-text" class="text-[12px] text-indigo-200/90 italic leading-relaxed"></p>
+        </div>
+      </div>
+
+      <!-- TAB: FINDINGS -->
+      <div id="tab-findings" class="result-panel hidden p-container-padding flex flex-col gap-3">
+        <div id="rule-findings-list" class="flex flex-col gap-3"></div>
+        <div id="llm-findings-section" class="hidden flex flex-col gap-2 mt-2">
+          <h4 class="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest px-1">AI Insights</h4>
+          <div id="llm-findings-list" class="flex flex-col gap-2"></div>
+        </div>
+        <div id="suspicious-quotes-section" class="hidden flex flex-col gap-2 mt-2">
+          <h4 class="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest px-1">Suspicious Phrases</h4>
+          <div id="suspicious-quotes-list" class="flex flex-col gap-2"></div>
+        </div>
+      </div>
+
+      <!-- TAB: URLS -->
+      <div id="tab-urls" class="result-panel hidden">
+        <div id="urls-empty" class="hidden p-8 flex flex-col items-center justify-center opacity-50">
+          <span class="material-symbols-outlined text-[32px] mb-2">link_off</span>
+          <p class="text-[13px]">No URLs detected</p>
+        </div>
+        <div id="urls-table-wrap" class="flex flex-col">
+          <div class="flex px-4 py-2 border-b border-outline-variant/30 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider bg-surface-container/30">
+            <div class="w-1/3">Display Text</div>
+            <div class="w-1/2">Destination</div>
+            <div class="w-1/6 text-right">Score</div>
+          </div>
+          <div id="urls-tbody" class="flex flex-col"></div>
+        </div>
+      </div>
+
+      <!-- TAB: HEADERS -->
+      <div id="tab-headers" class="result-panel hidden p-container-padding">
+        <div id="no-headers-msg" class="hidden p-4 bg-surface-container rounded-lg border border-outline-variant/30 text-[13px] text-on-surface-variant text-center">
+          No headers found. Paste raw email for header analysis.
+        </div>
+        <div id="headers-content" class="flex flex-col gap-3"></div>
+      </div>
+
+      <!-- TAB: REMEDIATION -->
+      <div id="tab-remediation" class="result-panel hidden p-container-padding flex flex-col gap-3">
+        <div id="tier-guidance" class="bg-surface-container border border-outline-variant/30 rounded-lg p-4"></div>
+        <div id="remediation-checklist" class="flex flex-col gap-2"></div>
+      </div>
+
+    </div>
+
+    <!-- Fixed Action Footer -->
+    <footer class="pg-result-footer w-full bg-surface-container-high border-t border-outline-variant/50 backdrop-blur-xl flex justify-between gap-2 px-container-padding py-3 z-30 shadow-[0_-10px_20px_rgba(0,0,0,0.3)]">
+      <button id="copy-report-btn" class="flex-1 bg-surface-variant text-on-surface-variant rounded-lg py-2 flex items-center justify-center gap-1.5 hover:brightness-110 active:scale-95">
+        <span class="material-symbols-outlined text-[16px]">content_copy</span> <span class="text-[11px] font-bold uppercase">Copy</span>
+      </button>
+      <button id="export-pdf-btn" class="flex-1 bg-surface-variant text-on-surface-variant rounded-lg py-2 flex items-center justify-center gap-1.5 hover:brightness-110 active:scale-95">
+        <span class="material-symbols-outlined text-[16px]">print</span> <span class="text-[11px] font-bold uppercase">PDF</span>
+      </button>
+      <button id="analyze-another-btn" class="flex-1 bg-primary text-on-primary rounded-lg py-2 flex items-center justify-center gap-1.5 font-bold shadow-[0_0_10px_rgba(56,189,248,0.3)] hover:brightness-110 active:scale-95">
+        <span class="material-symbols-outlined text-[16px]">refresh</span> <span class="text-[11px] font-bold uppercase">New</span>
+      </button>
+      <button id="history-btn" class="flex-1 bg-surface-variant text-on-surface-variant rounded-lg py-2 flex items-center justify-center gap-1.5 hover:brightness-110 active:scale-95">
+        <span class="material-symbols-outlined text-[16px]">history</span> <span class="text-[11px] font-bold uppercase">Log</span>
+      </button>
+    </footer>
+
+  </section>
+</main>
+
+<div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-surface-variant text-on-surface px-4 py-2 rounded-lg shadow-xl border border-outline-variant/50 text-[13px] transition-all duration-300 transform -translate-y-16 opacity-0 z-50"></div>
+
+<script src="popup.js" type="module"></script>
+</body>
+</html>

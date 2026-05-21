@@ -1,0 +1,17 @@
+{
+  "name": "revelio",
+  "version": "1.0.0",
+  "description": "> **AI-powered phishing email analysis for security professionals and enterprise SOC teams.**",
+  "main": "background.js",
+  "scripts": {
+    "build:css": "tailwindcss -i ./popup/popup.css -o ./popup/popup-built.css --minify",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.0",
+    "tailwindcss": "^4.3.0"
+  }
+}

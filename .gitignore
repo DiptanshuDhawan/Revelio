@@ -1,0 +1,5 @@
+node_modules/
+.env
+.DS_Store
+bundle_codebase.js
+phishguard_for_notebooklm.txt
