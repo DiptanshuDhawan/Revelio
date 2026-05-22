@@ -143,10 +143,17 @@
         <!-- Gauge -->
         <div class="relative w-28 h-16 flex flex-col items-center justify-end pb-1 shrink-0">
           <svg class="absolute top-0 left-0 w-full h-full overflow-visible drop-shadow-md" viewBox="0 0 100 50">
+            <defs>
+              <linearGradient id="gauge-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#34d399" />
+                <stop offset="45%" stop-color="#fbbf24" />
+                <stop offset="100%" stop-color="#ef4444" />
+              </linearGradient>
+            </defs>
             <path d="M 5 50 A 45 45 0 0 1 95 50" fill="none" stroke="#303539" stroke-linecap="round" stroke-width="8"></path>
-            <path id="gauge-arc" d="M 5 50 A 45 45 0 0 1 95 50" fill="none" stroke="#10b981" stroke-dasharray="141.37" stroke-dashoffset="141.37" stroke-linecap="round" stroke-width="8" class="transition-all duration-1000 ease-out"></path>
+            <path id="gauge-arc" d="M 5 50 A 45 45 0 0 1 95 50" fill="none" stroke="url(#gauge-gradient)" stroke-dasharray="141.37" stroke-dashoffset="141.37" stroke-linecap="round" stroke-width="8" class="transition-all duration-1000 ease-out"></path>
           </svg>
-          <div class="relative z-10 flex flex-col items-center mt-2">
+          <div class="relative z-10 flex flex-col items-center mt-2 translate-y-1.5">
             <span id="gauge-score-text" class="text-[32px] font-display-score text-on-surface leading-none font-bold">0</span>
             <span class="text-[10px] font-label-caps text-on-surface-variant">/ 100</span>
           </div>
@@ -159,6 +166,14 @@
             AI: <span id="ai-score-val">0</span> | Rules: <span id="rule-score-val">0</span>
           </div>
           <div id="risk-badges" class="flex gap-1 flex-wrap justify-end"></div>
+          <!-- MITRE ATT&CK Tag -->
+          <div id="mitre-tag-wrap" style="display:none;" class="flex items-center gap-1.5 mt-1">
+            <a id="mitre-link" href="#" target="_blank" rel="noopener noreferrer"
+               class="flex items-center gap-1.5 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/20 hover:border-indigo-400 transition-colors px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">
+              <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">target</span>
+              <span id="mitre-tag-text">T1566 — Phishing</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>

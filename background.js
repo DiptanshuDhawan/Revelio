@@ -402,6 +402,61 @@ function parseAIResponse(rawText) {
     throw new Error('Invalid JSON from AI: ' + e.message);
   }
 
+  // Sanitize and normalize MITRE ATT&CK information
+  let mitreAttack = { id: null, name: null, url: null };
+  if (parsed.mitreAttack && parsed.mitreAttack.id) {
+    let mitreId = String(parsed.mitreAttack.id).trim().toUpperCase().replace(/\s+/g, '');
+    let mitreName = parsed.mitreAttack.name ? String(parsed.mitreAttack.name).trim() : '';
+    let mitreUrl = null;
+
+    // Check if it starts with digits only (e.g. 1566) and prepend 'T'
+    if (/^\d{4}/.test(mitreId)) {
+      mitreId = 'T' + mitreId;
+    }
+
+    const match = mitreId.match(/^(T\d{4})(?:\.(\d{3}))?$/);
+    if (match) {
+      let baseId = match[1];
+      let subId = match[2];
+
+      // If it is Phishing (T1566), validate the sub-techniques to prevent hallucinated ones
+      if (baseId === 'T1566') {
+        if (subId) {
+          const validSubs = ['001', '002', '003', '004'];
+          if (!validSubs.includes(subId)) {
+            // Fallback to base technique if sub-technique is invalid (hallucinated)
+            mitreId = 'T1566';
+            subId = null;
+          }
+        }
+      }
+
+      if (subId) {
+        mitreUrl = `https://attack.mitre.org/techniques/${baseId}/${subId}/`;
+        if (!mitreName || mitreName.toLowerCase() === 'phishing') {
+          if (subId === '001') mitreName = 'Spearphishing Attachment';
+          else if (subId === '002') mitreName = 'Spearphishing Link';
+          else if (subId === '003') mitreName = 'Spearphishing via Service';
+          else if (subId === '004') mitreName = 'Spearphishing Voice';
+        }
+      } else {
+        mitreUrl = `https://attack.mitre.org/techniques/${baseId}/`;
+        if (!mitreName) {
+          if (baseId === 'T1566') mitreName = 'Phishing';
+        }
+      }
+    } else {
+      // Non-standard format - fallback
+      mitreUrl = `https://attack.mitre.org/techniques/${mitreId}/`;
+    }
+
+    mitreAttack = {
+      id: mitreId,
+      name: mitreName || 'Phishing',
+      url: mitreUrl
+    };
+  }
+
   // Validate and normalize required fields
   return {
     llmScore: clamp(parseInt(parsed.llmScore) || 50, 0, 100),
@@ -417,7 +472,7 @@ function parseAIResponse(rawText) {
     },
     topFindings: Array.isArray(parsed.topFindings) ? parsed.topFindings.slice(0, 5) : [],
     suspiciousQuotes: Array.isArray(parsed.suspiciousQuotes) ? parsed.suspiciousQuotes.slice(0, 5) : [],
-    mitreAttack: parsed.mitreAttack || { id: null, name: null, url: null },
+    mitreAttack,
     becRisk: Boolean(parsed.becRisk),
     spearPhishingRisk: Boolean(parsed.spearPhishingRisk),
     aiGeneratedRisk: Boolean(parsed.aiGeneratedRisk),

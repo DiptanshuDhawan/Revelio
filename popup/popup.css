@@ -2,6 +2,7 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
+
 /* Custom thin scrollbar for extension feel */
 .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
