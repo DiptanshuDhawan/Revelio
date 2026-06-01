@@ -132,6 +132,88 @@
   </section>
 
 
+  <!-- ─── OFFLINE VIEW ──────────────────────────────────────────────────── -->
+  <section id="offline-view" class="view hidden flex flex-col flex-1 h-full min-h-0 overflow-y-auto custom-scrollbar bg-background">
+
+    <!-- Hero Card -->
+    <div class="mx-4 mt-4 bg-surface-container-low/80 backdrop-blur-xl rounded-xl p-5 border border-tertiary-container/30 relative overflow-hidden glass-panel">
+      <!-- Ambient amber glow -->
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-20 bg-tertiary-container/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="flex flex-col items-center text-center relative z-10">
+        <!-- Compact pulsing icon (w-20 h-20 instead of w-32 h-32) -->
+        <div class="relative w-20 h-20 flex items-center justify-center mb-3">
+          <div class="absolute inset-0 rounded-full border border-tertiary-container/30 glow-warning animate-pulse"></div>
+          <div class="absolute inset-2 rounded-full border border-tertiary-container/40"></div>
+          <div class="bg-tertiary-container/20 rounded-full p-4 border border-tertiary-container/70 text-tertiary-container">
+            <svg xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 -960 960 960" width="32" fill="currentColor"><path d="M791-55 686-160H300q-75 0-127.5-52.5T120-340q0-70 47.5-121T284-520q9-59 52-100t104-54L56-960l56-56 735 735-56 226ZM581-265 303-543q-13 8-36 29t-23 54q0 42 29 71t71 29h237Zm94-95-56-56h61q42 0 71-29t29-71q0-42-29-71t-71-29h-45v-35q0-58-41-99t-99-41q-52 0-91 33t-49 84L402-691q27-31 66-48.5t82-17.5q92 0 156 64t64 156h10q75 0 127.5 52.5T960-357q0 58-33 103t-87 59l-165-165ZM470-496Z"/></svg>
+          </div>
+        </div>
+        <h2 class="font-headline-sm text-headline-sm text-tertiary-container mb-1">AI Engine Offline</h2>
+        <p class="text-on-surface-variant text-[12px] mb-4 w-full px-2 leading-relaxed">
+          Local Ollama instance unreachable. Basic heuristic analysis is shown below.
+        </p>
+        <!-- Side-by-side action buttons -->
+        <div class="flex gap-2 w-full">
+          <button id="offline-retry-btn" class="flex-1 bg-primary-container text-white py-2 px-3 rounded-lg font-label-caps text-[10px] uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-1.5">
+            <span class="material-symbols-outlined text-[14px]">refresh</span>
+            Retry
+          </button>
+          <button id="offline-new-btn" class="flex-1 bg-transparent border border-outline-variant/40 text-on-surface py-2 px-3 rounded-lg font-label-caps text-[10px] uppercase tracking-wider hover:bg-white/5 active:scale-95 transition-all flex items-center justify-center gap-1.5">
+            <span class="material-symbols-outlined text-[14px]">add</span>
+            New Analysis
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Separator -->
+    <div class="mx-4 my-3 separator-line"></div>
+
+    <!-- Basic Heuristics / Rule Score Card -->
+    <div class="mx-4 mb-3 glass-panel rounded-xl p-4 relative overflow-hidden">
+      <div class="absolute left-0 top-0 bottom-0 w-[3px] bg-tertiary-container rounded-l-xl"></div>
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-label-caps text-[10px] text-tertiary-container tracking-widest uppercase">Basic Heuristics</h3>
+        <span class="bg-tertiary-container/20 text-tertiary-container border border-tertiary-container/70 px-2 py-0.5 rounded font-code-xs text-[10px] uppercase tracking-wider">Limited</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="flex flex-col items-center">
+          <span id="offline-rule-score" class="text-[36px] font-display-score font-bold text-tertiary-container leading-none">—</span>
+          <span class="text-[10px] font-label-caps text-on-surface-variant mt-0.5">/ 100</span>
+        </div>
+        <div class="flex-1">
+          <div id="offline-verdict-badge" class="inline-block border px-2 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase mb-1.5 text-tertiary-container border-tertiary-container/50 bg-tertiary-container/10">Unknown</div>
+          <p class="text-[11px] text-on-surface-variant leading-relaxed">Rule-based score only. AI analysis unavailable.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Triggered Rule Findings List -->
+    <div class="mx-4 mb-3">
+      <h3 class="font-label-caps text-[10px] text-on-surface-variant tracking-widest uppercase mb-2 flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-[13px]">security</span>
+        Triggered Rules
+      </h3>
+      <div id="offline-findings-list" class="flex flex-col gap-2">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Footer actions -->
+    <div class="mx-4 mb-4 flex gap-2">
+      <button id="offline-copy-btn" class="flex-1 bg-surface-variant text-on-surface-variant rounded-lg py-2 flex items-center justify-center gap-1.5 hover:brightness-110 active:scale-95 transition-all">
+        <span class="material-symbols-outlined text-[14px]">content_copy</span>
+        <span class="text-[11px] font-bold uppercase">Copy Report</span>
+      </button>
+      <button id="offline-log-btn" class="flex-1 bg-surface-variant text-on-surface-variant rounded-lg py-2 flex items-center justify-center gap-1.5 hover:brightness-110 active:scale-95 transition-all">
+        <span class="material-symbols-outlined text-[14px]">history</span>
+        <span class="text-[11px] font-bold uppercase">Log</span>
+      </button>
+    </div>
+
+  </section>
+
+
   <!-- ─── RESULTS VIEW ─────────────────────────────────────────────────── -->
   <section id="results-view" class="pg-results-view view hidden flex flex-col h-full flex-1">
     

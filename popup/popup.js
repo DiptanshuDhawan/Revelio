@@ -375,8 +375,15 @@ async function autoExtractAndAnalyze() {
   const cached = await getCachedResult(extracted.emailText);
   if (cached) {
     currentResult = cached;
-    renderResults(cached);
-    showView('results');
+    // Route cached offline results to offline view
+    if (cached.llmResult?._offlineMode) {
+      renderOfflineView(cached.ruleResult, cached.finalScore);
+      showView('offline');
+      hideBanner();
+    } else {
+      renderResults(cached);
+      showView('results');
+    }
     showBanner('success', '✓ Showing cached result — click "Analyze Another" to re-scan');
     return;
   }
@@ -536,6 +543,20 @@ function attachEventListeners() {
   document.getElementById('clear-history-btn')?.addEventListener('click', handleClearHistory);
   document.getElementById('false-positive-btn')?.addEventListener('click', handleFalsePositive);
 
+  // Offline view buttons
+  document.getElementById('offline-retry-btn')?.addEventListener('click', async () => {
+    showView('input');
+    await clearLastCache(document.getElementById('email-input')?.value || '');
+    await handleAnalyze();
+  });
+  document.getElementById('offline-new-btn')?.addEventListener('click', async () => {
+    await clearLastCache(document.getElementById('email-input')?.value || '');
+    showView('input');
+    setTimeout(() => autoExtractAndAnalyze(), 100);
+  });
+  document.getElementById('offline-copy-btn')?.addEventListener('click', handleCopyReport);
+  document.getElementById('offline-log-btn')?.addEventListener('click', openHistory);
+
   // Keyboard shortcut: Ctrl/Cmd+Enter to analyze
   document.getElementById('email-input')?.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') handleAnalyze();
@@ -610,13 +631,20 @@ async function handleAnalyze() {
       if (entry) currentAnalysisId = entry.id;
     }
 
-    // Cache this result so reopening popup for same email skips re-analysis
-    await cacheResult(emailText, currentResult);
-
     chrome.runtime.sendMessage({ type: 'UPDATE_BADGE', score: finalScore }).catch(() => {});
 
-    renderResults(currentResult);
-    showView('results');
+    // Route to offline view if AI was unavailable
+    if (llmResult._offlineMode) {
+      // Don't cache offline results — we want a fresh try when Ollama comes back
+      renderOfflineView(ruleResult, finalScore);
+      showView('offline');
+      hideBanner();
+    } else {
+      // Cache this result so reopening popup for same email skips re-analysis
+      await cacheResult(emailText, currentResult);
+      renderResults(currentResult);
+      showView('results');
+    }
 
   } catch (err) {
     showToast(`Error: ${err.message?.slice(0, 60)}`, 'error');
@@ -681,9 +709,76 @@ function showView(view) {
     target.classList.add('active');
     target.classList.remove('hidden');
     target.hidden = false;
+    // Deferred scroll reset — wait for browser to layout the newly-visible element
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        target.scrollTop = 0;
+      });
+    });
   }
 
   if (view !== 'loading') stopLoadingAnimation();
+}
+
+// ─── Offline View Renderer ────────────────────────────────────────────────────
+function renderOfflineView(ruleResult, finalScore) {
+  const scoreEl = document.getElementById('offline-rule-score');
+  const verdictEl = document.getElementById('offline-verdict-badge');
+  const findingsEl = document.getElementById('offline-findings-list');
+
+  const score = ruleResult?.ruleScore ?? finalScore ?? 0;
+  const findings = ruleResult?.findings || [];
+
+  if (scoreEl) scoreEl.textContent = score;
+
+  // Derive verdict + colour from score
+  let verdict = 'Safe';
+  let verdictClass = 'text-emerald-400 border-emerald-400/50 bg-emerald-400/10';
+  if (score >= 86) { verdict = 'Confirmed Phishing'; verdictClass = 'text-error border-error/50 bg-error/10'; }
+  else if (score >= 70) { verdict = 'Likely Phishing'; verdictClass = 'text-error border-error/40 bg-error/10'; }
+  else if (score >= 40) { verdict = 'Suspicious'; verdictClass = 'text-amber-400 border-amber-400/50 bg-amber-400/10'; }
+
+  if (verdictEl) {
+    verdictEl.textContent = verdict.toUpperCase();
+    verdictEl.className = `inline-block border px-2 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase mb-2 ${verdictClass}`;
+  }
+
+  if (!findingsEl) return;
+  findingsEl.innerHTML = '';
+
+  const triggered = findings.filter((f) => !f.passed);
+  const safe = findings.filter((f) => f.passed);
+  const allToShow = [...triggered, ...safe.slice(0, 2)];
+
+  if (allToShow.length === 0) {
+    findingsEl.innerHTML = `<p class="text-[13px] text-on-surface-variant italic text-center py-4">No rule findings available.</p>`;
+    return;
+  }
+
+  const sanitize = (s) => (s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  for (const finding of allToShow) {
+    const isHigh = finding.severity === 'critical' || finding.severity === 'high';
+    const passed = finding.passed;
+    const stripColor = passed ? 'bg-emerald-500' : isHigh ? 'bg-error' : 'bg-amber-500';
+    const iconColor = passed ? 'text-emerald-400' : isHigh ? 'text-error' : 'text-amber-400';
+    const icon = passed ? 'check' : isHigh ? 'warning' : 'info';
+
+    const card = document.createElement('div');
+    card.className = 'bg-surface-container border border-outline-variant/15 rounded-lg p-3 relative overflow-hidden';
+    card.innerHTML = `
+      <div class="absolute left-0 top-0 bottom-0 w-[3px] ${stripColor}"></div>
+      <div class="flex items-start gap-2.5">
+        <span class="material-symbols-outlined ${iconColor} text-[18px] mt-0.5">${icon}</span>
+        <div class="flex-1 min-w-0">
+          <p class="text-on-surface text-[13px] font-semibold">${sanitize(finding.name)}</p>
+          <p class="text-on-surface-variant text-[12px] leading-relaxed mt-0.5">${sanitize(finding.finding)}</p>
+          ${finding.quote && !passed ? `<div class="mt-2 bg-error/5 border border-error/10 rounded p-1.5 font-code-xs text-[11px] ${iconColor} break-words">${sanitize(finding.quote.slice(0, 100))}</div>` : ''}
+        </div>
+      </div>
+    `;
+    findingsEl.appendChild(card);
+  }
 }
 
 // ─── Result Tab Switching ─────────────────────────────────────────────────────
