@@ -1,0 +1,6327 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {
+    "hyperedges": [
+      {
+        "id": "hyperedge_email_extraction",
+        "label": "Email Extraction Flow",
+        "nodes": [
+          "content_extractCurrentEmail",
+          "content_extractGmail",
+          "content_extractOutlook",
+          "rationale_heuristic_extraction"
+        ],
+        "relation": "participate_in",
+        "confidence": "INFERRED",
+        "confidence_score": 0.95,
+        "source_file": "content.js"
+      },
+      {
+        "id": "hyperedge_core_analysis_pipeline",
+        "label": "Core Analysis Pipeline",
+        "nodes": [
+          "popup_handleAnalyze",
+          "analyzer_analyzeEmail",
+          "analyzer_parseEmailData",
+          "headerParser_parseHeaders",
+          "urlScanner_extractAndAnalyzeURLs"
+        ],
+        "relation": "form",
+        "confidence": "INFERRED",
+        "confidence_score": 0.85,
+        "source_file": "engine/analyzer.js"
+      },
+      {
+        "id": "hyperedge_state_management",
+        "label": "Local State Management",
+        "nodes": [
+          "storage_saveAnalysis",
+          "storage_getSettings",
+          "popup_cacheResult",
+          "storage_saveSettings"
+        ],
+        "relation": "participate_in",
+        "confidence": "INFERRED",
+        "confidence_score": 0.85,
+        "source_file": "utils/storage.js"
+      },
+      {
+        "id": "icon128_visual_composition",
+        "label": "App Icon Visual Composition",
+        "nodes": [
+          "icon128_png",
+          "icon128_shield",
+          "icon128_lock"
+        ],
+        "relation": "form",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "icons/icon128.png"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "label": "settings.json",
+      "file_type": "code",
+      "source_file": ".claude/settings.json",
+      "source_location": "L1",
+      "id": "claude_settings",
+      "community": 12,
+      "norm_label": "settings.json"
+    },
+    {
+      "label": "hooks",
+      "file_type": "code",
+      "source_file": ".claude/settings.json",
+      "source_location": "L2",
+      "id": "claude_settings_hooks",
+      "community": 12,
+      "norm_label": "hooks"
+    },
+    {
+      "label": "PreToolUse",
+      "file_type": "code",
+      "source_file": ".claude/settings.json",
+      "source_location": "L3",
+      "id": "claude_settings_hooks_pretooluse",
+      "community": 12,
+      "norm_label": "pretooluse"
+    },
+    {
+      "label": "background.js",
+      "file_type": "code",
+      "source_file": "background.js",
+      "source_location": "L1",
+      "id": "background",
+      "community": 7,
+      "norm_label": "background.js"
+    },
+    {
+      "label": "updateBadge()",
+      "file_type": "code",
+      "source_file": "background.js",
+      "source_location": "L64",
+      "id": "background_updatebadge",
+      "community": 7,
+      "norm_label": "updatebadge()"
+    },
+    {
+      "label": "checkOllama()",
+      "file_type": "code",
+      "source_file": "background.js",
+      "source_location": "L143",
+      "id": "background_checkollama",
+      "community": 7,
+      "norm_label": "checkollama()"
+    },
+    {
+      "label": "getOllamaModels()",
+      "file_type": "code",
+      "source_file": "background.js",
+      "source_location": "L155",
+      "id": "background_getollamamodels",
+      "community": 7,
+      "norm_label": "getollamamodels()"
+    },
+    {
+      "label": "handleAnalyze()",
+      "file_type": "code",
+      "source_file": "background.js",
+      "source_location": "L164",
+      "id": "background_handleanalyze",
+      "community": 7,
+      "norm_label": "handleanalyze()"
+    },
+    {
+      "label": "buildAnalysisPrompt()",
+      "file_type": "code",
+      "source_file": "background.js",
+      "source_location": "L192",
+      "id": "background_buildanalysisprompt",
+      "community": 7,
+      "norm_label": "buildanalysisprompt()"
+    },
+    {
+      "label": "callOllama()",
+      "file_type": "code",
+      "source_file": "background.js",
+      "source_location": "L268",
+      "id": "background_callollama",
+      "community": 7,
+      "norm_label": "callollama()"
+    },
+    {
+      "label": "callOpenAI()",
+      "file_type": "code",
+      "source_file": "background.js",
+      "source_location": "L297",
+      "id": "background_callopenai",
+      "community": 7,
+      "norm_label": "callopenai()"
+    },
+    {
+      "label": "callGemini()",
+      "file_type": "code",
+      "source_file": "background.js",
+      "source_location": "L327",
+      "id": "background_callgemini",
+      "community": 7,
+      "norm_label": "callgemini()"
+    },
+    {
+      "label": "callGrok()",
+      "file_type": "code",
+      "source_file": "background.js",
+      "source_location": "L355",
+      "id": "background_callgrok",
+      "community": 7,
+      "norm_label": "callgrok()"
+    },
+    {
+      "label": "parseAIResponse()",
+      "file_type": "code",
+      "source_file": "background.js",
+      "source_location": "L384",
+      "id": "background_parseairesponse",
+      "community": 7,
+      "norm_label": "parseairesponse()"
+    },
+    {
+      "label": "clamp()",
+      "file_type": "code",
+      "source_file": "background.js",
+      "source_location": "L486",
+      "id": "background_clamp",
+      "community": 7,
+      "norm_label": "clamp()"
+    },
+    {
+      "label": "content.js",
+      "file_type": "code",
+      "source_file": "content.js",
+      "source_location": "L1",
+      "id": "content",
+      "community": 10,
+      "norm_label": "content.js"
+    },
+    {
+      "label": "extractCurrentEmail()",
+      "file_type": "code",
+      "source_file": "content.js",
+      "source_location": "L28",
+      "id": "content_extractcurrentemail",
+      "community": 10,
+      "norm_label": "extractcurrentemail()"
+    },
+    {
+      "label": "extractGmail()",
+      "file_type": "code",
+      "source_file": "content.js",
+      "source_location": "L42",
+      "id": "content_extractgmail",
+      "community": 10,
+      "norm_label": "extractgmail()"
+    },
+    {
+      "label": "extractOutlook()",
+      "file_type": "code",
+      "source_file": "content.js",
+      "source_location": "L141",
+      "id": "content_extractoutlook",
+      "community": 10,
+      "norm_label": "extractoutlook()"
+    },
+    {
+      "label": "extractFallback()",
+      "file_type": "code",
+      "source_file": "content.js",
+      "source_location": "L219",
+      "id": "content_extractfallback",
+      "community": 10,
+      "norm_label": "extractfallback()"
+    },
+    {
+      "label": "create-icons.ps1",
+      "file_type": "code",
+      "source_file": "create-icons.ps1",
+      "source_location": "L1",
+      "id": "create_icons",
+      "community": 17,
+      "norm_label": "create-icons.ps1"
+    },
+    {
+      "label": "analyzer.js",
+      "file_type": "code",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L1",
+      "id": "engine_analyzer",
+      "community": 5,
+      "norm_label": "analyzer.js"
+    },
+    {
+      "label": "parseEmailData()",
+      "file_type": "code",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L12",
+      "id": "engine_analyzer_parseemaildata",
+      "community": 5,
+      "norm_label": "parseemaildata()"
+    },
+    {
+      "label": "extractSubjectFromBody()",
+      "file_type": "code",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L48",
+      "id": "engine_analyzer_extractsubjectfrombody",
+      "community": 5,
+      "norm_label": "extractsubjectfrombody()"
+    },
+    {
+      "label": "computeFinalScore()",
+      "file_type": "code",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L55",
+      "id": "engine_analyzer_computefinalscore",
+      "community": 0,
+      "norm_label": "computefinalscore()"
+    },
+    {
+      "label": "scoreToVerdict()",
+      "file_type": "code",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L61",
+      "id": "engine_analyzer_scoretoverdict",
+      "community": 0,
+      "norm_label": "scoretoverdict()"
+    },
+    {
+      "label": "analyzeEmail()",
+      "file_type": "code",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L70",
+      "id": "engine_analyzer_analyzeemail",
+      "community": 5,
+      "norm_label": "analyzeemail()"
+    },
+    {
+      "label": "prompts.js",
+      "file_type": "code",
+      "source_file": "engine/prompts.js",
+      "source_location": "L1",
+      "id": "engine_prompts",
+      "community": 9,
+      "norm_label": "prompts.js"
+    },
+    {
+      "label": "buildAnalysisPrompt()",
+      "file_type": "code",
+      "source_file": "engine/prompts.js",
+      "source_location": "L24",
+      "id": "engine_prompts_buildanalysisprompt",
+      "community": 9,
+      "norm_label": "buildanalysisprompt()"
+    },
+    {
+      "label": "generateOfflineFallback()",
+      "file_type": "code",
+      "source_file": "engine/prompts.js",
+      "source_location": "L98",
+      "id": "engine_prompts_generateofflinefallback",
+      "community": 9,
+      "norm_label": "generateofflinefallback()"
+    },
+    {
+      "label": "ruleEngine.js",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L1",
+      "id": "engine_ruleengine",
+      "community": 1,
+      "norm_label": "ruleengine.js"
+    },
+    {
+      "label": "BRAND_DOMAIN_MAP",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L8",
+      "id": "engine_ruleengine_brand_domain_map",
+      "community": 1,
+      "norm_label": "brand_domain_map"
+    },
+    {
+      "label": "KNOWN_BRAND_DOMAINS",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L34",
+      "id": "engine_ruleengine_known_brand_domains",
+      "community": 1,
+      "norm_label": "known_brand_domains"
+    },
+    {
+      "label": "SUSPICIOUS_TLDS",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L38",
+      "id": "engine_ruleengine_suspicious_tlds",
+      "community": 1,
+      "norm_label": "suspicious_tlds"
+    },
+    {
+      "label": "URL_SHORTENERS",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L44",
+      "id": "engine_ruleengine_url_shorteners",
+      "community": 1,
+      "norm_label": "url_shorteners"
+    },
+    {
+      "label": "URGENCY_KEYWORDS",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L50",
+      "id": "engine_ruleengine_urgency_keywords",
+      "community": 1,
+      "norm_label": "urgency_keywords"
+    },
+    {
+      "label": "PERSONAL_DATA_KEYWORDS",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L61",
+      "id": "engine_ruleengine_personal_data_keywords",
+      "community": 1,
+      "norm_label": "personal_data_keywords"
+    },
+    {
+      "label": "GENERIC_GREETINGS",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L71",
+      "id": "engine_ruleengine_generic_greetings",
+      "community": 1,
+      "norm_label": "generic_greetings"
+    },
+    {
+      "label": "FINANCIAL_KEYWORDS",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L79",
+      "id": "engine_ruleengine_financial_keywords",
+      "community": 1,
+      "norm_label": "financial_keywords"
+    },
+    {
+      "label": "FREE_EMAIL_PROVIDERS",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L88",
+      "id": "engine_ruleengine_free_email_providers",
+      "community": 1,
+      "norm_label": "free_email_providers"
+    },
+    {
+      "label": "levenshtein()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L96",
+      "id": "engine_ruleengine_levenshtein",
+      "community": 1,
+      "norm_label": "levenshtein()"
+    },
+    {
+      "label": "extractDomain()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L112",
+      "id": "engine_ruleengine_extractdomain",
+      "community": 1,
+      "norm_label": "extractdomain()"
+    },
+    {
+      "label": "extractRootDomain()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L118",
+      "id": "engine_ruleengine_extractrootdomain",
+      "community": 1,
+      "norm_label": "extractrootdomain()"
+    },
+    {
+      "label": "getTLD()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L125",
+      "id": "engine_ruleengine_gettld",
+      "community": 1,
+      "norm_label": "gettld()"
+    },
+    {
+      "label": "checkUrgencyKeywords()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L133",
+      "id": "engine_ruleengine_checkurgencykeywords",
+      "community": 1,
+      "norm_label": "checkurgencykeywords()"
+    },
+    {
+      "label": "checkSenderBrandSpoof()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L164",
+      "id": "engine_ruleengine_checksenderbrandspoof",
+      "community": 1,
+      "norm_label": "checksenderbrandspoof()"
+    },
+    {
+      "label": "checkReplyToMismatch()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L201",
+      "id": "engine_ruleengine_checkreplytomismatch",
+      "community": 1,
+      "norm_label": "checkreplytomismatch()"
+    },
+    {
+      "label": "checkPersonalDataRequest()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L242",
+      "id": "engine_ruleengine_checkpersonaldatarequest",
+      "community": 1,
+      "norm_label": "checkpersonaldatarequest()"
+    },
+    {
+      "label": "checkGenericGreeting()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L265",
+      "id": "engine_ruleengine_checkgenericgreeting",
+      "community": 1,
+      "norm_label": "checkgenericgreeting()"
+    },
+    {
+      "label": "checkDisplayNameMismatch()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L295",
+      "id": "engine_ruleengine_checkdisplaynamemismatch",
+      "community": 1,
+      "norm_label": "checkdisplaynamemismatch()"
+    },
+    {
+      "label": "checkSuspiciousTLD()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L355",
+      "id": "engine_ruleengine_checksuspicioustld",
+      "community": 1,
+      "norm_label": "checksuspicioustld()"
+    },
+    {
+      "label": "DANGEROUS_EXTENSIONS",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L384",
+      "id": "engine_ruleengine_dangerous_extensions",
+      "community": 1,
+      "norm_label": "dangerous_extensions"
+    },
+    {
+      "label": "checkDangerousAttachment()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L389",
+      "id": "engine_ruleengine_checkdangerousattachment",
+      "community": 1,
+      "norm_label": "checkdangerousattachment()"
+    },
+    {
+      "label": "checkLookalikeURLs()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L436",
+      "id": "engine_ruleengine_checklookalikeurls",
+      "community": 1,
+      "norm_label": "checklookalikeurls()"
+    },
+    {
+      "label": "checkFreeEmailImpersonation()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L481",
+      "id": "engine_ruleengine_checkfreeemailimpersonation",
+      "community": 1,
+      "norm_label": "checkfreeemailimpersonation()"
+    },
+    {
+      "label": "checkHTMLObfuscation()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L534",
+      "id": "engine_ruleengine_checkhtmlobfuscation",
+      "community": 1,
+      "norm_label": "checkhtmlobfuscation()"
+    },
+    {
+      "label": "checkInvoiceFinancial()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L591",
+      "id": "engine_ruleengine_checkinvoicefinancial",
+      "community": 1,
+      "norm_label": "checkinvoicefinancial()"
+    },
+    {
+      "label": "calculateRuleScore()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L630",
+      "id": "engine_ruleengine_calculaterulescore",
+      "community": 1,
+      "norm_label": "calculaterulescore()"
+    },
+    {
+      "label": "runRuleEngine()",
+      "file_type": "code",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L657",
+      "id": "engine_ruleengine_runruleengine",
+      "community": 1,
+      "norm_label": "runruleengine()"
+    },
+    {
+      "label": "manifest.json",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L1",
+      "id": "manifest",
+      "community": 2,
+      "norm_label": "manifest.json"
+    },
+    {
+      "label": "manifest_version",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L2",
+      "id": "manifest_manifest_version",
+      "community": 2,
+      "norm_label": "manifest_version"
+    },
+    {
+      "label": "name",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L3",
+      "id": "manifest_name",
+      "community": 2,
+      "norm_label": "name"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L4",
+      "id": "manifest_version",
+      "community": 2,
+      "norm_label": "version"
+    },
+    {
+      "label": "description",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L5",
+      "id": "manifest_description",
+      "community": 2,
+      "norm_label": "description"
+    },
+    {
+      "label": "author",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L6",
+      "id": "manifest_author",
+      "community": 2,
+      "norm_label": "author"
+    },
+    {
+      "label": "permissions",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L8",
+      "id": "manifest_permissions",
+      "community": 2,
+      "norm_label": "permissions"
+    },
+    {
+      "label": "host_permissions",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L18",
+      "id": "manifest_host_permissions",
+      "community": 2,
+      "norm_label": "host_permissions"
+    },
+    {
+      "label": "content_security_policy",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L29",
+      "id": "manifest_content_security_policy",
+      "community": 2,
+      "norm_label": "content_security_policy"
+    },
+    {
+      "label": "extension_pages",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L30",
+      "id": "manifest_content_security_policy_extension_pages",
+      "community": 2,
+      "norm_label": "extension_pages"
+    },
+    {
+      "label": "action",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L33",
+      "id": "manifest_action",
+      "community": 2,
+      "norm_label": "action"
+    },
+    {
+      "label": "default_popup",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L34",
+      "id": "manifest_action_default_popup",
+      "community": 2,
+      "norm_label": "default_popup"
+    },
+    {
+      "label": "default_title",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L35",
+      "id": "manifest_action_default_title",
+      "community": 2,
+      "norm_label": "default_title"
+    },
+    {
+      "label": "default_icon",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L36",
+      "id": "manifest_action_default_icon",
+      "community": 2,
+      "norm_label": "default_icon"
+    },
+    {
+      "label": "16",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L37",
+      "id": "manifest_default_icon_16",
+      "community": 2,
+      "norm_label": "16"
+    },
+    {
+      "label": "48",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L38",
+      "id": "manifest_default_icon_48",
+      "community": 2,
+      "norm_label": "48"
+    },
+    {
+      "label": "128",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L39",
+      "id": "manifest_default_icon_128",
+      "community": 2,
+      "norm_label": "128"
+    },
+    {
+      "label": "background",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L43",
+      "id": "manifest_background",
+      "community": 2,
+      "norm_label": "background"
+    },
+    {
+      "label": "service_worker",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L44",
+      "id": "manifest_background_service_worker",
+      "community": 2,
+      "norm_label": "service_worker"
+    },
+    {
+      "label": "type",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L45",
+      "id": "manifest_background_type",
+      "community": 2,
+      "norm_label": "type"
+    },
+    {
+      "label": "content_scripts",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L48",
+      "id": "manifest_content_scripts",
+      "community": 2,
+      "norm_label": "content_scripts"
+    },
+    {
+      "label": "icons",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L61",
+      "id": "manifest_icons",
+      "community": 2,
+      "norm_label": "icons"
+    },
+    {
+      "label": "16",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L62",
+      "id": "manifest_icons_16",
+      "community": 2,
+      "norm_label": "16"
+    },
+    {
+      "label": "48",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L63",
+      "id": "manifest_icons_48",
+      "community": 2,
+      "norm_label": "48"
+    },
+    {
+      "label": "128",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L64",
+      "id": "manifest_icons_128",
+      "community": 2,
+      "norm_label": "128"
+    },
+    {
+      "label": "options_page",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L67",
+      "id": "manifest_options_page",
+      "community": 2,
+      "norm_label": "options_page"
+    },
+    {
+      "label": "web_accessible_resources",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": "L69",
+      "id": "manifest_web_accessible_resources",
+      "community": 2,
+      "norm_label": "web_accessible_resources"
+    },
+    {
+      "label": "package.json",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L1",
+      "id": "package",
+      "community": 6,
+      "norm_label": "package.json"
+    },
+    {
+      "label": "name",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L2",
+      "id": "package_name",
+      "community": 6,
+      "norm_label": "name"
+    },
+    {
+      "label": "version",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L3",
+      "id": "package_version",
+      "community": 6,
+      "norm_label": "version"
+    },
+    {
+      "label": "description",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L4",
+      "id": "package_description",
+      "community": 6,
+      "norm_label": "description"
+    },
+    {
+      "label": "main",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L5",
+      "id": "package_main",
+      "community": 6,
+      "norm_label": "main"
+    },
+    {
+      "label": "scripts",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L6",
+      "id": "package_scripts",
+      "community": 6,
+      "norm_label": "scripts"
+    },
+    {
+      "label": "build:css",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L7",
+      "id": "package_scripts_build_css",
+      "community": 6,
+      "norm_label": "build:css"
+    },
+    {
+      "label": "test",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L8",
+      "id": "package_scripts_test",
+      "community": 6,
+      "norm_label": "test"
+    },
+    {
+      "label": "keywords",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L10",
+      "id": "package_keywords",
+      "community": 6,
+      "norm_label": "keywords"
+    },
+    {
+      "label": "author",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L11",
+      "id": "package_author",
+      "community": 6,
+      "norm_label": "author"
+    },
+    {
+      "label": "license",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L12",
+      "id": "package_license",
+      "community": 6,
+      "norm_label": "license"
+    },
+    {
+      "label": "devDependencies",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L13",
+      "id": "package_devdependencies",
+      "community": 6,
+      "norm_label": "devdependencies"
+    },
+    {
+      "label": "@tailwindcss/cli",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L14",
+      "id": "package_devdependencies_tailwindcss_cli",
+      "community": 6,
+      "norm_label": "@tailwindcss/cli"
+    },
+    {
+      "label": "tailwindcss",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L15",
+      "id": "package_devdependencies_tailwindcss",
+      "community": 6,
+      "norm_label": "tailwindcss"
+    },
+    {
+      "label": "popup.js",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L1",
+      "id": "popup_popup",
+      "community": 0,
+      "norm_label": "popup.js"
+    },
+    {
+      "label": "currentSettings",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L12",
+      "id": "popup_popup_currentsettings",
+      "community": 0,
+      "norm_label": "currentsettings"
+    },
+    {
+      "label": "hashEmail()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L16",
+      "id": "popup_popup_hashemail",
+      "community": 0,
+      "norm_label": "hashemail()"
+    },
+    {
+      "label": "cacheResult()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L27",
+      "id": "popup_popup_cacheresult",
+      "community": 0,
+      "norm_label": "cacheresult()"
+    },
+    {
+      "label": "getCachedResult()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L38",
+      "id": "popup_popup_getcachedresult",
+      "community": 0,
+      "norm_label": "getcachedresult()"
+    },
+    {
+      "label": "clearLastCache()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L52",
+      "id": "popup_popup_clearlastcache",
+      "community": 0,
+      "norm_label": "clearlastcache()"
+    },
+    {
+      "label": "hydrateIconFallbacks()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L83",
+      "id": "popup_popup_hydrateiconfallbacks",
+      "community": 0,
+      "norm_label": "hydrateiconfallbacks()"
+    },
+    {
+      "label": "applyIconFallback()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L112",
+      "id": "popup_popup_applyiconfallback",
+      "community": 0,
+      "norm_label": "applyiconfallback()"
+    },
+    {
+      "label": "iconObserver",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L142",
+      "id": "popup_popup_iconobserver",
+      "community": 0,
+      "norm_label": "iconobserver"
+    },
+    {
+      "label": "applyTheme()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L159",
+      "id": "popup_popup_applytheme",
+      "community": 0,
+      "norm_label": "applytheme()"
+    },
+    {
+      "label": "startOllamaCheck()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L185",
+      "id": "popup_popup_startollamacheck",
+      "community": 0,
+      "norm_label": "startollamacheck()"
+    },
+    {
+      "label": "checkOllamaStatus()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L192",
+      "id": "popup_popup_checkollamastatus",
+      "community": 0,
+      "norm_label": "checkollamastatus()"
+    },
+    {
+      "label": "updateOllamaStatus()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L207",
+      "id": "popup_popup_updateollamastatus",
+      "community": 0,
+      "norm_label": "updateollamastatus()"
+    },
+    {
+      "label": "setStatusPill()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L220",
+      "id": "popup_popup_setstatuspill",
+      "community": 0,
+      "norm_label": "setstatuspill()"
+    },
+    {
+      "label": "capitalize()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L237",
+      "id": "popup_popup_capitalize",
+      "community": 0,
+      "norm_label": "capitalize()"
+    },
+    {
+      "label": "showBanner()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L242",
+      "id": "popup_popup_showbanner",
+      "community": 0,
+      "norm_label": "showbanner()"
+    },
+    {
+      "label": "hideBanner()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L276",
+      "id": "popup_popup_hidebanner",
+      "community": 0,
+      "norm_label": "hidebanner()"
+    },
+    {
+      "label": "checkForPendingText()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L283",
+      "id": "popup_popup_checkforpendingtext",
+      "community": 0,
+      "norm_label": "checkforpendingtext()"
+    },
+    {
+      "label": "autoExtractAndAnalyze()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L304",
+      "id": "popup_popup_autoextractandanalyze",
+      "community": 0,
+      "norm_label": "autoextractandanalyze()"
+    },
+    {
+      "label": "sleep()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L406",
+      "id": "popup_popup_sleep",
+      "community": 0,
+      "norm_label": "sleep()"
+    },
+    {
+      "label": "populateSettingsFromStorage()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L411",
+      "id": "popup_popup_populatesettingsfromstorage",
+      "community": 0,
+      "norm_label": "populatesettingsfromstorage()"
+    },
+    {
+      "label": "collectSettings()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L441",
+      "id": "popup_popup_collectsettings",
+      "community": 0,
+      "norm_label": "collectsettings()"
+    },
+    {
+      "label": "switchProviderTab()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L461",
+      "id": "popup_popup_switchprovidertab",
+      "community": 0,
+      "norm_label": "switchprovidertab()"
+    },
+    {
+      "label": "attachEventListeners()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L478",
+      "id": "popup_popup_attacheventlisteners",
+      "community": 0,
+      "norm_label": "attacheventlisteners()"
+    },
+    {
+      "label": "handleFileUpload()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L567",
+      "id": "popup_popup_handlefileupload",
+      "community": 8,
+      "norm_label": "handlefileupload()"
+    },
+    {
+      "label": "handleAnalyze()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L582",
+      "id": "popup_popup_handleanalyze",
+      "community": 0,
+      "norm_label": "handleanalyze()"
+    },
+    {
+      "label": "LOADING_MESSAGES",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L656",
+      "id": "popup_popup_loading_messages",
+      "community": 0,
+      "norm_label": "loading_messages"
+    },
+    {
+      "label": "startLoadingAnimation()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L667",
+      "id": "popup_popup_startloadinganimation",
+      "community": 0,
+      "norm_label": "startloadinganimation()"
+    },
+    {
+      "label": "stopLoadingAnimation()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L690",
+      "id": "popup_popup_stoploadinganimation",
+      "community": 0,
+      "norm_label": "stoploadinganimation()"
+    },
+    {
+      "label": "showView()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L700",
+      "id": "popup_popup_showview",
+      "community": 0,
+      "norm_label": "showview()"
+    },
+    {
+      "label": "renderOfflineView()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L724",
+      "id": "popup_popup_renderofflineview",
+      "community": 0,
+      "norm_label": "renderofflineview()"
+    },
+    {
+      "label": "switchResultTab()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L785",
+      "id": "popup_popup_switchresulttab",
+      "community": 0,
+      "norm_label": "switchresulttab()"
+    },
+    {
+      "label": "scoreToClass()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L806",
+      "id": "popup_popup_scoretoclass",
+      "community": 0,
+      "norm_label": "scoretoclass()"
+    },
+    {
+      "label": "categoryColor()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L813",
+      "id": "popup_popup_categorycolor",
+      "community": 0,
+      "norm_label": "categorycolor()"
+    },
+    {
+      "label": "renderResults()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L820",
+      "id": "popup_popup_renderresults",
+      "community": 0,
+      "norm_label": "renderresults()"
+    },
+    {
+      "label": "renderGauge()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L835",
+      "id": "popup_popup_rendergauge",
+      "community": 0,
+      "norm_label": "rendergauge()"
+    },
+    {
+      "label": "renderSummaryTab()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L890",
+      "id": "popup_popup_rendersummarytab",
+      "community": 0,
+      "norm_label": "rendersummarytab()"
+    },
+    {
+      "label": "renderFindingsTab()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L941",
+      "id": "popup_popup_renderfindingstab",
+      "community": 0,
+      "norm_label": "renderfindingstab()"
+    },
+    {
+      "label": "renderURLsTab()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L999",
+      "id": "popup_popup_renderurlstab",
+      "community": 0,
+      "norm_label": "renderurlstab()"
+    },
+    {
+      "label": "renderHeadersTab()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L1037",
+      "id": "popup_popup_renderheaderstab",
+      "community": 0,
+      "norm_label": "renderheaderstab()"
+    },
+    {
+      "label": "renderRemediationTab()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L1122",
+      "id": "popup_popup_renderremediationtab",
+      "community": 0,
+      "norm_label": "renderremediationtab()"
+    },
+    {
+      "label": "handleCopyReport()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L1178",
+      "id": "popup_popup_handlecopyreport",
+      "community": 8,
+      "norm_label": "handlecopyreport()"
+    },
+    {
+      "label": "handleExportPDF()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L1195",
+      "id": "popup_popup_handleexportpdf",
+      "community": 8,
+      "norm_label": "handleexportpdf()"
+    },
+    {
+      "label": "handleFalsePositive()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L1205",
+      "id": "popup_popup_handlefalsepositive",
+      "community": 8,
+      "norm_label": "handlefalsepositive()"
+    },
+    {
+      "label": "openHistory()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L1214",
+      "id": "popup_popup_openhistory",
+      "community": 3,
+      "norm_label": "openhistory()"
+    },
+    {
+      "label": "closeHistory()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L1221",
+      "id": "popup_popup_closehistory",
+      "community": 0,
+      "norm_label": "closehistory()"
+    },
+    {
+      "label": "renderHistory()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L1226",
+      "id": "popup_popup_renderhistory",
+      "community": 3,
+      "norm_label": "renderhistory()"
+    },
+    {
+      "label": "handleClearHistory()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L1272",
+      "id": "popup_popup_handleclearhistory",
+      "community": 3,
+      "norm_label": "handleclearhistory()"
+    },
+    {
+      "label": "showToast()",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": "L1282",
+      "id": "popup_popup_showtoast",
+      "community": 8,
+      "norm_label": "showtoast()"
+    },
+    {
+      "label": "sampleEmails.js",
+      "file_type": "code",
+      "source_file": "samples/sampleEmails.js",
+      "source_location": "L1",
+      "id": "samples_sampleemails",
+      "community": 0,
+      "norm_label": "sampleemails.js"
+    },
+    {
+      "label": "SAMPLE_EMAILS",
+      "file_type": "code",
+      "source_file": "samples/sampleEmails.js",
+      "source_location": "L6",
+      "id": "samples_sampleemails_sample_emails",
+      "community": 0,
+      "norm_label": "sample_emails"
+    },
+    {
+      "label": "getSampleById()",
+      "file_type": "code",
+      "source_file": "samples/sampleEmails.js",
+      "source_location": "L213",
+      "id": "samples_sampleemails_getsamplebyid",
+      "community": 0,
+      "norm_label": "getsamplebyid()"
+    },
+    {
+      "label": "settings.js",
+      "file_type": "code",
+      "source_file": "settings/settings.js",
+      "source_location": "L1",
+      "id": "settings_settings",
+      "community": 3,
+      "norm_label": "settings.js"
+    },
+    {
+      "label": "loadSettingsIntoUI()",
+      "file_type": "code",
+      "source_file": "settings/settings.js",
+      "source_location": "L16",
+      "id": "settings_settings_loadsettingsintoui",
+      "community": 3,
+      "norm_label": "loadsettingsintoui()"
+    },
+    {
+      "label": "loadStatsIntoUI()",
+      "file_type": "code",
+      "source_file": "settings/settings.js",
+      "source_location": "L59",
+      "id": "settings_settings_loadstatsintoui",
+      "community": 3,
+      "norm_label": "loadstatsintoui()"
+    },
+    {
+      "label": "switchProvider()",
+      "file_type": "code",
+      "source_file": "settings/settings.js",
+      "source_location": "L76",
+      "id": "settings_settings_switchprovider",
+      "community": 3,
+      "norm_label": "switchprovider()"
+    },
+    {
+      "label": "collectSettings()",
+      "file_type": "code",
+      "source_file": "settings/settings.js",
+      "source_location": "L89",
+      "id": "settings_settings_collectsettings",
+      "community": 3,
+      "norm_label": "collectsettings()"
+    },
+    {
+      "label": "attachEventListeners()",
+      "file_type": "code",
+      "source_file": "settings/settings.js",
+      "source_location": "L114",
+      "id": "settings_settings_attacheventlisteners",
+      "community": 3,
+      "norm_label": "attacheventlisteners()"
+    },
+    {
+      "label": "showOllamaModels()",
+      "file_type": "code",
+      "source_file": "settings/settings.js",
+      "source_location": "L210",
+      "id": "settings_settings_showollamamodels",
+      "community": 3,
+      "norm_label": "showollamamodels()"
+    },
+    {
+      "label": "showToast()",
+      "file_type": "code",
+      "source_file": "settings/settings.js",
+      "source_location": "L240",
+      "id": "settings_settings_showtoast",
+      "community": 3,
+      "norm_label": "showtoast()"
+    },
+    {
+      "label": "tailwind.config.js",
+      "file_type": "code",
+      "source_file": "tailwind.config.js",
+      "source_location": "L1",
+      "id": "tailwind_config",
+      "community": 18,
+      "norm_label": "tailwind.config.js"
+    },
+    {
+      "label": "headerParser.js",
+      "file_type": "code",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L1",
+      "id": "utils_headerparser",
+      "community": 5,
+      "norm_label": "headerparser.js"
+    },
+    {
+      "label": "extractHeader()",
+      "file_type": "code",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L8",
+      "id": "utils_headerparser_extractheader",
+      "community": 5,
+      "norm_label": "extractheader()"
+    },
+    {
+      "label": "parseEmailAddress()",
+      "file_type": "code",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L20",
+      "id": "utils_headerparser_parseemailaddress",
+      "community": 5,
+      "norm_label": "parseemailaddress()"
+    },
+    {
+      "label": "extractDomain()",
+      "file_type": "code",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L41",
+      "id": "utils_headerparser_extractdomain",
+      "community": 5,
+      "norm_label": "extractdomain()"
+    },
+    {
+      "label": "extractRootDomain()",
+      "file_type": "code",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L46",
+      "id": "utils_headerparser_extractrootdomain",
+      "community": 5,
+      "norm_label": "extractrootdomain()"
+    },
+    {
+      "label": "parseAuthResults()",
+      "file_type": "code",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L54",
+      "id": "utils_headerparser_parseauthresults",
+      "community": 5,
+      "norm_label": "parseauthresults()"
+    },
+    {
+      "label": "extractFirstHopIP()",
+      "file_type": "code",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L82",
+      "id": "utils_headerparser_extractfirsthopip",
+      "community": 5,
+      "norm_label": "extractfirsthopip()"
+    },
+    {
+      "label": "parseHeaders()",
+      "file_type": "code",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L103",
+      "id": "utils_headerparser_parseheaders",
+      "community": 5,
+      "norm_label": "parseheaders()"
+    },
+    {
+      "label": "createEmptyHeaders()",
+      "file_type": "code",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L208",
+      "id": "utils_headerparser_createemptyheaders",
+      "community": 5,
+      "norm_label": "createemptyheaders()"
+    },
+    {
+      "label": "reportExporter.js",
+      "file_type": "code",
+      "source_file": "utils/reportExporter.js",
+      "source_location": "L1",
+      "id": "utils_reportexporter",
+      "community": 8,
+      "norm_label": "reportexporter.js"
+    },
+    {
+      "label": "padRight()",
+      "file_type": "code",
+      "source_file": "utils/reportExporter.js",
+      "source_location": "L8",
+      "id": "utils_reportexporter_padright",
+      "community": 8,
+      "norm_label": "padright()"
+    },
+    {
+      "label": "asciiBar()",
+      "file_type": "code",
+      "source_file": "utils/reportExporter.js",
+      "source_location": "L12",
+      "id": "utils_reportexporter_asciibar",
+      "community": 8,
+      "norm_label": "asciibar()"
+    },
+    {
+      "label": "formatScore()",
+      "file_type": "code",
+      "source_file": "utils/reportExporter.js",
+      "source_location": "L17",
+      "id": "utils_reportexporter_formatscore",
+      "community": 8,
+      "norm_label": "formatscore()"
+    },
+    {
+      "label": "copyToClipboard()",
+      "file_type": "code",
+      "source_file": "utils/reportExporter.js",
+      "source_location": "L24",
+      "id": "utils_reportexporter_copytoclipboard",
+      "community": 8,
+      "norm_label": "copytoclipboard()"
+    },
+    {
+      "label": "exportPDF()",
+      "file_type": "code",
+      "source_file": "utils/reportExporter.js",
+      "source_location": "L132",
+      "id": "utils_reportexporter_exportpdf",
+      "community": 8,
+      "norm_label": "exportpdf()"
+    },
+    {
+      "label": "storage.js",
+      "file_type": "code",
+      "source_file": "utils/storage.js",
+      "source_location": "L1",
+      "id": "utils_storage",
+      "community": 3,
+      "norm_label": "storage.js"
+    },
+    {
+      "label": "DEFAULT_SETTINGS",
+      "file_type": "code",
+      "source_file": "utils/storage.js",
+      "source_location": "L6",
+      "id": "utils_storage_default_settings",
+      "community": 3,
+      "norm_label": "default_settings"
+    },
+    {
+      "label": "getSettings()",
+      "file_type": "code",
+      "source_file": "utils/storage.js",
+      "source_location": "L26",
+      "id": "utils_storage_getsettings",
+      "community": 3,
+      "norm_label": "getsettings()"
+    },
+    {
+      "label": "saveSettings()",
+      "file_type": "code",
+      "source_file": "utils/storage.js",
+      "source_location": "L36",
+      "id": "utils_storage_savesettings",
+      "community": 3,
+      "norm_label": "savesettings()"
+    },
+    {
+      "label": "saveAnalysis()",
+      "file_type": "code",
+      "source_file": "utils/storage.js",
+      "source_location": "L49",
+      "id": "utils_storage_saveanalysis",
+      "community": 3,
+      "norm_label": "saveanalysis()"
+    },
+    {
+      "label": "getHistory()",
+      "file_type": "code",
+      "source_file": "utils/storage.js",
+      "source_location": "L94",
+      "id": "utils_storage_gethistory",
+      "community": 3,
+      "norm_label": "gethistory()"
+    },
+    {
+      "label": "clearHistory()",
+      "file_type": "code",
+      "source_file": "utils/storage.js",
+      "source_location": "L104",
+      "id": "utils_storage_clearhistory",
+      "community": 3,
+      "norm_label": "clearhistory()"
+    },
+    {
+      "label": "getStats()",
+      "file_type": "code",
+      "source_file": "utils/storage.js",
+      "source_location": "L116",
+      "id": "utils_storage_getstats",
+      "community": 3,
+      "norm_label": "getstats()"
+    },
+    {
+      "label": "exportHistory()",
+      "file_type": "code",
+      "source_file": "utils/storage.js",
+      "source_location": "L127",
+      "id": "utils_storage_exporthistory",
+      "community": 3,
+      "norm_label": "exporthistory()"
+    },
+    {
+      "label": "saveFeedback()",
+      "file_type": "code",
+      "source_file": "utils/storage.js",
+      "source_location": "L153",
+      "id": "utils_storage_savefeedback",
+      "community": 8,
+      "norm_label": "savefeedback()"
+    },
+    {
+      "label": "urlScanner.js",
+      "file_type": "code",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L1",
+      "id": "utils_urlscanner",
+      "community": 1,
+      "norm_label": "urlscanner.js"
+    },
+    {
+      "label": "extractRootDomain()",
+      "file_type": "code",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L20",
+      "id": "utils_urlscanner_extractrootdomain",
+      "community": 1,
+      "norm_label": "extractrootdomain()"
+    },
+    {
+      "label": "getHostname()",
+      "file_type": "code",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L28",
+      "id": "utils_urlscanner_gethostname",
+      "community": 1,
+      "norm_label": "gethostname()"
+    },
+    {
+      "label": "getTLD()",
+      "file_type": "code",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L37",
+      "id": "utils_urlscanner_gettld",
+      "community": 1,
+      "norm_label": "gettld()"
+    },
+    {
+      "label": "analyzeURL()",
+      "file_type": "code",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L45",
+      "id": "utils_urlscanner_analyzeurl",
+      "community": 1,
+      "norm_label": "analyzeurl()"
+    },
+    {
+      "label": "extractAndAnalyzeURLs()",
+      "file_type": "code",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L143",
+      "id": "utils_urlscanner_extractandanalyzeurls",
+      "community": 5,
+      "norm_label": "extractandanalyzeurls()"
+    },
+    {
+      "label": "background.js",
+      "file_type": "code",
+      "source_file": "background.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "background_js",
+      "community": 9,
+      "norm_label": "background.js"
+    },
+    {
+      "label": "Graphify Configuration",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "claude_graphify",
+      "community": 19,
+      "norm_label": "graphify configuration"
+    },
+    {
+      "label": "Revelio \u2014 Email Threat Analyzer",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "readme_revelio",
+      "community": 9,
+      "norm_label": "revelio \u2014 email threat analyzer"
+    },
+    {
+      "label": "Ollama Setup",
+      "file_type": "concept",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "readme_ollama",
+      "community": 9,
+      "norm_label": "ollama setup"
+    },
+    {
+      "label": "Rule Engine",
+      "file_type": "code",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "readme_rule_engine",
+      "community": 9,
+      "norm_label": "rule engine"
+    },
+    {
+      "label": "LLM Analysis",
+      "file_type": "code",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "readme_llm_analysis",
+      "community": 9,
+      "norm_label": "llm analysis"
+    },
+    {
+      "label": "MITRE ATT&CK Reference",
+      "file_type": "concept",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "readme_mitre_attack",
+      "community": 9,
+      "norm_label": "mitre att&ck reference"
+    },
+    {
+      "label": "extractCurrentEmail",
+      "file_type": "code",
+      "source_file": "content.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "content_extractCurrentEmail",
+      "community": 4,
+      "norm_label": "extractcurrentemail"
+    },
+    {
+      "label": "extractGmail",
+      "file_type": "code",
+      "source_file": "content.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "content_extractGmail",
+      "community": 4,
+      "norm_label": "extractgmail"
+    },
+    {
+      "label": "extractOutlook",
+      "file_type": "code",
+      "source_file": "content.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "content_extractOutlook",
+      "community": 4,
+      "norm_label": "extractoutlook"
+    },
+    {
+      "label": "analyzeEmail",
+      "file_type": "code",
+      "source_file": "engine/analyzer.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "analyzer_analyzeEmail",
+      "community": 4,
+      "norm_label": "analyzeemail"
+    },
+    {
+      "label": "parseEmailData",
+      "file_type": "code",
+      "source_file": "engine/analyzer.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "analyzer_parseEmailData",
+      "community": 4,
+      "norm_label": "parseemaildata"
+    },
+    {
+      "label": "computeFinalScore",
+      "file_type": "code",
+      "source_file": "engine/analyzer.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "analyzer_computeFinalScore",
+      "community": 4,
+      "norm_label": "computefinalscore"
+    },
+    {
+      "label": "parseHeaders",
+      "file_type": "code",
+      "source_file": "utils/headerParser.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "headerParser_parseHeaders",
+      "community": 4,
+      "norm_label": "parseheaders"
+    },
+    {
+      "label": "extractAndAnalyzeURLs",
+      "file_type": "code",
+      "source_file": "utils/urlScanner.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "urlScanner_extractAndAnalyzeURLs",
+      "community": 4,
+      "norm_label": "extractandanalyzeurls"
+    },
+    {
+      "label": "analyzeURL",
+      "file_type": "code",
+      "source_file": "utils/urlScanner.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "urlScanner_analyzeURL",
+      "community": 4,
+      "norm_label": "analyzeurl"
+    },
+    {
+      "label": "saveAnalysis",
+      "file_type": "code",
+      "source_file": "utils/storage.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "storage_saveAnalysis",
+      "community": 4,
+      "norm_label": "saveanalysis"
+    },
+    {
+      "label": "getSettings",
+      "file_type": "code",
+      "source_file": "utils/storage.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "storage_getSettings",
+      "community": 16,
+      "norm_label": "getsettings"
+    },
+    {
+      "label": "saveSettings",
+      "file_type": "code",
+      "source_file": "utils/storage.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "storage_saveSettings",
+      "community": 4,
+      "norm_label": "savesettings"
+    },
+    {
+      "label": "copyToClipboard",
+      "file_type": "code",
+      "source_file": "utils/reportExporter.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "reportExporter_copyToClipboard",
+      "community": 20,
+      "norm_label": "copytoclipboard"
+    },
+    {
+      "label": "exportPDF",
+      "file_type": "code",
+      "source_file": "utils/reportExporter.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "reportExporter_exportPDF",
+      "community": 21,
+      "norm_label": "exportpdf"
+    },
+    {
+      "label": "handleAnalyze",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "popup_handleAnalyze",
+      "community": 4,
+      "norm_label": "handleanalyze"
+    },
+    {
+      "label": "autoExtractAndAnalyze",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "popup_autoExtractAndAnalyze",
+      "community": 4,
+      "norm_label": "autoextractandanalyze"
+    },
+    {
+      "label": "cacheResult",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "popup_cacheResult",
+      "community": 4,
+      "norm_label": "cacheresult"
+    },
+    {
+      "label": "getCachedResult",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "popup_getCachedResult",
+      "community": 4,
+      "norm_label": "getcachedresult"
+    },
+    {
+      "label": "hydrateIconFallbacks",
+      "file_type": "code",
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "popup_hydrateIconFallbacks",
+      "community": 15,
+      "norm_label": "hydrateiconfallbacks"
+    },
+    {
+      "label": "loadSettingsIntoUI",
+      "file_type": "code",
+      "source_file": "settings/settings.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "settings_loadSettingsIntoUI",
+      "community": 16,
+      "norm_label": "loadsettingsintoui"
+    },
+    {
+      "label": "SAMPLE_EMAILS",
+      "file_type": "code",
+      "source_file": "samples/sampleEmails.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "sampleEmails_SAMPLE_EMAILS",
+      "community": 22,
+      "norm_label": "sample_emails"
+    },
+    {
+      "label": "Revelio Manifest",
+      "file_type": "code",
+      "source_file": "manifest.json",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "manifest_revelio",
+      "community": 23,
+      "norm_label": "revelio manifest"
+    },
+    {
+      "label": "Tailwind Theme Config",
+      "file_type": "code",
+      "source_file": "tailwind.config.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "tailwind_themeConfig",
+      "community": 24,
+      "norm_label": "tailwind theme config"
+    },
+    {
+      "label": "Zero-Friction Analysis Flow",
+      "file_type": "rationale",
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_zero_friction_flow",
+      "community": 4,
+      "norm_label": "zero-friction analysis flow"
+    },
+    {
+      "label": "DJB2 Email Hashing for Caching",
+      "file_type": "rationale",
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_djb2_hash",
+      "community": 4,
+      "norm_label": "djb2 email hashing for caching"
+    },
+    {
+      "label": "Icon Hydration Fallback",
+      "file_type": "rationale",
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_icon_fallback",
+      "community": 15,
+      "norm_label": "icon hydration fallback"
+    },
+    {
+      "label": "DOM Heuristic Email Extraction",
+      "file_type": "rationale",
+      "source_file": "content.js",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "rationale_heuristic_extraction",
+      "community": 4,
+      "norm_label": "dom heuristic email extraction"
+    },
+    {
+      "label": "PhishGuard AI App Icon 128x128",
+      "file_type": "image",
+      "source_file": "icons/icon128.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "icon128_png",
+      "community": 11,
+      "norm_label": "phishguard ai app icon 128x128"
+    },
+    {
+      "label": "Shield Motif",
+      "file_type": "image",
+      "source_file": "icons/icon128.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "icon128_shield",
+      "community": 11,
+      "norm_label": "shield motif"
+    },
+    {
+      "label": "Padlock Motif",
+      "file_type": "image",
+      "source_file": "icons/icon128.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "icon128_lock",
+      "community": 11,
+      "norm_label": "padlock motif"
+    },
+    {
+      "label": "Cybersecurity Protection Concept",
+      "file_type": "rationale",
+      "source_file": "icons/icon128.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_cybersecurity_protection",
+      "community": 11,
+      "norm_label": "cybersecurity protection concept"
+    },
+    {
+      "label": "PhishGuard AI 16x16 Icon",
+      "file_type": "image",
+      "source_file": "icons/icon16.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "icon16_png",
+      "community": 13,
+      "norm_label": "phishguard ai 16x16 icon"
+    },
+    {
+      "label": "Shield Icon (Protection)",
+      "file_type": "image",
+      "source_file": "icons/icon16.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_shield_icon",
+      "community": 13,
+      "norm_label": "shield icon (protection)"
+    },
+    {
+      "label": "AI/Modern Tech Gradient (Blue/Purple)",
+      "file_type": "image",
+      "source_file": "icons/icon16.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "concept_ai_gradient",
+      "community": 13,
+      "norm_label": "ai/modern tech gradient (blue/purple)"
+    },
+    {
+      "label": "Extension Icon (48x48)",
+      "file_type": "image",
+      "source_file": "icons/icon48.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "icon48_image",
+      "community": 14,
+      "norm_label": "extension icon (48x48)"
+    },
+    {
+      "label": "Padlock on Shield Concept",
+      "file_type": "image",
+      "source_file": "icons/icon48.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "padlock_shield_concept",
+      "community": 14,
+      "norm_label": "padlock on shield concept"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/settings.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "claude_settings",
+      "target": "claude_settings_hooks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/settings.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "claude_settings_hooks",
+      "target": "claude_settings_hooks_pretooluse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L192",
+      "weight": 1.0,
+      "source": "background",
+      "target": "background_buildanalysisprompt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L327",
+      "weight": 1.0,
+      "source": "background",
+      "target": "background_callgemini",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L355",
+      "weight": 1.0,
+      "source": "background",
+      "target": "background_callgrok",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L268",
+      "weight": 1.0,
+      "source": "background",
+      "target": "background_callollama",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L297",
+      "weight": 1.0,
+      "source": "background",
+      "target": "background_callopenai",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L143",
+      "weight": 1.0,
+      "source": "background",
+      "target": "background_checkollama",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L486",
+      "weight": 1.0,
+      "source": "background",
+      "target": "background_clamp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L155",
+      "weight": 1.0,
+      "source": "background",
+      "target": "background_getollamamodels",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L164",
+      "weight": 1.0,
+      "source": "background",
+      "target": "background_handleanalyze",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L384",
+      "weight": 1.0,
+      "source": "background",
+      "target": "background_parseairesponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L64",
+      "weight": 1.0,
+      "source": "background",
+      "target": "background_updatebadge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "background",
+      "target": "utils_storage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "background",
+      "target": "utils_storage_getsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "background",
+      "target": "utils_storage_savesettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L166",
+      "weight": 1.0,
+      "source": "background_handleanalyze",
+      "target": "background_buildanalysisprompt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L178",
+      "weight": 1.0,
+      "source": "background_handleanalyze",
+      "target": "background_callgemini",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L181",
+      "weight": 1.0,
+      "source": "background_handleanalyze",
+      "target": "background_callgrok",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "background_handleanalyze",
+      "target": "background_callollama",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L175",
+      "weight": 1.0,
+      "source": "background_handleanalyze",
+      "target": "background_callopenai",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L294",
+      "weight": 1.0,
+      "source": "background_callollama",
+      "target": "background_parseairesponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L324",
+      "weight": 1.0,
+      "source": "background_callopenai",
+      "target": "background_parseairesponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L352",
+      "weight": 1.0,
+      "source": "background_callgemini",
+      "target": "background_parseairesponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L379",
+      "weight": 1.0,
+      "source": "background_callgrok",
+      "target": "background_parseairesponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "background.js",
+      "source_location": "L462",
+      "weight": 1.0,
+      "source": "background_parseairesponse",
+      "target": "background_clamp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "content.js",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "content",
+      "target": "content_extractcurrentemail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "content.js",
+      "source_location": "L219",
+      "weight": 1.0,
+      "source": "content",
+      "target": "content_extractfallback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "content.js",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "content",
+      "target": "content_extractgmail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "content.js",
+      "source_location": "L141",
+      "weight": 1.0,
+      "source": "content",
+      "target": "content_extractoutlook",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "content.js",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "content_extractcurrentemail",
+      "target": "content_extractfallback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "content.js",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "content_extractcurrentemail",
+      "target": "content_extractgmail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "content.js",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "content_extractcurrentemail",
+      "target": "content_extractoutlook",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L70",
+      "weight": 1.0,
+      "source": "engine_analyzer",
+      "target": "engine_analyzer_analyzeemail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L55",
+      "weight": 1.0,
+      "source": "engine_analyzer",
+      "target": "engine_analyzer_computefinalscore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L48",
+      "weight": 1.0,
+      "source": "engine_analyzer",
+      "target": "engine_analyzer_extractsubjectfrombody",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "engine_analyzer",
+      "target": "engine_analyzer_parseemaildata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "engine_analyzer",
+      "target": "engine_analyzer_scoretoverdict",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "engine_analyzer",
+      "target": "engine_ruleengine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "engine_analyzer",
+      "target": "engine_ruleengine_runruleengine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "engine_analyzer",
+      "target": "utils_headerparser",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "engine_analyzer",
+      "target": "utils_headerparser_parseheaders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "engine_analyzer",
+      "target": "utils_urlscanner",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "engine_analyzer",
+      "target": "utils_urlscanner_extractandanalyzeurls",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "engine_analyzer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L71",
+      "weight": 1.0,
+      "source": "engine_analyzer_analyzeemail",
+      "target": "engine_analyzer_parseemaildata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/analyzer.js",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "engine_analyzer_parseemaildata",
+      "target": "engine_analyzer_extractsubjectfrombody",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine/analyzer.js",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "engine_analyzer_parseemaildata",
+      "target": "utils_headerparser_parseheaders"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine/analyzer.js",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "engine_analyzer_parseemaildata",
+      "target": "utils_urlscanner_extractandanalyzeurls"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "engine_analyzer_computefinalscore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L624",
+      "weight": 1.0,
+      "source": "popup_popup_handleanalyze",
+      "target": "engine_analyzer_computefinalscore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "engine_analyzer_scoretoverdict",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L861",
+      "weight": 1.0,
+      "source": "popup_popup_rendergauge",
+      "target": "engine_analyzer_scoretoverdict",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine/analyzer.js",
+      "source_location": "L72",
+      "weight": 1.0,
+      "source": "engine_analyzer_analyzeemail",
+      "target": "engine_ruleengine_runruleengine"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "engine_analyzer_analyzeemail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L599",
+      "weight": 1.0,
+      "source": "popup_popup_handleanalyze",
+      "target": "engine_analyzer_analyzeemail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/prompts.js",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "engine_prompts",
+      "target": "engine_prompts_buildanalysisprompt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/prompts.js",
+      "source_location": "L98",
+      "weight": 1.0,
+      "source": "engine_prompts",
+      "target": "engine_prompts_generateofflinefallback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "engine_prompts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "readme_llm_analysis",
+      "target": "engine_prompts"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "engine_prompts_generateofflinefallback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L621",
+      "weight": 1.0,
+      "source": "popup_popup_handleanalyze",
+      "target": "engine_prompts_generateofflinefallback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_brand_domain_map",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L630",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_calculaterulescore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L389",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_checkdangerousattachment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L295",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_checkdisplaynamemismatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L481",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_checkfreeemailimpersonation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L265",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_checkgenericgreeting",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L534",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_checkhtmlobfuscation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L591",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_checkinvoicefinancial",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L436",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_checklookalikeurls",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L242",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_checkpersonaldatarequest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L201",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_checkreplytomismatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L164",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_checksenderbrandspoof",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L355",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_checksuspicioustld",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L133",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_checkurgencykeywords",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L384",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_dangerous_extensions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L112",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_extractdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L118",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_extractrootdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L79",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_financial_keywords",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L88",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_free_email_providers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L71",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_generic_greetings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L125",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_gettld",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_known_brand_domains",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L96",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_levenshtein",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_personal_data_keywords",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L657",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_runruleengine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_suspicious_tlds",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_urgency_keywords",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "engine_ruleengine",
+      "target": "engine_ruleengine_url_shorteners",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "readme_rule_engine",
+      "target": "engine_ruleengine"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "utils_urlscanner",
+      "target": "engine_ruleengine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "utils_urlscanner",
+      "target": "engine_ruleengine_known_brand_domains",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "utils_urlscanner",
+      "target": "engine_ruleengine_suspicious_tlds",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "utils_urlscanner",
+      "target": "engine_ruleengine_url_shorteners",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L450",
+      "weight": 1.0,
+      "source": "engine_ruleengine_checklookalikeurls",
+      "target": "engine_ruleengine_levenshtein",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "utils_urlscanner",
+      "target": "engine_ruleengine_levenshtein",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L70",
+      "weight": 1.0,
+      "source": "utils_urlscanner_analyzeurl",
+      "target": "engine_ruleengine_levenshtein",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L312",
+      "weight": 1.0,
+      "source": "engine_ruleengine_checkdisplaynamemismatch",
+      "target": "engine_ruleengine_extractdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L484",
+      "weight": 1.0,
+      "source": "engine_ruleengine_checkfreeemailimpersonation",
+      "target": "engine_ruleengine_extractdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L214",
+      "weight": 1.0,
+      "source": "engine_ruleengine_checkreplytomismatch",
+      "target": "engine_ruleengine_extractdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L167",
+      "weight": 1.0,
+      "source": "engine_ruleengine_checksenderbrandspoof",
+      "target": "engine_ruleengine_extractdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L356",
+      "weight": 1.0,
+      "source": "engine_ruleengine_checksuspicioustld",
+      "target": "engine_ruleengine_extractdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L312",
+      "weight": 1.0,
+      "source": "engine_ruleengine_checkdisplaynamemismatch",
+      "target": "engine_ruleengine_extractrootdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L554",
+      "weight": 1.0,
+      "source": "engine_ruleengine_checkhtmlobfuscation",
+      "target": "engine_ruleengine_extractrootdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L444",
+      "weight": 1.0,
+      "source": "engine_ruleengine_checklookalikeurls",
+      "target": "engine_ruleengine_extractrootdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L214",
+      "weight": 1.0,
+      "source": "engine_ruleengine_checkreplytomismatch",
+      "target": "engine_ruleengine_extractrootdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L357",
+      "weight": 1.0,
+      "source": "engine_ruleengine_checksuspicioustld",
+      "target": "engine_ruleengine_gettld",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L659",
+      "weight": 1.0,
+      "source": "engine_ruleengine_runruleengine",
+      "target": "engine_ruleengine_checkurgencykeywords",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L660",
+      "weight": 1.0,
+      "source": "engine_ruleengine_runruleengine",
+      "target": "engine_ruleengine_checksenderbrandspoof",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L661",
+      "weight": 1.0,
+      "source": "engine_ruleengine_runruleengine",
+      "target": "engine_ruleengine_checkreplytomismatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L662",
+      "weight": 1.0,
+      "source": "engine_ruleengine_runruleengine",
+      "target": "engine_ruleengine_checkpersonaldatarequest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L663",
+      "weight": 1.0,
+      "source": "engine_ruleengine_runruleengine",
+      "target": "engine_ruleengine_checkgenericgreeting",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L664",
+      "weight": 1.0,
+      "source": "engine_ruleengine_runruleengine",
+      "target": "engine_ruleengine_checkdisplaynamemismatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L665",
+      "weight": 1.0,
+      "source": "engine_ruleengine_runruleengine",
+      "target": "engine_ruleengine_checksuspicioustld",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L666",
+      "weight": 1.0,
+      "source": "engine_ruleengine_runruleengine",
+      "target": "engine_ruleengine_checkdangerousattachment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L667",
+      "weight": 1.0,
+      "source": "engine_ruleengine_runruleengine",
+      "target": "engine_ruleengine_checklookalikeurls",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L668",
+      "weight": 1.0,
+      "source": "engine_ruleengine_runruleengine",
+      "target": "engine_ruleengine_checkfreeemailimpersonation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L669",
+      "weight": 1.0,
+      "source": "engine_ruleengine_runruleengine",
+      "target": "engine_ruleengine_checkhtmlobfuscation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L670",
+      "weight": 1.0,
+      "source": "engine_ruleengine_runruleengine",
+      "target": "engine_ruleengine_checkinvoicefinancial",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "engine/ruleEngine.js",
+      "source_location": "L673",
+      "weight": 1.0,
+      "source": "engine_ruleengine_runruleengine",
+      "target": "engine_ruleengine_calculaterulescore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "manifest",
+      "target": "manifest_action",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "manifest",
+      "target": "manifest_author",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "manifest",
+      "target": "manifest_background",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L48",
+      "weight": 1.0,
+      "source": "manifest",
+      "target": "manifest_content_scripts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "manifest",
+      "target": "manifest_content_security_policy",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "manifest",
+      "target": "manifest_description",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "manifest",
+      "target": "manifest_host_permissions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L61",
+      "weight": 1.0,
+      "source": "manifest",
+      "target": "manifest_icons",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "manifest",
+      "target": "manifest_manifest_version",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "manifest",
+      "target": "manifest_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L67",
+      "weight": 1.0,
+      "source": "manifest",
+      "target": "manifest_options_page",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "manifest",
+      "target": "manifest_permissions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "manifest",
+      "target": "manifest_version",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L69",
+      "weight": 1.0,
+      "source": "manifest",
+      "target": "manifest_web_accessible_resources",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "manifest_content_security_policy",
+      "target": "manifest_content_security_policy_extension_pages",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "manifest_action",
+      "target": "manifest_action_default_icon",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "manifest_action",
+      "target": "manifest_action_default_popup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "manifest_action",
+      "target": "manifest_action_default_title",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L39",
+      "weight": 1.0,
+      "source": "manifest_action_default_icon",
+      "target": "manifest_default_icon_128",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "manifest_action_default_icon",
+      "target": "manifest_default_icon_16",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "manifest_action_default_icon",
+      "target": "manifest_default_icon_48",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "manifest_background",
+      "target": "manifest_background_service_worker",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "manifest_background",
+      "target": "manifest_background_type",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L64",
+      "weight": 1.0,
+      "source": "manifest_icons",
+      "target": "manifest_icons_128",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L62",
+      "weight": 1.0,
+      "source": "manifest_icons",
+      "target": "manifest_icons_16",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "manifest.json",
+      "source_location": "L63",
+      "weight": 1.0,
+      "source": "manifest_icons",
+      "target": "manifest_icons_48",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "package",
+      "target": "package_author",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "package",
+      "target": "package_description",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "package",
+      "target": "package_devdependencies",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "package",
+      "target": "package_keywords",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "package",
+      "target": "package_license",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "package",
+      "target": "package_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "package",
+      "target": "package_name",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "package",
+      "target": "package_scripts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "package",
+      "target": "package_version",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_build_css",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "package_scripts",
+      "target": "package_scripts_test",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "package_devdependencies",
+      "target": "package_devdependencies_tailwindcss",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "package_devdependencies",
+      "target": "package_devdependencies_tailwindcss_cli",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "popup/popup.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "background_js"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L112",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_applyiconfallback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L159",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_applytheme",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L478",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_attacheventlisteners",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L304",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_autoextractandanalyze",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_cacheresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L237",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_capitalize",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L813",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_categorycolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L283",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_checkforpendingtext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L192",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_checkollamastatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L52",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_clearlastcache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1221",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_closehistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L441",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_collectsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_currentsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_getcachedresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L582",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_handleanalyze",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1272",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_handleclearhistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1178",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_handlecopyreport",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1195",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_handleexportpdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1205",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_handlefalsepositive",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L567",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_handlefileupload",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_hashemail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L276",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_hidebanner",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L83",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_hydrateiconfallbacks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L142",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_iconobserver",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L656",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_loading_messages",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1214",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_openhistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L411",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_populatesettingsfromstorage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L941",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_renderfindingstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L835",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_rendergauge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1037",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_renderheaderstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1226",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_renderhistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L724",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_renderofflineview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1122",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_renderremediationtab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L820",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_renderresults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L890",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_rendersummarytab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L999",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_renderurlstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L806",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_scoretoclass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L220",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_setstatuspill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L242",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_showbanner",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1282",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_showtoast",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L700",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_showview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L406",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_sleep",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L667",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_startloadinganimation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L185",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_startollamacheck",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L690",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_stoploadinganimation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L461",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_switchprovidertab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L785",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_switchresulttab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L207",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "popup_popup_updateollamastatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "samples_sampleemails",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "samples_sampleemails_sample_emails",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "popup/popup.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "settings_settings"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "utils_reportexporter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "utils_reportexporter_copytoclipboard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "utils_reportexporter_exportpdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "utils_storage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "utils_storage_clearhistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "utils_storage_gethistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "utils_storage_getsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "utils_storage_saveanalysis",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "utils_storage_savefeedback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "popup_popup",
+      "target": "utils_storage_savesettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "popup_popup_cacheresult",
+      "target": "popup_popup_hashemail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L55",
+      "weight": 1.0,
+      "source": "popup_popup_clearlastcache",
+      "target": "popup_popup_hashemail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L40",
+      "weight": 1.0,
+      "source": "popup_popup_getcachedresult",
+      "target": "popup_popup_hashemail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L644",
+      "weight": 1.0,
+      "source": "popup_popup_handleanalyze",
+      "target": "popup_popup_cacheresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L375",
+      "weight": 1.0,
+      "source": "popup_popup_autoextractandanalyze",
+      "target": "popup_popup_getcachedresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L272",
+      "weight": 1.0,
+      "source": "popup_popup_showbanner",
+      "target": "popup_popup_applyiconfallback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L186",
+      "weight": 1.0,
+      "source": "popup_popup_startollamacheck",
+      "target": "popup_popup_checkollamastatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L196",
+      "weight": 1.0,
+      "source": "popup_popup_checkollamastatus",
+      "target": "popup_popup_setstatuspill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L201",
+      "weight": 1.0,
+      "source": "popup_popup_checkollamastatus",
+      "target": "popup_popup_updateollamastatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L474",
+      "weight": 1.0,
+      "source": "popup_popup_switchprovidertab",
+      "target": "popup_popup_checkollamastatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L473",
+      "weight": 1.0,
+      "source": "popup_popup_switchprovidertab",
+      "target": "popup_popup_updateollamastatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L213",
+      "weight": 1.0,
+      "source": "popup_popup_updateollamastatus",
+      "target": "popup_popup_capitalize",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L213",
+      "weight": 1.0,
+      "source": "popup_popup_updateollamastatus",
+      "target": "popup_popup_setstatuspill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L324",
+      "weight": 1.0,
+      "source": "popup_popup_autoextractandanalyze",
+      "target": "popup_popup_showbanner",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L290",
+      "weight": 1.0,
+      "source": "popup_popup_checkforpendingtext",
+      "target": "popup_popup_showbanner",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L586",
+      "weight": 1.0,
+      "source": "popup_popup_handleanalyze",
+      "target": "popup_popup_showbanner",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L382",
+      "weight": 1.0,
+      "source": "popup_popup_autoextractandanalyze",
+      "target": "popup_popup_hidebanner",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L641",
+      "weight": 1.0,
+      "source": "popup_popup_handleanalyze",
+      "target": "popup_popup_hidebanner",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L403",
+      "weight": 1.0,
+      "source": "popup_popup_autoextractandanalyze",
+      "target": "popup_popup_handleanalyze",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L380",
+      "weight": 1.0,
+      "source": "popup_popup_autoextractandanalyze",
+      "target": "popup_popup_renderofflineview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L384",
+      "weight": 1.0,
+      "source": "popup_popup_autoextractandanalyze",
+      "target": "popup_popup_renderresults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L381",
+      "weight": 1.0,
+      "source": "popup_popup_autoextractandanalyze",
+      "target": "popup_popup_showview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L342",
+      "weight": 1.0,
+      "source": "popup_popup_autoextractandanalyze",
+      "target": "popup_popup_sleep",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L437",
+      "weight": 1.0,
+      "source": "popup_popup_populatesettingsfromstorage",
+      "target": "popup_popup_switchprovidertab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L590",
+      "weight": 1.0,
+      "source": "popup_popup_handleanalyze",
+      "target": "popup_popup_collectsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L472",
+      "weight": 1.0,
+      "source": "popup_popup_switchprovidertab",
+      "target": "utils_storage_savesettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L574",
+      "weight": 1.0,
+      "source": "popup_popup_handlefileupload",
+      "target": "popup_popup_showtoast",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L639",
+      "weight": 1.0,
+      "source": "popup_popup_handleanalyze",
+      "target": "popup_popup_renderofflineview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L645",
+      "weight": 1.0,
+      "source": "popup_popup_handleanalyze",
+      "target": "popup_popup_renderresults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L585",
+      "weight": 1.0,
+      "source": "popup_popup_handleanalyze",
+      "target": "popup_popup_showtoast",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L594",
+      "weight": 1.0,
+      "source": "popup_popup_handleanalyze",
+      "target": "popup_popup_showview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L595",
+      "weight": 1.0,
+      "source": "popup_popup_handleanalyze",
+      "target": "popup_popup_startloadinganimation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L630",
+      "weight": 1.0,
+      "source": "popup_popup_handleanalyze",
+      "target": "utils_storage_saveanalysis",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L592",
+      "weight": 1.0,
+      "source": "popup_popup_handleanalyze",
+      "target": "utils_storage_savesettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L720",
+      "weight": 1.0,
+      "source": "popup_popup_showview",
+      "target": "popup_popup_stoploadinganimation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L831",
+      "weight": 1.0,
+      "source": "popup_popup_renderresults",
+      "target": "popup_popup_switchresulttab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L864",
+      "weight": 1.0,
+      "source": "popup_popup_rendergauge",
+      "target": "popup_popup_scoretoclass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L908",
+      "weight": 1.0,
+      "source": "popup_popup_rendersummarytab",
+      "target": "popup_popup_categorycolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L825",
+      "weight": 1.0,
+      "source": "popup_popup_renderresults",
+      "target": "popup_popup_renderfindingstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L823",
+      "weight": 1.0,
+      "source": "popup_popup_renderresults",
+      "target": "popup_popup_rendergauge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L827",
+      "weight": 1.0,
+      "source": "popup_popup_renderresults",
+      "target": "popup_popup_renderheaderstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L828",
+      "weight": 1.0,
+      "source": "popup_popup_renderresults",
+      "target": "popup_popup_renderremediationtab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L824",
+      "weight": 1.0,
+      "source": "popup_popup_renderresults",
+      "target": "popup_popup_rendersummarytab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L826",
+      "weight": 1.0,
+      "source": "popup_popup_renderresults",
+      "target": "popup_popup_renderurlstab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1179",
+      "weight": 1.0,
+      "source": "popup_popup_handlecopyreport",
+      "target": "popup_popup_showtoast",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1182",
+      "weight": 1.0,
+      "source": "popup_popup_handlecopyreport",
+      "target": "utils_reportexporter_copytoclipboard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1196",
+      "weight": 1.0,
+      "source": "popup_popup_handleexportpdf",
+      "target": "popup_popup_showtoast",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1198",
+      "weight": 1.0,
+      "source": "popup_popup_handleexportpdf",
+      "target": "utils_reportexporter_exportpdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1206",
+      "weight": 1.0,
+      "source": "popup_popup_handlefalsepositive",
+      "target": "popup_popup_showtoast",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1207",
+      "weight": 1.0,
+      "source": "popup_popup_handlefalsepositive",
+      "target": "utils_storage_savefeedback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1218",
+      "weight": 1.0,
+      "source": "popup_popup_openhistory",
+      "target": "popup_popup_renderhistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1275",
+      "weight": 1.0,
+      "source": "popup_popup_handleclearhistory",
+      "target": "popup_popup_renderhistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1230",
+      "weight": 1.0,
+      "source": "popup_popup_renderhistory",
+      "target": "utils_storage_gethistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1276",
+      "weight": 1.0,
+      "source": "popup_popup_handleclearhistory",
+      "target": "popup_popup_showtoast",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "popup/popup.js",
+      "source_location": "L1274",
+      "weight": 1.0,
+      "source": "popup_popup_handleclearhistory",
+      "target": "utils_storage_clearhistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "samples/sampleEmails.js",
+      "source_location": "L213",
+      "weight": 1.0,
+      "source": "samples_sampleemails",
+      "target": "samples_sampleemails_getsamplebyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "samples/sampleEmails.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "samples_sampleemails",
+      "target": "samples_sampleemails_sample_emails",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "settings/settings.html",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "settings_settings",
+      "target": "background_js"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L114",
+      "weight": 1.0,
+      "source": "settings_settings",
+      "target": "settings_settings_attacheventlisteners",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L89",
+      "weight": 1.0,
+      "source": "settings_settings",
+      "target": "settings_settings_collectsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "settings_settings",
+      "target": "settings_settings_loadsettingsintoui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "settings_settings",
+      "target": "settings_settings_loadstatsintoui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L210",
+      "weight": 1.0,
+      "source": "settings_settings",
+      "target": "settings_settings_showollamamodels",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L240",
+      "weight": 1.0,
+      "source": "settings_settings",
+      "target": "settings_settings_showtoast",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L76",
+      "weight": 1.0,
+      "source": "settings_settings",
+      "target": "settings_settings_switchprovider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "settings_settings",
+      "target": "utils_storage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "settings_settings",
+      "target": "utils_storage_clearhistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "settings_settings",
+      "target": "utils_storage_exporthistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "settings_settings",
+      "target": "utils_storage_getsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "settings_settings",
+      "target": "utils_storage_getstats",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "settings_settings",
+      "target": "utils_storage_savesettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "settings_settings_loadsettingsintoui",
+      "target": "settings_settings_switchprovider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L203",
+      "weight": 1.0,
+      "source": "settings_settings_attacheventlisteners",
+      "target": "utils_storage_clearhistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L189",
+      "weight": 1.0,
+      "source": "settings_settings_attacheventlisteners",
+      "target": "utils_storage_exporthistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "settings/settings.js",
+      "source_location": "L131",
+      "weight": 1.0,
+      "source": "settings_settings_attacheventlisteners",
+      "target": "utils_storage_savesettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L208",
+      "weight": 1.0,
+      "source": "utils_headerparser",
+      "target": "utils_headerparser_createemptyheaders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "utils_headerparser",
+      "target": "utils_headerparser_extractdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L82",
+      "weight": 1.0,
+      "source": "utils_headerparser",
+      "target": "utils_headerparser_extractfirsthopip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "utils_headerparser",
+      "target": "utils_headerparser_extractheader",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L46",
+      "weight": 1.0,
+      "source": "utils_headerparser",
+      "target": "utils_headerparser_extractrootdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "utils_headerparser",
+      "target": "utils_headerparser_parseauthresults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "utils_headerparser",
+      "target": "utils_headerparser_parseemailaddress",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L103",
+      "weight": 1.0,
+      "source": "utils_headerparser",
+      "target": "utils_headerparser_parseheaders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L116",
+      "weight": 1.0,
+      "source": "utils_headerparser_parseheaders",
+      "target": "utils_headerparser_extractheader",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L117",
+      "weight": 1.0,
+      "source": "utils_headerparser_parseheaders",
+      "target": "utils_headerparser_parseemailaddress",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L149",
+      "weight": 1.0,
+      "source": "utils_headerparser_parseheaders",
+      "target": "utils_headerparser_extractdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L149",
+      "weight": 1.0,
+      "source": "utils_headerparser_parseheaders",
+      "target": "utils_headerparser_extractrootdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L140",
+      "weight": 1.0,
+      "source": "utils_headerparser_parseheaders",
+      "target": "utils_headerparser_parseauthresults",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L165",
+      "weight": 1.0,
+      "source": "utils_headerparser_parseheaders",
+      "target": "utils_headerparser_extractfirsthopip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/headerParser.js",
+      "source_location": "L105",
+      "weight": 1.0,
+      "source": "utils_headerparser_parseheaders",
+      "target": "utils_headerparser_createemptyheaders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/reportExporter.js",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "utils_reportexporter",
+      "target": "utils_reportexporter_asciibar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/reportExporter.js",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "utils_reportexporter",
+      "target": "utils_reportexporter_copytoclipboard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/reportExporter.js",
+      "source_location": "L132",
+      "weight": 1.0,
+      "source": "utils_reportexporter",
+      "target": "utils_reportexporter_exportpdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/reportExporter.js",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "utils_reportexporter",
+      "target": "utils_reportexporter_formatscore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/reportExporter.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "utils_reportexporter",
+      "target": "utils_reportexporter_padright",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/reportExporter.js",
+      "source_location": "L65",
+      "weight": 1.0,
+      "source": "utils_reportexporter_copytoclipboard",
+      "target": "utils_reportexporter_padright",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/reportExporter.js",
+      "source_location": "L65",
+      "weight": 1.0,
+      "source": "utils_reportexporter_copytoclipboard",
+      "target": "utils_reportexporter_asciibar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/reportExporter.js",
+      "source_location": "L65",
+      "weight": 1.0,
+      "source": "utils_reportexporter_copytoclipboard",
+      "target": "utils_reportexporter_formatscore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/storage.js",
+      "source_location": "L104",
+      "weight": 1.0,
+      "source": "utils_storage",
+      "target": "utils_storage_clearhistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/storage.js",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "utils_storage",
+      "target": "utils_storage_default_settings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/storage.js",
+      "source_location": "L127",
+      "weight": 1.0,
+      "source": "utils_storage",
+      "target": "utils_storage_exporthistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/storage.js",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "utils_storage",
+      "target": "utils_storage_gethistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/storage.js",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "utils_storage",
+      "target": "utils_storage_getsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/storage.js",
+      "source_location": "L116",
+      "weight": 1.0,
+      "source": "utils_storage",
+      "target": "utils_storage_getstats",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/storage.js",
+      "source_location": "L49",
+      "weight": 1.0,
+      "source": "utils_storage",
+      "target": "utils_storage_saveanalysis",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/storage.js",
+      "source_location": "L153",
+      "weight": 1.0,
+      "source": "utils_storage",
+      "target": "utils_storage_savefeedback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/storage.js",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "utils_storage",
+      "target": "utils_storage_savesettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/storage.js",
+      "source_location": "L131",
+      "weight": 1.0,
+      "source": "utils_storage_exporthistory",
+      "target": "utils_storage_getsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/storage.js",
+      "source_location": "L51",
+      "weight": 1.0,
+      "source": "utils_storage_saveanalysis",
+      "target": "utils_storage_getsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/storage.js",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "utils_storage_savesettings",
+      "target": "utils_storage_getsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/storage.js",
+      "source_location": "L129",
+      "weight": 1.0,
+      "source": "utils_storage_exporthistory",
+      "target": "utils_storage_gethistory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/storage.js",
+      "source_location": "L130",
+      "weight": 1.0,
+      "source": "utils_storage_exporthistory",
+      "target": "utils_storage_getstats",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "utils_urlscanner",
+      "target": "utils_urlscanner_analyzeurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L143",
+      "weight": 1.0,
+      "source": "utils_urlscanner",
+      "target": "utils_urlscanner_extractandanalyzeurls",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "utils_urlscanner",
+      "target": "utils_urlscanner_extractrootdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "utils_urlscanner",
+      "target": "utils_urlscanner_gethostname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "utils_urlscanner",
+      "target": "utils_urlscanner_gettld",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L47",
+      "weight": 1.0,
+      "source": "utils_urlscanner_analyzeurl",
+      "target": "utils_urlscanner_extractrootdomain",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L46",
+      "weight": 1.0,
+      "source": "utils_urlscanner_analyzeurl",
+      "target": "utils_urlscanner_gethostname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L48",
+      "weight": 1.0,
+      "source": "utils_urlscanner_analyzeurl",
+      "target": "utils_urlscanner_gettld",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/urlScanner.js",
+      "source_location": "L181",
+      "weight": 1.0,
+      "source": "utils_urlscanner_extractandanalyzeurls",
+      "target": "utils_urlscanner_analyzeurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "readme_llm_analysis",
+      "target": "background_js"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "readme_revelio",
+      "target": "readme_llm_analysis"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "readme_revelio",
+      "target": "readme_mitre_attack"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "readme_revelio",
+      "target": "readme_ollama"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "readme_revelio",
+      "target": "readme_rule_engine"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "content.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "content_extractCurrentEmail",
+      "target": "content_extractGmail"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "content.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "content_extractCurrentEmail",
+      "target": "content_extractOutlook"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "content.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "content_extractCurrentEmail",
+      "target": "popup_autoExtractAndAnalyze"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "content.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "content_extractGmail",
+      "target": "rationale_heuristic_extraction"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "content.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "content_extractOutlook",
+      "target": "rationale_heuristic_extraction"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine/analyzer.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "analyzer_analyzeEmail",
+      "target": "analyzer_parseEmailData"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "popup_handleAnalyze",
+      "target": "analyzer_analyzeEmail"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine/analyzer.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "analyzer_parseEmailData",
+      "target": "headerParser_parseHeaders"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "engine/analyzer.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "analyzer_parseEmailData",
+      "target": "urlScanner_extractAndAnalyzeURLs"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "popup_handleAnalyze",
+      "target": "analyzer_computeFinalScore"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "utils/urlScanner.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "urlScanner_extractAndAnalyzeURLs",
+      "target": "urlScanner_analyzeURL"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "popup_handleAnalyze",
+      "target": "storage_saveAnalysis"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "utils/storage.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "storage_saveAnalysis",
+      "target": "popup_cacheResult"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "settings/settings.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "settings_loadSettingsIntoUI",
+      "target": "storage_getSettings"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "popup_handleAnalyze",
+      "target": "storage_saveSettings"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "popup_autoExtractAndAnalyze",
+      "target": "popup_handleAnalyze"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "popup_handleAnalyze",
+      "target": "popup_cacheResult"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "popup_autoExtractAndAnalyze",
+      "target": "popup_getCachedResult"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "popup_autoExtractAndAnalyze",
+      "target": "rationale_zero_friction_flow"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "popup_cacheResult",
+      "target": "rationale_djb2_hash"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "popup/popup.js",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "popup_hydrateIconFallbacks",
+      "target": "rationale_icon_fallback"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "icons/icon128.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "icon128_png",
+      "target": "concept_cybersecurity_protection"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "icons/icon128.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "icon128_png",
+      "target": "icon128_lock"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "icons/icon128.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "icon128_png",
+      "target": "icon128_shield"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "icons/icon16.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "icon16_png",
+      "target": "concept_ai_gradient"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "icons/icon16.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "icon16_png",
+      "target": "concept_shield_icon"
+    },
+    {
+      "relation": "depicts",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "icons/icon48.png",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "icon48_image",
+      "target": "padlock_shield_concept"
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "hyperedge_email_extraction",
+      "label": "Email Extraction Flow",
+      "nodes": [
+        "content_extractCurrentEmail",
+        "content_extractGmail",
+        "content_extractOutlook",
+        "rationale_heuristic_extraction"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "content.js"
+    },
+    {
+      "id": "hyperedge_core_analysis_pipeline",
+      "label": "Core Analysis Pipeline",
+      "nodes": [
+        "popup_handleAnalyze",
+        "analyzer_analyzeEmail",
+        "analyzer_parseEmailData",
+        "headerParser_parseHeaders",
+        "urlScanner_extractAndAnalyzeURLs"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "engine/analyzer.js"
+    },
+    {
+      "id": "hyperedge_state_management",
+      "label": "Local State Management",
+      "nodes": [
+        "storage_saveAnalysis",
+        "storage_getSettings",
+        "popup_cacheResult",
+        "storage_saveSettings"
+      ],
+      "relation": "participate_in",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "utils/storage.js"
+    },
+    {
+      "id": "icon128_visual_composition",
+      "label": "App Icon Visual Composition",
+      "nodes": [
+        "icon128_png",
+        "icon128_shield",
+        "icon128_lock"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "icons/icon128.png"
+    }
+  ],
+  "built_at_commit": "e0d6abdfbbf7346d4dac77bdd96612b0c298d782"
+}

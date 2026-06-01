@@ -1,0 +1,87 @@
+{
+  "D:\\PhishingDetection\\phishguard-ai\\.claude\\settings.json": {
+    "mtime": 1780311739.6050973,
+    "ast_hash": "5d6ecd96cf065b16e8bb9fbf5d7d8f0d",
+    "semantic_hash": "5d6ecd96cf065b16e8bb9fbf5d7d8f0d"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\background.js": {
+    "mtime": 1779404556.936643,
+    "ast_hash": "238711a49e431378c5af4ee1bf515228",
+    "semantic_hash": "238711a49e431378c5af4ee1bf515228"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\content.js": {
+    "mtime": 1779384748.6077921,
+    "ast_hash": "a6167fc444655e36f205679a50d619f9",
+    "semantic_hash": "a6167fc444655e36f205679a50d619f9"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\create-icons.ps1": {
+    "mtime": 1779383089.8227181,
+    "ast_hash": "c8f088d5ea8a765e35fbfc10e2a91bc6",
+    "semantic_hash": "c8f088d5ea8a765e35fbfc10e2a91bc6"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\engine\\analyzer.js": {
+    "mtime": 1779780788.5000563,
+    "ast_hash": "aa0c63dec9bc56c5a849341cdecbf597",
+    "semantic_hash": "aa0c63dec9bc56c5a849341cdecbf597"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\engine\\prompts.js": {
+    "mtime": 1779780788.5010529,
+    "ast_hash": "c096072a75fa2183ab4a8da5ec2bd647",
+    "semantic_hash": "c096072a75fa2183ab4a8da5ec2bd647"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\engine\\ruleEngine.js": {
+    "mtime": 1779382241.687977,
+    "ast_hash": "13115f9ca123c92ebcbd3f95c23a4b5d",
+    "semantic_hash": "13115f9ca123c92ebcbd3f95c23a4b5d"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\manifest.json": {
+    "mtime": 1779400717.241267,
+    "ast_hash": "a0542fb9c67ede12a2a4964f81bbc154",
+    "semantic_hash": "a0542fb9c67ede12a2a4964f81bbc154"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\package.json": {
+    "mtime": 1779400755.4107628,
+    "ast_hash": "93967f0612a065c9e4346f20f88c2eb3",
+    "semantic_hash": "93967f0612a065c9e4346f20f88c2eb3"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\popup\\popup.js": {
+    "mtime": 1780309258.2184784,
+    "ast_hash": "8854e64dbbfa3532c0979683c5b80a92",
+    "semantic_hash": "8854e64dbbfa3532c0979683c5b80a92"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\samples\\sampleEmails.js": {
+    "mtime": 1779382477.9312868,
+    "ast_hash": "380cede653b53818b4845d85582dc009",
+    "semantic_hash": "380cede653b53818b4845d85582dc009"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\settings\\settings.js": {
+    "mtime": 1779395426.2357748,
+    "ast_hash": "b8b72a1ba80f857c240da43757966cac",
+    "semantic_hash": "b8b72a1ba80f857c240da43757966cac"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\tailwind.config.js": {
+    "mtime": 1779392911.572833,
+    "ast_hash": "4565ae9ce266f510b39730723ffd9c09",
+    "semantic_hash": "4565ae9ce266f510b39730723ffd9c09"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\utils\\headerParser.js": {
+    "mtime": 1779382360.9085507,
+    "ast_hash": "8153894065a2eb90674d950bd22e4d3d",
+    "semantic_hash": "8153894065a2eb90674d950bd22e4d3d"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\utils\\reportExporter.js": {
+    "mtime": 1779780788.5035849,
+    "ast_hash": "91bf69878e8856a13979c617d601f3f5",
+    "semantic_hash": "91bf69878e8856a13979c617d601f3f5"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\utils\\storage.js": {
+    "mtime": 1779395323.45675,
+    "ast_hash": "6371df478d4f488096c76bd2c193fe53",
+    "semantic_hash": "6371df478d4f488096c76bd2c193fe53"
+  },
+  "D:\\PhishingDetection\\phishguard-ai\\utils\\urlScanner.js": {
+    "mtime": 1779382341.694228,
+    "ast_hash": "361f3d1f9b785f7b19a8a07e4caa92f3",
+    "semantic_hash": "361f3d1f9b785f7b19a8a07e4caa92f3"
+  }
+}
