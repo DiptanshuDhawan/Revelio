@@ -20,7 +20,7 @@ function hashEmail(text) {
     hash = ((hash << 5) + hash) ^ text.charCodeAt(i);
     hash = hash & 0xffffffff; // keep 32-bit
   }
-  return 'phishcache_' + Math.abs(hash).toString(36);
+  return 'phishcache_v2_' + Math.abs(hash).toString(36);
 }
 
 // Save analysis result to cache keyed by email hash
