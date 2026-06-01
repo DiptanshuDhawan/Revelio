@@ -136,7 +136,7 @@
   <section id="offline-view" class="view hidden flex flex-col flex-1 h-full min-h-0 overflow-y-auto custom-scrollbar bg-background">
 
     <!-- Hero Card -->
-    <div class="mx-4 mt-4 bg-surface-container-low/80 backdrop-blur-xl rounded-xl p-5 border border-tertiary-container/30 relative overflow-hidden glass-panel">
+    <div class="mx-4 mt-4 bg-surface-container-low/80 backdrop-blur-xl rounded-xl p-5 border border-tertiary-container/30 relative overflow-hidden glass-panel shrink-0">
       <!-- Ambient amber glow -->
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-20 bg-tertiary-container/10 rounded-full blur-3xl pointer-events-none"></div>
       <div class="flex flex-col items-center text-center relative z-10">
@@ -167,10 +167,10 @@
     </div>
 
     <!-- Separator -->
-    <div class="mx-4 my-3 separator-line"></div>
+    <div class="mx-4 my-3 separator-line shrink-0"></div>
 
     <!-- Basic Heuristics / Rule Score Card -->
-    <div class="mx-4 mb-3 glass-panel rounded-xl p-4 relative overflow-hidden">
+    <div class="mx-4 mb-3 glass-panel rounded-xl p-4 relative overflow-hidden shrink-0">
       <div class="absolute left-0 top-0 bottom-0 w-[3px] bg-tertiary-container rounded-l-xl"></div>
       <div class="flex justify-between items-center mb-3">
         <h3 class="font-label-caps text-[10px] text-tertiary-container tracking-widest uppercase">Basic Heuristics</h3>
@@ -189,7 +189,7 @@
     </div>
 
     <!-- Triggered Rule Findings List -->
-    <div class="mx-4 mb-3">
+    <div class="mx-4 mb-3 shrink-0">
       <h3 class="font-label-caps text-[10px] text-on-surface-variant tracking-widest uppercase mb-2 flex items-center gap-1.5">
         <span class="material-symbols-outlined text-[13px]">security</span>
         Triggered Rules
@@ -200,7 +200,7 @@
     </div>
 
     <!-- Footer actions -->
-    <div class="mx-4 mb-4 flex gap-2">
+    <div class="mx-4 mb-4 flex gap-2 shrink-0">
       <button id="offline-copy-btn" class="flex-1 bg-surface-variant text-on-surface-variant rounded-lg py-2 flex items-center justify-center gap-1.5 hover:brightness-110 active:scale-95 transition-all">
         <span class="material-symbols-outlined text-[14px]">content_copy</span>
         <span class="text-[11px] font-bold uppercase">Copy Report</span>
