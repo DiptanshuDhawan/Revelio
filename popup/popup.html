@@ -309,13 +309,25 @@
           <span class="material-symbols-outlined text-[32px] mb-2">link_off</span>
           <p class="text-[13px]">No URLs detected</p>
         </div>
-        <div id="urls-table-wrap" class="flex flex-col">
-          <div class="flex px-4 py-2 border-b border-outline-variant/30 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider bg-surface-container/30">
-            <div class="w-1/3">Display Text</div>
-            <div class="w-1/2">Destination</div>
-            <div class="w-1/6 text-right">Score</div>
+        
+        <div id="urls-content-wrap" class="flex flex-col hidden p-3 gap-3">
+          <!-- URL Summary Header -->
+          <div class="bg-surface-container-low border border-outline-variant/30 rounded-xl p-3 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold text-[13px] flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px] text-primary">link</span>
+                <span id="urls-total-count">0 URLs Found</span>
+              </h3>
+            </div>
+            <div class="flex gap-2 text-[11px] font-bold">
+              <div class="bg-error/10 text-error px-2 py-1 rounded-md flex-1 text-center border border-error/20"><span id="urls-malicious-count">0</span> Malicious</div>
+              <div class="bg-amber-500/10 text-amber-500 px-2 py-1 rounded-md flex-1 text-center border border-amber-500/20"><span id="urls-suspicious-count">0</span> Suspicious</div>
+              <div class="bg-emerald-500/10 text-emerald-500 px-2 py-1 rounded-md flex-1 text-center border border-emerald-500/20"><span id="urls-safe-count">0</span> Safe</div>
+            </div>
           </div>
-          <div id="urls-tbody" class="flex flex-col"></div>
+          
+          <!-- URL Cards Container -->
+          <div id="urls-cards-container" class="flex flex-col gap-3"></div>
         </div>
       </div>
 

@@ -4,6 +4,9 @@
 'use strict';
 
 import { KNOWN_BRAND_DOMAINS, URL_SHORTENERS, SUSPICIOUS_TLDS, levenshtein } from '../engine/ruleEngine.js';
+import { detectHomoglyphAttack } from './homoglyphMap.js';
+
+const PHISHING_KEYWORDS = ['login', 'verify', 'account', 'secure', 'update', 'confirm', 'signin'];
 
 // ─── IP Address Pattern ───────────────────────────────────────────────────────
 
@@ -90,21 +93,51 @@ function analyzeURL(href, displayText) {
     }
   }
 
+  // New heuristic checks
+  const isDangerousURI = href.toLowerCase().startsWith('data:') || href.toLowerCase().startsWith('javascript:');
+  const isAbnormalLength = href.length > 200;
+  const hasExcessiveSubdomains = hostname.split('.').length >= 4;
+  const hasPhishingKeywords = PHISHING_KEYWORDS.some(k => hostname.includes(k) || href.includes(k));
+  const hasEncodedAbuse = (hostname.match(/%[0-9a-f]{2}/gi) || []).length > 2;
+  const hasAtRedirect = href.includes('@') && !href.startsWith('mailto:');
+  
+  const knownRoots = KNOWN_BRAND_DOMAINS.map(extractRootDomain);
+  const homoglyphCheck = detectHomoglyphAttack(hostname, knownRoots);
+  const isHomoglyph = homoglyphCheck?.isHomoglyph || false;
+  const homoglyphTarget = homoglyphCheck?.target || null;
+
   // Build risk tags
   const riskTags = [];
   if (isIP) riskTags.push('IP-Based');
   if (isShortener) riskTags.push('URL Shortener');
   if (isLookalike) riskTags.push(`Lookalike (${lookalikeBrand || 'brand'})`);
-  if (!isHTTPS) riskTags.push('No HTTPS');
+  if (!isHTTPS && !isDangerousURI) riskTags.push('No HTTPS');
   if (suspiciousTLD) riskTags.push(`Suspicious TLD (${tld})`);
+  
+  if (isHomoglyph) riskTags.push('IDN/Homoglyph Attack');
+  if (hasExcessiveSubdomains) riskTags.push('Deep Subdomains');
+  if (hasPhishingKeywords) riskTags.push('Phishing Keywords');
+  if (isAbnormalLength) riskTags.push('Abnormal Length');
+  if (isDangerousURI) riskTags.push('Dangerous URI');
+  if (hasEncodedAbuse) riskTags.push('Encoded URL');
+  if (hasAtRedirect) riskTags.push('@ Redirect');
 
   // Compute risk score
   let riskScore = 0;
   if (isIP) riskScore += 60;
   if (isShortener) riskScore += 45;
   if (isLookalike) riskScore += 90;
-  if (!isHTTPS) riskScore += 20;
+  if (!isHTTPS && !isDangerousURI) riskScore += 20;
   if (suspiciousTLD) riskScore += 35;
+  
+  if (isHomoglyph) riskScore += 80;
+  if (hasExcessiveSubdomains) riskScore += 40;
+  if (hasPhishingKeywords) riskScore += 25;
+  if (isAbnormalLength) riskScore += 15;
+  if (isDangerousURI) riskScore += 95;
+  if (hasEncodedAbuse) riskScore += 35;
+  if (hasAtRedirect) riskScore += 50;
+  
   riskScore = Math.min(riskScore, 100);
 
   // Check for display text mismatch (shown as one URL, goes to another)
@@ -121,6 +154,11 @@ function analyzeURL(href, displayText) {
     }
   }
 
+  let safetyVerdict = 'unknown';
+  if (riskScore >= 70) safetyVerdict = 'malicious';
+  else if (riskScore >= 40) safetyVerdict = 'suspicious';
+  else safetyVerdict = 'safe';
+
   return {
     displayText: displayText || href,
     href,
@@ -133,8 +171,19 @@ function analyzeURL(href, displayText) {
     isHTTPS,
     suspiciousTLD,
     hasMismatch,
+    isHomoglyph,
+    homoglyphTarget,
+    hasExcessiveSubdomains,
+    hasPhishingKeywords,
+    isDangerousURI,
+    hasEncodedAbuse,
+    hasAtRedirect,
     riskScore,
     riskTags,
+    safetyVerdict,
+    safetySource: 'Heuristics',
+    safeBrowsingResult: null,
+    virusTotalResult: null,
   };
 }
 

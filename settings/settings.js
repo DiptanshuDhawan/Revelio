@@ -20,30 +20,89 @@ function loadSettingsIntoUI(settings) {
   const $ = (id) => document.getElementById(id);
 
   // Ollama
-  if ($('s-ollama-endpoint')) $('s-ollama-endpoint').value = settings.ollamaEndpoint || 'http://localhost:11434';
+  const endpoint = settings.ollamaEndpoint || 'http://localhost:11434';
+  if ($('s-ollama-endpoint')) $('s-ollama-endpoint').value = endpoint;
+  
   if ($('s-ollama-model')) {
-    const known = ['deepseek-r1:8b', 'llama3.1', 'mistral', 'phi3', 'llama3.2', 'gemma2'];
-    if (known.includes(settings.ollamaModel)) {
-      $('s-ollama-model').value = settings.ollamaModel;
-    } else if (settings.ollamaModel) {
-      $('s-ollama-model').value = 'custom';
-      if ($('s-ollama-model-custom')) {
-        $('s-ollama-model-custom').style.display = 'block';
-        $('s-ollama-model-custom').value = settings.ollamaModel;
-      }
-    }
+    const selectEl = $('s-ollama-model');
+    // Save current value before we clear options
+    const savedModel = settings.ollamaModel || 'deepseek-r1:8b';
+    
+    // Try to fetch real models from Ollama to populate dropdown
+    chrome.runtime.sendMessage({ type: 'GET_OLLAMA_MODELS', endpoint })
+      .then(resp => {
+        if (resp && resp.success && resp.models && resp.models.length > 0) {
+          // Clear current options except "custom"
+          const customOpt = selectEl.querySelector('option[value="custom"]');
+          selectEl.innerHTML = '';
+          
+          let foundSaved = false;
+          resp.models.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.textContent = m;
+            selectEl.appendChild(opt);
+            if (m === savedModel) foundSaved = true;
+          });
+          
+          if (customOpt) selectEl.appendChild(customOpt);
+          
+          if (foundSaved) {
+            selectEl.value = savedModel;
+          } else {
+            selectEl.value = 'custom';
+            if ($('s-ollama-model-custom')) {
+              $('s-ollama-model-custom').style.display = 'block';
+              $('s-ollama-model-custom').value = savedModel;
+            }
+          }
+        } else {
+          // Fallback if offline: just show the saved one
+          const opt = document.createElement('option');
+          opt.value = savedModel;
+          opt.textContent = savedModel + ' (Saved)';
+          selectEl.insertBefore(opt, selectEl.firstChild);
+          selectEl.value = savedModel;
+        }
+      })
+      .catch(() => {
+        const opt = document.createElement('option');
+        opt.value = savedModel;
+        opt.textContent = savedModel + ' (Saved)';
+        selectEl.insertBefore(opt, selectEl.firstChild);
+        selectEl.value = savedModel;
+      });
   }
 
   // OpenAI
   if ($('s-openai-key')) $('s-openai-key').value = settings.openaiApiKey || '';
-  if ($('s-openai-model')) $('s-openai-model').value = settings.openaiModel || 'gpt-4o-mini';
+  if ($('s-openai-model')) {
+    const openaiKnown = ['gpt-4o-mini', 'gpt-4o', 'o1-mini', 'o1-preview'];
+    if (openaiKnown.includes(settings.openaiModel) || !settings.openaiModel) {
+      $('s-openai-model').value = settings.openaiModel || 'gpt-4o-mini';
+    } else {
+      $('s-openai-model').value = 'custom';
+      if ($('s-openai-model-custom')) {
+        $('s-openai-model-custom').style.display = 'block';
+        $('s-openai-model-custom').value = settings.openaiModel;
+      }
+    }
+  }
 
   // Gemini
   if ($('s-gemini-key')) $('s-gemini-key').value = settings.geminiApiKey || '';
-  if ($('s-gemini-model')) $('s-gemini-model').value = settings.geminiModel || 'gemini-1.5-flash';
-
-  // Grok
-  if ($('s-grok-key')) $('s-grok-key').value = settings.grokApiKey || '';
+  if ($('s-gemini-model')) {
+    const geminiKnown = ['gemini-3.5-flash', 'gemini-3.1-flash-lite'];
+    if (geminiKnown.includes(settings.geminiModel) || !settings.geminiModel) {
+      $('s-gemini-model').value = settings.geminiModel || 'gemini-3.5-flash';
+    } else {
+      $('s-gemini-model').value = 'custom';
+      if ($('s-gemini-model-custom')) {
+        $('s-gemini-model-custom').style.display = 'block';
+        $('s-gemini-model-custom').value = settings.geminiModel;
+      }
+    }
+  }
 
   // Analysis settings
   if ($('sensitivity')) {
@@ -54,6 +113,19 @@ function loadSettingsIntoUI(settings) {
   if ($('show-rules')) $('show-rules').checked = settings.showRuleBreakdown !== false;
   if ($('max-history')) $('max-history').value = String(settings.maxHistoryEntries || 20);
   if ($('context-menu')) $('context-menu').checked = settings.contextMenuEnabled !== false;
+
+  // URL Safety
+  if ($('enable-safebrowsing')) {
+    $('enable-safebrowsing').checked = settings.enableSafeBrowsing === true;
+    if ($('cfg-safebrowsing')) $('cfg-safebrowsing').style.display = settings.enableSafeBrowsing === true ? 'block' : 'none';
+  }
+  if ($('s-safebrowsing-key')) $('s-safebrowsing-key').value = settings.safeBrowsingApiKey || '';
+
+  if ($('enable-virustotal')) {
+    $('enable-virustotal').checked = settings.enableVirusTotal === true;
+    if ($('cfg-virustotal')) $('cfg-virustotal').style.display = settings.enableVirusTotal === true ? 'block' : 'none';
+  }
+  if ($('s-virustotal-key')) $('s-virustotal-key').value = settings.virusTotalApiKey || '';
 }
 
 function loadStatsIntoUI(stats) {
@@ -80,7 +152,7 @@ function switchProvider(provider) {
     btn.classList.toggle('active', btn.dataset.prov === provider);
   });
 
-  ['ollama', 'openai', 'gemini', 'grok'].forEach((p) => {
+  ['ollama', 'openai', 'gemini'].forEach((p) => {
     const el = document.getElementById(`cfg-${p}`);
     if (el) el.style.display = p === provider ? 'flex' : 'none';
   });
@@ -93,21 +165,34 @@ function collectSettings() {
   if (ollamaModel === 'custom') {
     ollamaModel = $('s-ollama-model-custom')?.value || 'deepseek-r1:8b';
   }
+  
+  let openaiModel = $('s-openai-model')?.value || 'gpt-4o-mini';
+  if (openaiModel === 'custom') {
+    openaiModel = $('s-openai-model-custom')?.value || 'gpt-4o-mini';
+  }
+
+  let geminiModel = $('s-gemini-model')?.value || 'gemini-3.5-flash';
+  if (geminiModel === 'custom') {
+    geminiModel = $('s-gemini-model-custom')?.value || 'gemini-3.5-flash';
+  }
 
   return {
     provider: currentProvider,
     ollamaEndpoint: $('s-ollama-endpoint')?.value || 'http://localhost:11434',
     ollamaModel,
     openaiApiKey: $('s-openai-key')?.value || '',
-    openaiModel: $('s-openai-model')?.value || 'gpt-4o-mini',
+    openaiModel,
     geminiApiKey: $('s-gemini-key')?.value || '',
-    geminiModel: $('s-gemini-model')?.value || 'gemini-1.5-flash',
-    grokApiKey: $('s-grok-key')?.value || '',
+    geminiModel,
     sensitivityThreshold: parseInt($('sensitivity')?.value) || 50,
     autoSave: $('auto-save')?.checked !== false,
     showRuleBreakdown: $('show-rules')?.checked !== false,
     maxHistoryEntries: parseInt($('max-history')?.value) || 20,
     contextMenuEnabled: $('context-menu')?.checked !== false,
+    enableSafeBrowsing: $('enable-safebrowsing')?.checked === true,
+    safeBrowsingApiKey: $('s-safebrowsing-key')?.value || '',
+    enableVirusTotal: $('enable-virustotal')?.checked === true,
+    virusTotalApiKey: $('s-virustotal-key')?.value || '',
   };
 }
 
@@ -125,6 +210,16 @@ function attachEventListeners() {
     if (custom) custom.style.display = e.target.value === 'custom' ? 'block' : 'none';
   });
 
+  $('s-openai-model')?.addEventListener('change', (e) => {
+    const custom = $('s-openai-model-custom');
+    if (custom) custom.style.display = e.target.value === 'custom' ? 'block' : 'none';
+  });
+
+  $('s-gemini-model')?.addEventListener('change', (e) => {
+    const custom = $('s-gemini-model-custom');
+    if (custom) custom.style.display = e.target.value === 'custom' ? 'block' : 'none';
+  });
+
   // Save button
   $('save-btn')?.addEventListener('click', async () => {
     const settings = collectSettings();
@@ -135,6 +230,14 @@ function attachEventListeners() {
   // Sensitivity slider
   $('sensitivity')?.addEventListener('input', (e) => {
     if ($('sensitivity-val')) $('sensitivity-val').textContent = e.target.value;
+  });
+
+  // URL Safety Toggles
+  $('enable-safebrowsing')?.addEventListener('change', (e) => {
+    if ($('cfg-safebrowsing')) $('cfg-safebrowsing').style.display = e.target.checked ? 'block' : 'none';
+  });
+  $('enable-virustotal')?.addEventListener('change', (e) => {
+    if ($('cfg-virustotal')) $('cfg-virustotal').style.display = e.target.checked ? 'block' : 'none';
   });
 
   // Test Ollama connection
@@ -221,8 +324,11 @@ function showOllamaModels(models) {
       const select = document.getElementById('s-ollama-model');
       const custom = document.getElementById('s-ollama-model-custom');
       if (!select) return;
-      const known = ['deepseek-r1:8b', 'llama3.1', 'mistral', 'phi3', 'llama3.2', 'gemma2'];
-      if (known.includes(m)) {
+      
+      // Since we dynamically populate the select, the option should exist
+      let optionExists = Array.from(select.options).some(opt => opt.value === m);
+      
+      if (optionExists) {
         select.value = m;
         if (custom) custom.style.display = 'none';
       } else {

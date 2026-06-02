@@ -2,6 +2,7 @@
 // All external API calls are routed through here to avoid CORS issues in the popup.
 
 import { getSettings, saveSettings } from './utils/storage.js';
+import { checkSafeBrowsing, checkVirusTotal } from './utils/urlSafety.js';
 
 // ─── Context Menu Setup ───────────────────────────────────────────────────────
 
@@ -130,6 +131,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return false;
   }
 
+  if (message.type === 'CHECK_URL_SAFETY') {
+    getSettings().then(settings => {
+      checkSafeBrowsing(message.url, settings.safeBrowsingApiKey)
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(err => sendResponse({ success: false, error: err.message }));
+    });
+    return true;
+  }
+
+  if (message.type === 'DEEP_SCAN_URL') {
+    getSettings().then(settings => {
+      checkVirusTotal(message.url, settings.virusTotalApiKey)
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(err => sendResponse({ success: false, error: err.message }));
+    });
+    return true;
+  }
+
   if (message.type === 'GET_OLLAMA_MODELS') {
     getOllamaModels(message.endpoint)
       .then((models) => sendResponse({ success: true, models }))
@@ -176,9 +195,6 @@ async function handleAnalyze({ emailText, settings }) {
       break;
     case 'gemini':
       llmResponse = await callGemini(prompt, settings);
-      break;
-    case 'grok':
-      llmResponse = await callGrok(prompt, settings);
       break;
     default:
       throw new Error('Unknown AI provider: ' + provider);
@@ -286,8 +302,12 @@ async function callOllama(prompt, settings) {
   }
 
   if (!response.ok) {
-    const text = await response.text().catch(() => '');
-    throw new Error(`Ollama error ${response.status}: ${text}`);
+    let errorMsg = await response.text().catch(() => '');
+    try {
+      const jsonMsg = JSON.parse(errorMsg);
+      if (jsonMsg.error) errorMsg = jsonMsg.error;
+    } catch (e) {}
+    throw new Error(`Ollama (500): ${errorMsg}`);
   }
 
   const data = await response.json();
@@ -328,7 +348,7 @@ async function callGemini(prompt, settings) {
   const apiKey = settings.geminiApiKey;
   if (!apiKey) throw new Error('Gemini API key not configured');
 
-  const model = settings.geminiModel || 'gemini-1.5-flash';
+  let model = settings.geminiModel || 'gemini-3.5-flash';
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
@@ -349,33 +369,6 @@ async function callGemini(prompt, settings) {
 
   const data = await response.json();
   const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
-  return parseAIResponse(content);
-}
-
-async function callGrok(prompt, settings) {
-  const apiKey = settings.grokApiKey;
-  if (!apiKey) throw new Error('Grok API key not configured');
-
-  const response = await fetch('https://api.x.ai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'grok-beta',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.1,
-    }),
-  });
-
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(`Grok error: ${err.error?.message || response.status}`);
-  }
-
-  const data = await response.json();
-  const content = data.choices?.[0]?.message?.content;
   return parseAIResponse(content);
 }
 

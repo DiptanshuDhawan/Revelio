@@ -23,11 +23,13 @@
     "https://mail.google.com/*",
     "https://outlook.live.com/*",
     "https://outlook.office.com/*",
-    "https://outlook.office365.com/*"
+    "https://outlook.office365.com/*",
+    "https://safebrowsing.googleapis.com/*",
+    "https://www.virustotal.com/*"
   ],
 
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' http://localhost:11434 https://api.openai.com https://generativelanguage.googleapis.com https://api.x.ai;"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' http://localhost:11434 https://api.openai.com https://generativelanguage.googleapis.com https://api.x.ai https://safebrowsing.googleapis.com https://www.virustotal.com;"
   },
 
   "action": {

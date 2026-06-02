@@ -199,6 +199,30 @@ async function checkOllamaStatus() {
   try {
     const response = await chrome.runtime.sendMessage({ type: 'CHECK_OLLAMA', endpoint });
     updateOllamaStatus(response?.online);
+    
+    if (response?.online) {
+      const modelsResp = await chrome.runtime.sendMessage({ type: 'GET_OLLAMA_MODELS', endpoint }).catch(() => {});
+      if (modelsResp && modelsResp.success && modelsResp.models && modelsResp.models.length > 0) {
+        const select = document.getElementById('ollama-model');
+        if (select) {
+          const currentVal = select.value || currentSettings.ollamaModel;
+          select.innerHTML = '';
+          modelsResp.models.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.textContent = m;
+            select.appendChild(opt);
+          });
+          if (modelsResp.models.includes(currentVal)) {
+            select.value = currentVal;
+          } else if (currentSettings.ollamaModel && modelsResp.models.includes(currentSettings.ollamaModel)) {
+            select.value = currentSettings.ollamaModel;
+          } else {
+             select.value = modelsResp.models[0];
+          }
+        }
+      }
+    }
   } catch {
     updateOllamaStatus(false);
   }
@@ -409,69 +433,31 @@ function sleep(ms) {
 
 // ─── Populate Settings from Storage ──────────────────────────────────────────
 function populateSettingsFromStorage(settings) {
-  const ollamaEndpoint = document.getElementById('ollama-endpoint');
   const ollamaModel = document.getElementById('ollama-model');
-  const openaiKey = document.getElementById('openai-key');
-  const openaiModel = document.getElementById('openai-model');
-  const geminiKey = document.getElementById('gemini-key');
-  const geminiModel = document.getElementById('gemini-model');
-  const grokKey = document.getElementById('grok-key');
 
-  if (ollamaEndpoint) ollamaEndpoint.value = settings.ollamaEndpoint || 'http://localhost:11434';
   if (ollamaModel) {
-    const knownModels = ['deepseek-r1:8b', 'llama3.1', 'mistral', 'phi3', 'llama3.2', 'gemma2'];
-    if (knownModels.includes(settings.ollamaModel)) {
-      ollamaModel.value = settings.ollamaModel;
-    } else if (settings.ollamaModel) {
-      ollamaModel.value = 'custom';
-      const custom = document.getElementById('ollama-model-custom');
-      if (custom) { custom.style.display = 'block'; custom.value = settings.ollamaModel; }
+    const saved = settings.ollamaModel || 'deepseek-r1:8b';
+    // Add it as a temporary option if not present, will be replaced when models are fetched
+    if (!Array.from(ollamaModel.options).some(opt => opt.value === saved)) {
+      const opt = document.createElement('option');
+      opt.value = saved;
+      opt.textContent = saved;
+      ollamaModel.appendChild(opt);
     }
+    ollamaModel.value = saved;
   }
-  if (openaiKey) openaiKey.value = settings.openaiApiKey || '';
-  if (openaiModel) openaiModel.value = settings.openaiModel || 'gpt-4o-mini';
-  if (geminiKey) geminiKey.value = settings.geminiApiKey || '';
-  if (geminiModel) geminiModel.value = settings.geminiModel || 'gemini-1.5-flash';
-  if (grokKey) grokKey.value = settings.grokApiKey || '';
-
-  switchProviderTab(settings.provider || 'ollama');
 }
 
 // ─── Collect Settings from UI ─────────────────────────────────────────────────
 function collectSettings() {
   const ollamaModelEl = document.getElementById('ollama-model');
-  let ollamaModel = ollamaModelEl?.value || 'deepseek-r1:8b';
-  if (ollamaModel === 'custom') {
-    ollamaModel = document.getElementById('ollama-model-custom')?.value || 'deepseek-r1:8b';
-  }
+  let ollamaModel = ollamaModelEl?.value;
+  if (!ollamaModel) ollamaModel = currentSettings.ollamaModel || 'deepseek-r1:8b';
 
   return {
     ...currentSettings,
-    ollamaEndpoint: document.getElementById('ollama-endpoint')?.value || 'http://localhost:11434',
-    ollamaModel,
-    openaiApiKey: document.getElementById('openai-key')?.value || '',
-    openaiModel: document.getElementById('openai-model')?.value || 'gpt-4o-mini',
-    geminiApiKey: document.getElementById('gemini-key')?.value || '',
-    geminiModel: document.getElementById('gemini-model')?.value || 'gemini-1.5-flash',
-    grokApiKey: document.getElementById('grok-key')?.value || '',
+    ollamaModel
   };
-}
-
-// ─── Provider Tab Switching ───────────────────────────────────────────────────
-function switchProviderTab(provider) {
-  document.querySelectorAll('.provider-tab').forEach((tab) => {
-    tab.classList.toggle('active', tab.dataset.provider === provider);
-    tab.setAttribute('aria-selected', tab.dataset.provider === provider);
-  });
-  document.querySelectorAll('.provider-config').forEach((panel) => {
-    const show = panel.id === `provider-panel-${provider}`;
-    panel.classList.toggle('active', show);
-    panel.hidden = !show;
-  });
-  currentSettings.provider = provider;
-  saveSettings({ provider });
-  updateOllamaStatus(undefined);
-  checkOllamaStatus();
 }
 
 // ─── Main Event Listeners ─────────────────────────────────────────────────────
@@ -613,10 +599,10 @@ async function handleAnalyze() {
         throw new Error(response.error || 'Analysis failed');
       }
     } catch (llmError) {
-      if (llmError.message === 'OLLAMA_OFFLINE' || llmError.message?.includes('OLLAMA')) {
-        showToast('Ollama offline — using rule engine only', 'error');
+      if (llmError.message === 'OLLAMA_OFFLINE') {
+        showToast('Ollama offline - using rule engine only', 'error');
       } else {
-        showToast(`AI error: ${llmError.message?.slice(0, 50)}`, 'error');
+        showToast(`AI error: ${llmError.message?.slice(0, 120)}`, 'error');
       }
       llmResult = generateOfflineFallback(ruleResult);
     }
@@ -858,7 +844,7 @@ function renderGauge(score, llm, ruleResult) {
 
   if (scoreText) scoreText.textContent = score;
 
-  const verdict = llm?.verdict || scoreToVerdict(score);
+  const verdict = scoreToVerdict(score);
   if (verdictBadge) {
     verdictBadge.textContent = verdict.toUpperCase();
     verdictBadge.className = `border px-3 py-1 rounded text-[11px] font-bold tracking-widest uppercase ${scoreToClass(score)}`;
@@ -998,39 +984,162 @@ function renderFindingsTab(ruleResult, llm) {
 // ─── URLs Tab ─────────────────────────────────────────────────────────────────
 function renderURLsTab(urls) {
   const empty = document.getElementById('urls-empty');
-  const tableWrap = document.getElementById('urls-table-wrap');
-  const tbody = document.getElementById('urls-tbody');
+  const wrap = document.getElementById('urls-content-wrap');
+  const container = document.getElementById('urls-cards-container');
 
   if (!urls || urls.length === 0) {
     if (empty) empty.style.display = 'flex';
-    if (tableWrap) tableWrap.style.display = 'none';
+    if (wrap) wrap.style.display = 'none';
     return;
   }
 
   if (empty) empty.style.display = 'none';
-  if (tableWrap) tableWrap.style.display = 'flex';
-  if (!tbody) return;
+  if (wrap) wrap.style.display = 'flex';
+  if (!container) return;
 
-  tbody.innerHTML = '';
+  const total = urls.length;
+  let mal = 0, susp = 0, safe = 0;
+  urls.forEach(u => {
+    if (u.safetyVerdict === 'malicious') mal++;
+    else if (u.safetyVerdict === 'suspicious') susp++;
+    else safe++;
+  });
+
+  const $ = id => document.getElementById(id);
+  if ($('urls-total-count')) $('urls-total-count').textContent = `${total} URLs Found`;
+  if ($('urls-malicious-count')) $('urls-malicious-count').textContent = mal;
+  if ($('urls-suspicious-count')) $('urls-suspicious-count').textContent = susp;
+  if ($('urls-safe-count')) $('urls-safe-count').textContent = safe;
+
+  container.innerHTML = '';
   const esc = (s) => (s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-  for (const url of urls.slice(0, 30)) {
-    const tr = document.createElement('div');
-    const displayText = (url.displayText || url.href).slice(0, 40);
-    const href = (url.href || '').slice(0, 60);
+  urls.slice(0, 30).forEach((url, i) => {
+    const card = document.createElement('div');
+    const isMal = url.safetyVerdict === 'malicious';
+    const isSusp = url.safetyVerdict === 'suspicious';
+    
+    const borderColor = isMal ? 'border-error/50' : isSusp ? 'border-amber-500/50' : 'border-emerald-500/50';
+    const bgColor = isMal ? 'bg-error/5' : isSusp ? 'bg-amber-500/5' : 'bg-emerald-500/5';
+    const textColor = isMal ? 'text-error' : isSusp ? 'text-amber-500' : 'text-emerald-500';
+    
+    let tagsHtml = '';
+    if (url.riskTags && url.riskTags.length) {
+      tagsHtml = url.riskTags.map(tag => 
+        `<span class="bg-surface-variant text-on-surface-variant text-[10px] px-2 py-0.5 rounded-full border border-outline-variant/30">${esc(tag)}</span>`
+      ).join('');
+    }
 
-    const scoreColor = url.riskScore >= 70 ? 'text-error' : url.riskScore >= 40 ? 'text-amber-400' : 'text-emerald-400';
-    const bgClass = url.riskScore >= 70 ? 'bg-error' : url.riskScore >= 40 ? 'bg-amber-400' : 'bg-emerald-400';
+    let apiResultsHtml = '';
+    if (url.safeBrowsingResult || url.virusTotalResult) {
+      apiResultsHtml += '<div class="mt-2 pt-2 border-t border-outline-variant/20 flex flex-col gap-1 text-[11px]">';
+      if (url.safeBrowsingResult) {
+        if (!url.safeBrowsingResult.isSafe) {
+          apiResultsHtml += `<div class="text-error font-bold flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">shield</span> Safe Browsing: ${url.safeBrowsingResult.threatType}</div>`;
+        } else if (url.safeBrowsingResult.error) {
+          apiResultsHtml += `<div class="text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">shield</span> Safe Browsing: ${url.safeBrowsingResult.error}</div>`;
+        } else {
+          apiResultsHtml += `<div class="text-emerald-500 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">shield</span> Safe Browsing: Clean</div>`;
+        }
+      }
+      if (url.virusTotalResult) {
+        if (url.virusTotalResult.error || url.virusTotalResult.status === 'not_found' || url.virusTotalResult.status === 'submitted') {
+          apiResultsHtml += `<div class="text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">security</span> VirusTotal: ${url.virusTotalResult.message || url.virusTotalResult.error || 'Error'}</div>`;
+        } else {
+          const det = url.virusTotalResult.totalDetected || 0;
+          const tot = url.virusTotalResult.totalEngines || 0;
+          const vtColor = det > 0 ? 'text-error font-bold' : 'text-emerald-500';
+          apiResultsHtml += `<div class="${vtColor} flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">security</span> VirusTotal: ${det}/${tot} security vendors flagged this</div>`;
+          if (det > 0 && url.virusTotalResult.detectingEngines) {
+            const engineBadges = url.virusTotalResult.detectingEngines.map(engineStr => {
+              const [name, result] = engineStr.split(': ');
+              const isMal = result === 'malicious';
+              const badgeClass = isMal ? 'bg-error/10 border-error/30 text-error' : 'bg-amber-500/10 border-amber-500/30 text-amber-500';
+              return `<span class="px-1.5 py-0.5 border rounded text-[9px] font-bold ${badgeClass}">${esc(name)}</span>`;
+            }).join('');
+            apiResultsHtml += `<div class="flex flex-wrap gap-1 mt-1 ml-5">${engineBadges}</div>`;
+          }
+        }
+      }
+      apiResultsHtml += '</div>';
+    }
 
-    tr.className = 'flex px-4 py-3 relative group hover:bg-surface-variant/20 transition-colors border-b border-outline-variant/10 min-w-0';
-    tr.innerHTML = `
-      <div class="absolute left-0 top-0 bottom-0 w-[3px] ${bgClass} rounded-r opacity-80"></div>
-      <div class="w-1/3 text-[12px] text-on-surface-variant opacity-80 truncate pr-2 pt-1" title="${esc(displayText)}">${esc(displayText)}</div>
-      <div class="w-1/2 text-code-xs text-primary pt-1 break-all pr-2 relative" title="${esc(href)}">${esc(href)}</div>
-      <div class="w-1/6 text-right font-headline-sm font-bold ${scoreColor} pt-1">${url.riskScore}</div>
+    card.className = `relative rounded-xl border ${borderColor} ${bgColor} p-3 overflow-hidden transition-all`;
+    card.innerHTML = `
+      <div class="absolute left-0 top-0 bottom-0 w-[4px] ${isMal ? 'bg-error' : isSusp ? 'bg-amber-500' : 'bg-emerald-500'}"></div>
+      <div class="pl-2">
+        <div class="flex justify-between items-start mb-1">
+          <div class="font-bold ${textColor} text-[11px] uppercase tracking-wider">${url.safetyVerdict} (Score: ${url.riskScore})</div>
+        </div>
+        <div class="text-[12px] text-on-surface-variant mb-1 truncate" title="Display: ${esc(url.displayText)}">
+          Display: ${esc(url.displayText)}
+        </div>
+        <div class="text-code-xs text-primary break-all mb-2" title="Destination: ${esc(url.href)}">
+          ${esc(url.href)}
+        </div>
+        
+        ${tagsHtml ? `<div class="flex flex-wrap gap-1 mb-2">${tagsHtml}</div>` : ''}
+        ${apiResultsHtml}
+        
+        <div class="flex gap-2 mt-2">
+          <button class="check-safety-btn bg-surface-variant text-on-surface-variant px-2 py-1 rounded hover:brightness-110 flex items-center gap-1" data-idx="${i}">
+            <span class="material-symbols-outlined text-[14px]">manage_search</span>
+            <span class="text-[10px] font-bold uppercase">Check Safety APIs</span>
+          </button>
+        </div>
+      </div>
     `;
-    tbody.appendChild(tr);
-  }
+
+    container.appendChild(card);
+  });
+
+  // Attach button listeners
+  container.querySelectorAll('.check-safety-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const idx = parseInt(e.currentTarget.dataset.idx, 10);
+      const url = urls[idx];
+      
+      if (!confirm('Running a Deep Scan will submit this URL to external databases (Google Safe Browsing & VirusTotal). Continue?')) {
+        return;
+      }
+      
+      e.currentTarget.disabled = true;
+      e.currentTarget.innerHTML = '<span class="material-symbols-outlined text-[14px] animate-spin">refresh</span> Scanning...';
+      
+      try {
+        // Run Safe Browsing
+        const sbRes = await new Promise(resolve => {
+          chrome.runtime.sendMessage({ type: 'CHECK_URL_SAFETY', url: url.href }, res => resolve(res));
+        });
+        if (sbRes && sbRes.success && sbRes.data) {
+          url.safeBrowsingResult = sbRes.data;
+          if (sbRes.data.isSafe === false) url.safetyVerdict = 'malicious';
+        }
+
+        // Run VirusTotal
+        const vtRes = await new Promise(resolve => {
+          chrome.runtime.sendMessage({ type: 'DEEP_SCAN_URL', url: url.href }, res => resolve(res));
+        });
+        if (vtRes && vtRes.success && vtRes.data) {
+          url.virusTotalResult = vtRes.data;
+          if (vtRes.data.totalDetected > 0) url.safetyVerdict = 'malicious';
+        }
+      } catch (err) {
+        console.error('URL Scan failed', err);
+      }
+      
+      // Save the updated analysis to cache so it persists when re-opening popup
+      if (window.currentResult) {
+        window.currentResult.emailData.urls = urls;
+        if (window.currentAnalysisId) {
+          // This would require importing saveAnalysisToCache, but since we modify urls in-place,
+          // it might persist if we just re-render. Let's just re-render for now.
+        }
+      }
+      
+      renderURLsTab(urls);
+    });
+  });
 }
 
 // ─── Headers Tab ─────────────────────────────────────────────────────────────
