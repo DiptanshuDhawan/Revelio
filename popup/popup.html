@@ -7,7 +7,7 @@
   <link href="../assets/fonts/fonts.css" rel="stylesheet"/>
   <link href="popup-built.css" rel="stylesheet"/>
 </head>
-<body class="pg-shell bg-background text-on-surface min-h-[600px] w-[400px] flex flex-col font-body-md antialiased overflow-hidden border border-outline-variant/30">
+<body class="pg-shell bg-background text-on-surface min-h-[600px] w-[440px] flex flex-col font-body-md antialiased overflow-hidden border border-outline-variant/30">
 
 <!-- Global Header -->
 <header class="pg-header bg-surface border-b border-outline-variant flex justify-between items-center w-full px-container-padding py-stack-gap shrink-0 z-40 relative">
@@ -132,9 +132,10 @@
 
 
   <!-- ─── OFFLINE VIEW ──────────────────────────────────────────────────── -->
-  <section id="offline-view" class="view hidden flex flex-col flex-1 h-full min-h-0 overflow-y-auto custom-scrollbar bg-background">
-
-    <!-- Hero Card -->
+  <section id="offline-view" class="view hidden flex flex-col flex-1 h-full min-h-0 overflow-hidden bg-background">
+    <!-- Scrolling Content -->
+    <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col pb-4">
+      <!-- Hero Card -->
     <div class="mx-4 mt-4 bg-surface-container-low/80 backdrop-blur-xl rounded-xl p-5 border border-tertiary-container/30 relative overflow-hidden glass-panel shrink-0">
       <!-- Ambient amber glow -->
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-20 bg-tertiary-container/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -198,17 +199,18 @@
       </div>
     </div>
 
-    <!-- Footer actions -->
-    <div class="mx-4 mb-4 flex gap-2 shrink-0">
+    <!-- Fixed Footer actions -->
+    </div>
+    <footer class="pg-result-footer w-full bg-surface-container-high border-t border-outline-variant/50 backdrop-blur-xl flex justify-between gap-2 px-container-padding py-3 z-30 shadow-[0_-10px_20px_rgba(0,0,0,0.3)]">
       <button id="offline-copy-btn" class="flex-1 bg-surface-variant text-on-surface-variant rounded-lg py-2 flex items-center justify-center gap-1.5 hover:brightness-110 active:scale-95 transition-all">
-        <span class="material-symbols-outlined text-[14px]">content_copy</span>
+        <span class="material-symbols-outlined text-[16px]">content_copy</span>
         <span class="text-[11px] font-bold uppercase">Copy Report</span>
       </button>
       <button id="offline-log-btn" class="flex-1 bg-surface-variant text-on-surface-variant rounded-lg py-2 flex items-center justify-center gap-1.5 hover:brightness-110 active:scale-95 transition-all">
-        <span class="material-symbols-outlined text-[14px]">history</span>
+        <span class="material-symbols-outlined text-[16px]">history</span>
         <span class="text-[11px] font-bold uppercase">Log</span>
       </button>
-    </div>
+    </footer>
 
   </section>
 
@@ -218,11 +220,11 @@
     
     <!-- Threat Meter Area -->
     <div class="px-container-padding pt-2 pb-2 shrink-0">
-      <div class="bg-surface-container rounded-xl border border-white/5 p-4 flex gap-4 items-center relative overflow-hidden shadow-lg" id="threat-card-bg">
+      <div class="bg-surface-container rounded-xl border border-white/5 p-4 flex justify-around items-center relative overflow-hidden shadow-lg" id="threat-card-bg">
         <div id="threat-glow" class="absolute -top-10 -right-10 w-32 h-32 bg-error/10 blur-[40px] rounded-full pointer-events-none transition-colors duration-1000"></div>
         
         <!-- Gauge -->
-        <div class="relative w-28 h-16 flex flex-col items-center justify-end pb-1 shrink-0">
+        <div class="relative w-32 h-20 flex flex-col items-center justify-end pb-1 shrink-0">
           <svg class="absolute top-0 left-0 w-full h-full overflow-visible drop-shadow-md" viewBox="0 0 100 50">
             <defs>
               <linearGradient id="gauge-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -235,13 +237,13 @@
             <path id="gauge-arc" d="M 5 50 A 45 45 0 0 1 95 50" fill="none" stroke="url(#gauge-gradient)" stroke-dasharray="141.37" stroke-dashoffset="141.37" stroke-linecap="round" stroke-width="8" class="transition-all duration-1000 ease-out"></path>
           </svg>
           <div class="relative z-10 flex flex-col items-center mt-2 translate-y-1.5">
-            <span id="gauge-score-text" class="text-[32px] font-display-score text-on-surface leading-none font-bold">0</span>
+            <span id="gauge-score-text" class="text-[36px] font-display-score text-on-surface leading-none font-bold">0</span>
             <span class="text-[10px] font-label-caps text-on-surface-variant">/ 100</span>
           </div>
         </div>
 
         <!-- Details -->
-        <div class="flex-1 flex flex-col items-end gap-1.5 justify-center">
+        <div class="flex flex-col items-end gap-1.5 justify-center">
           <div id="verdict-badge" class="border px-3 py-1 rounded text-[11px] font-bold tracking-widest uppercase">SAFE</div>
           <div class="text-[11px] text-on-surface-variant font-code-xs">
             AI: <span id="ai-score-val">0</span> | Rules: <span id="rule-score-val">0</span>
@@ -261,11 +263,11 @@
 
     <!-- Navigation Tabs -->
     <nav class="flex justify-around items-center w-full px-container-padding bg-surface-container-lowest border-b border-outline-variant/30 pt-1 shrink-0 result-tabs z-20">
-      <button class="result-tab active text-primary border-b-2 border-primary font-bold pb-2 text-[13px] transition-colors" data-tab="summary">Summary</button>
-      <button class="result-tab text-on-secondary-container opacity-60 hover:text-primary-fixed pb-2 text-[13px] transition-colors" data-tab="findings">Findings</button>
-      <button class="result-tab text-on-secondary-container opacity-60 hover:text-primary-fixed pb-2 text-[13px] transition-colors" data-tab="urls">URLs</button>
-      <button class="result-tab text-on-secondary-container opacity-60 hover:text-primary-fixed pb-2 text-[13px] transition-colors" data-tab="headers">Headers</button>
-      <button class="result-tab text-on-secondary-container opacity-60 hover:text-primary-fixed pb-2 text-[13px] transition-colors" data-tab="remediation">Remediation</button>
+      <button class="result-tab active text-primary border-b-2 border-primary font-bold pb-1.5 transition-colors" data-tab="summary">Summary</button>
+      <button class="result-tab text-on-secondary-container opacity-60 hover:text-primary-fixed pb-1.5 transition-colors" data-tab="findings">Findings</button>
+      <button class="result-tab text-on-secondary-container opacity-60 hover:text-primary-fixed pb-1.5 transition-colors" data-tab="urls">URLs</button>
+      <button class="result-tab text-on-secondary-container opacity-60 hover:text-primary-fixed pb-1.5 transition-colors" data-tab="headers">Headers</button>
+      <button class="result-tab text-on-secondary-container opacity-60 hover:text-primary-fixed pb-1.5 transition-colors" data-tab="remediation">Remediation</button>
     </nav>
 
     <!-- Scrollable Panels -->
@@ -324,13 +326,13 @@
       </div>
 
       <!-- TAB: FINDINGS -->
-      <div id="tab-findings" class="result-panel hidden p-container-padding flex flex-col gap-3">
+      <div id="tab-findings" class="result-panel hidden p-3 flex flex-col gap-2">
         <div id="rule-findings-list" class="flex flex-col gap-3"></div>
-        <div id="llm-findings-section" class="hidden flex flex-col gap-2 mt-2">
+        <div id="llm-findings-section" class="hidden flex flex-col gap-2 mt-1">
           <h4 class="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest px-1">AI Insights</h4>
           <div id="llm-findings-list" class="flex flex-col gap-2"></div>
         </div>
-        <div id="suspicious-quotes-section" class="hidden flex flex-col gap-2 mt-2">
+        <div id="suspicious-quotes-section" class="hidden flex flex-col gap-2 mt-1">
           <h4 class="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest px-1">Suspicious Phrases</h4>
           <div id="suspicious-quotes-list" class="flex flex-col gap-2"></div>
         </div>
@@ -373,7 +375,7 @@
       </div>
 
       <!-- TAB: REMEDIATION -->
-      <div id="tab-remediation" class="result-panel hidden p-container-padding flex flex-col gap-3">
+      <div id="tab-remediation" class="result-panel hidden p-3 flex flex-col gap-2">
         <div id="tier-guidance"></div>
         <div id="remediation-checklist" class="flex flex-col gap-3"></div>
       </div>

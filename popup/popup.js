@@ -988,18 +988,18 @@ function renderFindingsTab(ruleResult, llm) {
     const icon = finding.passed ? 'check_circle' : isError ? 'warning' : 'info';
     const pillText = finding.passed ? 'SAFE' : finding.severity.toUpperCase();
 
-    card.className = 'glass-panel relative overflow-hidden p-4 flex flex-col gap-2';
+    card.className = 'glass-panel relative overflow-hidden p-3 flex flex-col gap-1.5';
     card.innerHTML = `
       <div class="finding-strip ${severity}"></div>
-      <div class="flex items-start gap-3 ml-2">
-        <span class="material-symbols-outlined ${iconColor} text-xl mt-0.5" style="font-variation-settings: 'FILL' 1;">${icon}</span>
+      <div class="flex items-start gap-2.5 ml-2">
+        <span class="material-symbols-outlined ${iconColor} text-[18px] mt-0.5" style="font-variation-settings: 'FILL' 1;">${icon}</span>
         <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-start gap-2 mb-1">
-            <h3 class="${titleColor} font-semibold text-[14px] leading-tight">${sanitize(finding.name)}</h3>
+          <div class="flex justify-between items-start gap-2 mb-0.5">
+            <h3 class="${titleColor} font-semibold text-[13px] leading-tight">${sanitize(finding.name)}</h3>
             <span class="finding-severity-pill ${severity}">${pillText}</span>
           </div>
-          <p class="text-on-surface-variant text-[13px] leading-relaxed opacity-90">${sanitize(finding.finding)}</p>
-          ${finding.quote && !finding.passed ? `<div class="mt-2 finding-quote-block">${sanitize(finding.quote.slice(0, 120))}</div>` : ''}
+          <p class="text-on-surface-variant text-[12px] leading-relaxed opacity-90">${sanitize(finding.finding)}</p>
+          ${finding.quote && !finding.passed ? `<div class="mt-1.5 finding-quote-block">${sanitize(finding.quote.slice(0, 120))}</div>` : ''}
         </div>
       </div>
     `;
@@ -1116,7 +1116,7 @@ function renderURLsTab(urls) {
       apiResultsHtml += '</div>';
     }
 
-    card.className = 'glass-panel relative overflow-hidden p-4 flex flex-col gap-2';
+    card.className = 'glass-panel relative overflow-hidden p-3 flex flex-col gap-1.5';
     card.innerHTML = `
       <div class="flex items-start gap-3">
         <div class="url-status-dot ${severity} mt-1.5"></div>
@@ -1297,7 +1297,7 @@ function renderRemediationTab(score, llm) {
     const iconColor = isDanger ? 'text-error' : isWarn ? 'text-amber-400' : 'text-emerald-400';
     const titleColor = isDanger ? 'text-error' : isWarn ? 'text-amber-400' : 'text-emerald-400';
 
-    tierBox.className = `glass-panel${isDanger ? ' threat-pulse' : ''} relative overflow-hidden p-4 flex flex-col gap-2 mb-0`;
+    tierBox.className = `glass-panel${isDanger ? ' threat-pulse' : ''} relative overflow-hidden p-3 flex flex-col gap-1.5 mb-0`;
     tierBox.innerHTML = `
       ${isDanger ? '<div class="threat-strip danger"></div>' : isWarn ? '<div class="threat-strip warn"></div>' : '<div class="threat-strip safe"></div>'}
       <div class="flex items-center gap-2 ml-2">
@@ -1328,8 +1328,8 @@ function renderRemediationTab(score, llm) {
     const wrapper = document.createElement('div');
     wrapper.className = 'glass-panel p-0 overflow-hidden flex flex-col';
     wrapper.innerHTML = `
-      <div class="px-4 py-3 border-b border-white/5 flex items-center justify-between" style="background: rgba(37, 43, 46, 0.5);">
-        <h3 class="text-headline-sm font-headline-sm text-on-surface font-semibold">Remediation Plan</h3>
+      <div class="px-3 py-2 border-b border-white/5 flex items-center justify-between" style="background: rgba(37, 43, 46, 0.5);">
+        <h3 class="text-[13px] font-headline-sm text-on-surface font-semibold">Remediation Plan</h3>
         <span class="text-code-xs font-code-xs text-outline">Action Required</span>
       </div>
       <div id="remediation-steps-inner" class="p-2 flex flex-col gap-1"></div>
@@ -1345,7 +1345,7 @@ function renderRemediationTab(score, llm) {
       const stepTextColor = isUrgent ? 'text-error' : 'text-on-surface';
 
       const item = document.createElement('label');
-      item.className = 'flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors cursor-pointer group';
+      item.className = 'flex items-start gap-2.5 p-2.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer group';
       item.innerHTML = `
         <input type="checkbox" class="cyber-checkbox mt-0.5" id="check-step-${i}">
         <div class="flex flex-col checkbox-label">
