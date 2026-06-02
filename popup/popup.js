@@ -935,19 +935,25 @@ function renderFindingsTab(ruleResult, llm) {
   for (const finding of findings) {
     const card = document.createElement('div');
     const isError = finding.severity === 'critical' || finding.severity === 'high';
-    const colorClass = finding.passed ? 'text-emerald-400' : isError ? 'text-error' : 'text-amber-400';
-    const bgClass = finding.passed ? 'bg-emerald-400' : isError ? 'bg-error' : 'bg-amber-400';
-    const icon = finding.passed ? 'check' : isError ? 'warning' : 'info';
+    const severity = finding.passed ? 'safe' : isError ? (finding.severity === 'critical' ? 'critical' : 'high') : 'medium';
 
-    card.className = 'bg-surface-container border border-white/5 rounded-lg p-3 relative overflow-hidden backdrop-blur-md';
+    const iconColor = finding.passed ? 'text-emerald-400' : isError ? 'text-error' : 'text-amber-400';
+    const titleColor = finding.passed ? 'text-emerald-400' : isError ? 'text-error' : 'text-on-surface';
+    const icon = finding.passed ? 'check_circle' : isError ? 'warning' : 'info';
+    const pillText = finding.passed ? 'SAFE' : finding.severity.toUpperCase();
+
+    card.className = 'glass-panel relative overflow-hidden p-4 flex flex-col gap-2';
     card.innerHTML = `
-      <div class="absolute left-0 top-0 bottom-0 w-[3px] ${bgClass}"></div>
-      <div class="flex items-start gap-3">
-        <span class="material-symbols-outlined ${colorClass} text-[20px] mt-0.5">${icon}</span>
+      <div class="finding-strip ${severity}"></div>
+      <div class="flex items-start gap-3 ml-2">
+        <span class="material-symbols-outlined ${iconColor} text-xl mt-0.5" style="font-variation-settings: 'FILL' 1;">${icon}</span>
         <div class="flex-1 min-w-0">
-          <h3 class="text-on-surface font-semibold text-[14px] mb-1">${sanitize(finding.name)}</h3>
-          <p class="text-on-secondary-container text-[13px] leading-relaxed">${sanitize(finding.finding)}</p>
-          ${finding.quote && !finding.passed ? `<div class="mt-3 bg-error/5 border border-error/10 rounded p-2 font-code-xs text-[11px] ${colorClass}/80 break-words">${sanitize(finding.quote.slice(0, 120))}</div>` : ''}
+          <div class="flex justify-between items-start gap-2 mb-1">
+            <h3 class="${titleColor} font-semibold text-[14px] leading-tight">${sanitize(finding.name)}</h3>
+            <span class="finding-severity-pill ${severity}">${pillText}</span>
+          </div>
+          <p class="text-on-surface-variant text-[13px] leading-relaxed opacity-90">${sanitize(finding.finding)}</p>
+          ${finding.quote && !finding.passed ? `<div class="mt-2 finding-quote-block">${sanitize(finding.quote.slice(0, 120))}</div>` : ''}
         </div>
       </div>
     `;
@@ -979,6 +985,7 @@ function renderFindingsTab(ruleResult, llm) {
   } else {
     if (quotesSection) quotesSection.style.display = 'none';
   }
+
 }
 
 // ─── URLs Tab ─────────────────────────────────────────────────────────────────
@@ -1018,15 +1025,14 @@ function renderURLsTab(urls) {
     const card = document.createElement('div');
     const isMal = url.safetyVerdict === 'malicious';
     const isSusp = url.safetyVerdict === 'suspicious';
+    const severity = isMal ? 'malicious' : isSusp ? 'suspicious' : 'safe';
     
-    const borderColor = isMal ? 'border-error/50' : isSusp ? 'border-amber-500/50' : 'border-emerald-500/50';
-    const bgColor = isMal ? 'bg-error/5' : isSusp ? 'bg-amber-500/5' : 'bg-emerald-500/5';
     const textColor = isMal ? 'text-error' : isSusp ? 'text-amber-500' : 'text-emerald-500';
     
     let tagsHtml = '';
     if (url.riskTags && url.riskTags.length) {
       tagsHtml = url.riskTags.map(tag => 
-        `<span class="bg-surface-variant text-on-surface-variant text-[10px] px-2 py-0.5 rounded-full border border-outline-variant/30">${esc(tag)}</span>`
+        `<span class="url-risk-tag ${textColor}">${esc(tag)}</span>`
       ).join('');
     }
 
@@ -1064,28 +1070,27 @@ function renderURLsTab(urls) {
       apiResultsHtml += '</div>';
     }
 
-    card.className = `relative rounded-xl border ${borderColor} ${bgColor} p-3 overflow-hidden transition-all`;
+    card.className = 'glass-panel relative overflow-hidden p-4 flex flex-col gap-2';
     card.innerHTML = `
-      <div class="absolute left-0 top-0 bottom-0 w-[4px] ${isMal ? 'bg-error' : isSusp ? 'bg-amber-500' : 'bg-emerald-500'}"></div>
-      <div class="pl-2">
-        <div class="flex justify-between items-start mb-1">
-          <div class="font-bold ${textColor} text-[11px] uppercase tracking-wider">${url.safetyVerdict} (Score: ${url.riskScore})</div>
-        </div>
-        <div class="text-[12px] text-on-surface-variant mb-1 truncate" title="Display: ${esc(url.displayText)}">
-          Display: ${esc(url.displayText)}
-        </div>
-        <div class="text-code-xs text-primary break-all mb-2" title="Destination: ${esc(url.href)}">
-          ${esc(url.href)}
-        </div>
-        
-        ${tagsHtml ? `<div class="flex flex-wrap gap-1 mb-2">${tagsHtml}</div>` : ''}
-        ${apiResultsHtml}
-        
-        <div class="flex gap-2 mt-2">
-          <button class="check-safety-btn bg-surface-variant text-on-surface-variant px-2 py-1 rounded hover:brightness-110 flex items-center gap-1" data-idx="${i}">
-            <span class="material-symbols-outlined text-[14px]">manage_search</span>
-            <span class="text-[10px] font-bold uppercase">Check Safety APIs</span>
-          </button>
+      <div class="flex items-start gap-3">
+        <div class="url-status-dot ${severity} mt-1.5"></div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-start gap-2 mb-1.5">
+            <div class="font-bold ${textColor} text-[11px] uppercase tracking-wider font-code-xs">${url.safetyVerdict}</div>
+            <div class="text-[9px] font-code-xs text-on-surface-variant border border-white/10 rounded px-1.5 py-0.5 bg-white/5 flex-shrink-0">Score: ${url.riskScore}</div>
+          </div>
+          <div class="text-[12px] text-on-surface-variant mb-1 truncate">
+            <span class="text-outline opacity-80">Display: </span>${esc(url.displayText)}
+          </div>
+          <div class="text-code-xs text-primary break-all mb-2 opacity-90 leading-relaxed">${esc(url.href)}</div>
+          ${tagsHtml ? `<div class="flex flex-wrap gap-1 mb-2">${tagsHtml}</div>` : ''}
+          ${apiResultsHtml}
+          <div class="mt-2 pt-2 border-t border-white/5">
+            <button class="check-safety-btn deep-scan-btn" data-idx="${i}">
+              <span class="material-symbols-outlined text-[14px]">manage_search</span>
+              Deep Scan (Safe Browsing + VirusTotal)
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -1233,26 +1238,27 @@ function renderRemediationTab(score, llm) {
   const checklistEl = document.getElementById('remediation-checklist');
 
   if (tierBox) {
-    let cls, icon, text;
-    if (score <= 39) {
-      cls = 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400';
-      icon = 'check_circle';
-      text = 'This email appears safe. Normal precautions apply.';
-    } else if (score <= 69) {
-      cls = 'bg-amber-500/20 border-amber-500/40 text-amber-400';
-      icon = 'warning';
-      text = 'Exercise caution. Verify the sender via official channels.';
-    } else {
-      cls = 'bg-error/20 border-error/40 text-error';
-      icon = 'error';
-      text = 'Confirmed threat. Do not click links or download attachments.';
-    }
-    tierBox.className = `bg-surface-container border rounded-lg p-3 mb-2 relative overflow-hidden shadow-sm ${cls}`;
+    const isDanger = score > 69;
+    const isWarn = score > 39 && score <= 69;
+    const cls = isDanger ? 'danger' : isWarn ? 'warn' : 'safe';
+    const icon = isDanger ? 'warning' : isWarn ? 'warning' : 'check_circle';
+    const title = isDanger ? 'Confirmed threat.' : isWarn ? 'Exercise caution.' : 'Email appears safe.';
+    const subtitle = isDanger
+      ? 'Delete immediately. Do not interact with links or attachments.'
+      : isWarn
+        ? 'Verify the sender via official channels before taking any action.'
+        : 'Normal precautions apply. No immediate action required.';
+    const iconColor = isDanger ? 'text-error' : isWarn ? 'text-amber-400' : 'text-emerald-400';
+    const titleColor = isDanger ? 'text-error' : isWarn ? 'text-amber-400' : 'text-emerald-400';
+
+    tierBox.className = `glass-panel${isDanger ? ' threat-pulse' : ''} relative overflow-hidden p-4 flex flex-col gap-2 mb-0`;
     tierBox.innerHTML = `
-      <div class="flex gap-3 items-start">
-        <span class="material-symbols-outlined mt-0.5" style="font-variation-settings: 'FILL' 1;">${icon}</span>
-        <p class="text-[13px] leading-relaxed">${text}</p>
+      ${isDanger ? '<div class="threat-strip danger"></div>' : isWarn ? '<div class="threat-strip warn"></div>' : '<div class="threat-strip safe"></div>'}
+      <div class="flex items-center gap-2 ml-2">
+        <span class="material-symbols-outlined ${iconColor} text-xl" style="font-variation-settings: 'FILL' 1;">${icon}</span>
+        <h2 class="text-headline-sm font-headline-sm ${titleColor} font-bold">${title}</h2>
       </div>
+      <p class="text-body-md font-body-md text-on-surface-variant ml-2 opacity-90">${subtitle}</p>
     `;
   }
 
@@ -1265,20 +1271,43 @@ function renderRemediationTab(score, llm) {
       'Delete the email from your inbox and trash.'
     ];
 
+    // Fallback subtitles per step
+    const fallbackSubs = [
+      'Remove from inbox to prevent accidental clicks.',
+      'Verify account status via official channels, not links provided.',
+      'Contact your help desk or CISO immediately.',
+      'Remove from trash as well to fully purge.'
+    ];
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'glass-panel p-0 overflow-hidden flex flex-col';
+    wrapper.innerHTML = `
+      <div class="px-4 py-3 border-b border-white/5 flex items-center justify-between" style="background: rgba(37, 43, 46, 0.5);">
+        <h3 class="text-headline-sm font-headline-sm text-on-surface font-semibold">Remediation Plan</h3>
+        <span class="text-code-xs font-code-xs text-outline">Action Required</span>
+      </div>
+      <div id="remediation-steps-inner" class="p-2 flex flex-col gap-1"></div>
+    `;
+    checklistEl.appendChild(wrapper);
+
+    const stepsInner = wrapper.querySelector('#remediation-steps-inner');
+    const esc = (s) => s.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
     steps.forEach((step, i) => {
+      // First step gets error color (most urgent)
+      const isUrgent = i === 0 && (llm?.remediationSteps?.length > 0 ? false : true);
+      const stepTextColor = isUrgent ? 'text-error' : 'text-on-surface';
+
       const item = document.createElement('label');
-      item.className = 'flex items-start gap-3 p-3 rounded-lg bg-surface-container-low border border-outline-variant/20 hover:bg-surface-variant/20 transition-colors cursor-pointer group min-w-0';
-      const esc = (s) => s.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      item.className = 'flex items-start gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors cursor-pointer group';
       item.innerHTML = `
-        <div class="relative flex items-center justify-center mt-0.5">
-          <input type="checkbox" id="check-step-${i}" class="peer appearance-none w-5 h-5 border border-outline rounded bg-surface-container checked:bg-primary checked:border-primary transition-all cursor-pointer">
-          <span class="material-symbols-outlined text-on-primary absolute text-[16px] opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity" style="font-variation-settings: 'FILL' 1;">check</span>
-        </div>
-        <div class="flex-1">
-          <p class="text-[13px] text-on-surface opacity-90 group-hover:opacity-100 transition-opacity">${esc(step)}</p>
+        <input type="checkbox" class="cyber-checkbox mt-0.5" id="check-step-${i}">
+        <div class="flex flex-col checkbox-label">
+          <span class="text-body-md font-body-md ${stepTextColor} font-medium">${esc(step)}</span>
+          ${fallbackSubs[i] ? `<span class="text-code-xs font-code-xs text-outline mt-1">${esc(fallbackSubs[i])}</span>` : ''}
         </div>
       `;
-      checklistEl.appendChild(item);
+      stepsInner.appendChild(item);
     });
   }
 }

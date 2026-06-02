@@ -419,3 +419,215 @@
   color: #ffdad6;
   font-size: 12px;
 }
+
+/* ═══════════════════════════════════════════════════════
+   STITCH GLASSMORPHISM DESIGN SYSTEM
+   ═══════════════════════════════════════════════════════ */
+
+/* Glass Panel — matches Stitch .glass-panel exactly */
+.glass-panel {
+  background: rgba(27, 32, 36, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Legacy alias — keep existing .glass-card working */
+.glass-card {
+  background: rgba(27, 32, 36, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Neon threat pulse — red glow animation */
+@keyframes neonPulse {
+  0%   { box-shadow: 0 0 10px rgba(239, 68, 68, 0.2), inset 0 0 10px rgba(239, 68, 68, 0.1); }
+  50%  { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5), inset 0 0 15px rgba(239, 68, 68, 0.2); }
+  100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.2), inset 0 0 10px rgba(239, 68, 68, 0.1); }
+}
+.threat-pulse {
+  animation: neonPulse 2s infinite ease-in-out;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  background: linear-gradient(135deg, rgba(147, 0, 10, 0.8) 0%, rgba(27, 32, 36, 0.6) 100%) !important;
+}
+
+/* Left strip accent */
+.threat-strip {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 1rem 0 0 1rem;
+}
+.threat-strip.danger {
+  background-color: #EF4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+.threat-strip.warn {
+  background-color: #F59E0B;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+.threat-strip.safe {
+  background-color: #10B981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+/* ── Cyber Checkbox (Stitch exact) ─────────────────────── */
+.cyber-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(135, 146, 154, 0.5);
+  border-radius: 4px;
+  background: rgba(15, 20, 24, 0.5);
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.cyber-checkbox:checked {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+}
+.cyber-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 7px;
+  width: 5px;
+  height: 10px;
+  border: solid #38bdf8;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.checkbox-label {
+  transition: color 0.2s ease;
+}
+.cyber-checkbox:checked ~ .checkbox-label,
+.cyber-checkbox:checked + .checkbox-label {
+  color: #bdc8d1;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+/* ── Findings ──────────────────────────────────────────── */
+.finding-strip {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 1rem 0 0 1rem;
+}
+.finding-strip.critical, .finding-strip.high {
+  background-color: #EF4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+.finding-strip.medium {
+  background-color: #F59E0B;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+}
+.finding-strip.safe {
+  background-color: #10B981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+}
+
+.finding-severity-pill {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 0.25rem;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+}
+.finding-severity-pill.critical, .finding-severity-pill.high {
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+  border-color: rgba(239, 68, 68, 0.35);
+}
+.finding-severity-pill.medium {
+  background: rgba(245, 158, 11, 0.15);
+  color: #F59E0B;
+  border-color: rgba(245, 158, 11, 0.35);
+}
+.finding-severity-pill.safe {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10B981;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.finding-quote-block {
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid rgba(239, 68, 68, 0.5);
+  border-radius: 0 0.25rem 0.25rem 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #ffb4ab;
+  word-break: break-all;
+}
+
+/* ── URLs ──────────────────────────────────────────────── */
+.url-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.url-status-dot.malicious {
+  background-color: #EF4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+  animation: neonPulse 1.5s infinite ease-in-out;
+}
+.url-status-dot.suspicious {
+  background-color: #F59E0B;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+}
+.url-status-dot.safe {
+  background-color: #10B981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+}
+
+.url-risk-tag {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.15rem 0.4rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #bdc8d1;
+}
+
+.deep-scan-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  width: 100%;
+  color: #bdc8d1;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  cursor: pointer;
+}
+.deep-scan-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #dee3e8;
+}
+
