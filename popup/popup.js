@@ -874,6 +874,20 @@ function renderGauge(score, llm, ruleResult) {
 
 // ─── Summary Tab ─────────────────────────────────────────────────────────────
 function renderSummaryTab(score, llm) {
+  const stripEl = document.getElementById('summary-threat-strip');
+  if (stripEl) {
+    const sev = score >= 70 ? 'danger' : score >= 40 ? 'warn' : 'safe';
+    stripEl.className = `threat-strip ${sev}`;
+  }
+
+  const verdictEl = document.getElementById('summary-verdict-text');
+  if (verdictEl) {
+    const verdict = scoreToVerdict(score);
+    verdictEl.textContent = verdict;
+    const color = score >= 70 ? '#EF4444' : score >= 40 ? '#F59E0B' : '#10B981';
+    verdictEl.style.color = color;
+  }
+
   const actionEl = document.getElementById('summary-recommended-action');
   if (actionEl) actionEl.textContent = llm?.recommendedAction || '';
 
@@ -882,33 +896,65 @@ function renderSummaryTab(score, llm) {
   barsEl.innerHTML = '';
 
   const categories = [
-    { icon: '🎭', label: 'Impersonation', key: 'impersonation' },
-    { icon: '⏰', label: 'Urgency Manipulation', key: 'urgencyManipulation' },
-    { icon: '🧠', label: 'Social Engineering', key: 'socialEngineering' },
-    { icon: '🔗', label: 'Technical Indicators', key: 'technicalIndicators' },
-    { icon: '🤖', label: 'AI-Generated Signs', key: 'aiGeneratedSigns' },
+    { 
+      label: 'Impersonation', 
+      key: 'impersonation', 
+      path: 'M 0 32 C 20 32, 25 12, 45 12 C 65 12, 70 28, 90 28 C 105 28, 110 16, 120 16', 
+      fillPath: 'M 0 32 C 20 32, 25 12, 45 12 C 65 12, 70 28, 90 28 C 105 28, 110 16, 120 16 L 120 40 L 0 40 Z' 
+    },
+    { 
+      label: 'Urgency Manipulation', 
+      key: 'urgencyManipulation', 
+      path: 'M 0 28 C 20 28, 30 18, 50 18 C 70 18, 80 26, 100 26 C 110 26, 115 22, 120 22', 
+      fillPath: 'M 0 28 C 20 28, 30 18, 50 18 C 70 18, 80 26, 100 26 C 110 26, 115 22, 120 22 L 120 40 L 0 40 Z' 
+    },
+    { 
+      label: 'Social Engineering', 
+      key: 'socialEngineering', 
+      path: 'M 0 30 C 15 30, 25 14, 40 14 C 55 14, 65 26, 80 26 C 95 26, 105 18, 120 18', 
+      fillPath: 'M 0 30 C 15 30, 25 14, 40 14 C 55 14, 65 26, 80 26 C 95 26, 105 18, 120 18 L 120 40 L 0 40 Z' 
+    },
+    { 
+      label: 'Technical Indicators', 
+      key: 'technicalIndicators', 
+      path: 'M 0 26 C 15 26, 20 8, 35 8 C 50 8, 60 28, 80 28 C 95 28, 105 20, 120 20', 
+      fillPath: 'M 0 26 C 15 26, 20 8, 35 8 C 50 8, 60 28, 80 28 C 95 28, 105 20, 120 20 L 120 40 L 0 40 Z' 
+    },
   ];
 
   for (const cat of categories) {
     const val = llm?.categories?.[cat.key] ?? 0;
     const color = categoryColor(val);
-    const row = document.createElement('div');
-    row.className = 'flex items-center gap-2 min-w-0';
-    row.innerHTML = `
-      <span class="text-[14px] text-on-surface-variant w-4 text-center">${cat.icon}</span>
-      <span class="text-[12px] font-body-md text-on-surface-variant w-32 truncate min-w-0">${cat.label}</span>
-      <div class="flex-1 h-1.5 bg-surface-variant rounded-full overflow-hidden">
-        <div class="h-full category-bar-fill transition-all duration-1000 ease-out" style="width: 0%; background:${color};" data-target="${val}"></div>
+    const gradId = val >= 70 ? 'sparkline-grad-danger' : val >= 40 ? 'sparkline-grad-warn' : 'sparkline-grad-safe';
+    const glowColor = val >= 70 ? 'rgba(239, 68, 68, 0.45)' : val >= 40 ? 'rgba(245, 158, 11, 0.45)' : 'rgba(16, 185, 129, 0.45)';
+
+    const cell = document.createElement('div');
+    cell.className = 'flex flex-col min-w-0';
+    cell.innerHTML = `
+      <div class="flex justify-between items-center text-[12px] font-medium mb-1 shrink-0 px-0.5">
+        <span class="text-on-surface/90 truncate min-w-0 font-sans tracking-wide">${cat.label}</span>
+        <span class="font-bold ml-1.5 shrink-0" style="color:${color}">${val}</span>
       </div>
-      <span class="text-label-caps font-label-caps w-5 text-right" style="color:${color}">${val}</span>
+      <div class="w-full h-[36px] relative overflow-hidden rounded-lg border border-white/5 bg-white/[0.02]">
+        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 120 40" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Area gradient fill -->
+          <path class="sparkline-area-fill" d="${cat.fillPath}" fill="url(#${gradId})" style="transform: scaleY(0); transform-origin: bottom; transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);" />
+          <!-- Wavy stroke with dynamic drop shadow -->
+          <path class="sparkline-stroke-path" d="${cat.path}" stroke="${color}" stroke-width="2.2" stroke-linecap="round" fill="none" style="filter: drop-shadow(0px 2px 4px ${glowColor}); stroke-dasharray: 150; stroke-dashoffset: 150; transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1);" />
+        </svg>
+      </div>
     `;
-    barsEl.appendChild(row);
+    barsEl.appendChild(cell);
   }
 
+  // Trigger SVG animations
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      document.querySelectorAll('.category-bar-fill').forEach((el) => {
-        el.style.width = el.dataset.target + '%';
+      document.querySelectorAll('.sparkline-area-fill').forEach((el) => {
+        el.style.transform = 'scaleY(1)';
+      });
+      document.querySelectorAll('.sparkline-stroke-path').forEach((el) => {
+        el.style.strokeDashoffset = '0';
       });
     });
   });
@@ -916,7 +962,7 @@ function renderSummaryTab(score, llm) {
   const noteWrap = document.getElementById('analyst-note-wrap');
   const noteText = document.getElementById('analyst-note-text');
   if (llm?.analystNote) {
-    if (noteWrap) noteWrap.style.display = 'flex';
+    if (noteWrap) noteWrap.style.display = 'block';
     if (noteText) noteText.textContent = llm.analystNote;
   } else {
     if (noteWrap) noteWrap.style.display = 'none';
