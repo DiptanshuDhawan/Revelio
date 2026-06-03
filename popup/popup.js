@@ -459,15 +459,17 @@ function populateSettingsFromStorage(settings) {
   const ollamaModel = document.getElementById('ollama-model');
 
   if (ollamaModel) {
-    const saved = settings.ollamaModel || 'deepseek-r1:8b';
-    // Add it as a temporary option if not present, will be replaced when models are fetched
-    if (!Array.from(ollamaModel.options).some(opt => opt.value === saved)) {
-      const opt = document.createElement('option');
-      opt.value = saved;
-      opt.textContent = saved;
-      ollamaModel.appendChild(opt);
+    const saved = settings.ollamaModel || '';
+    if (saved) {
+      // Add it as a temporary option if not present, will be replaced when models are fetched
+      if (!Array.from(ollamaModel.options).some(opt => opt.value === saved)) {
+        const opt = document.createElement('option');
+        opt.value = saved;
+        opt.textContent = saved;
+        ollamaModel.appendChild(opt);
+      }
+      ollamaModel.value = saved;
     }
-    ollamaModel.value = saved;
   }
 }
 

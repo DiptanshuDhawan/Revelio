@@ -26,7 +26,7 @@ function loadSettingsIntoUI(settings) {
   if ($('s-ollama-model')) {
     const selectEl = $('s-ollama-model');
     // Save current value before we clear options
-    const savedModel = settings.ollamaModel || 'deepseek-r1:8b';
+    const savedModel = settings.ollamaModel || '';
     
     // Try to fetch real models from Ollama to populate dropdown
     chrome.runtime.sendMessage({ type: 'GET_OLLAMA_MODELS', endpoint })
@@ -49,12 +49,15 @@ function loadSettingsIntoUI(settings) {
           
           if (foundSaved) {
             selectEl.value = savedModel;
-          } else {
+          } else if (savedModel) {
             selectEl.value = 'custom';
             if ($('s-ollama-model-custom')) {
               $('s-ollama-model-custom').style.display = 'block';
               $('s-ollama-model-custom').value = savedModel;
             }
+          } else {
+            selectEl.value = resp.models[0];
+            saveSettings({ ollamaModel: resp.models[0] });
           }
         } else {
           // Fallback if offline: just show the saved one
@@ -162,9 +165,9 @@ function switchProvider(provider) {
 function collectSettings() {
   const $ = (id) => document.getElementById(id);
 
-  let ollamaModel = $('s-ollama-model')?.value || 'deepseek-r1:8b';
+  let ollamaModel = $('s-ollama-model')?.value || '';
   if (ollamaModel === 'custom') {
-    ollamaModel = $('s-ollama-model-custom')?.value || 'deepseek-r1:8b';
+    ollamaModel = $('s-ollama-model-custom')?.value || '';
   }
   
   let openaiModel = $('s-openai-model')?.value || 'gpt-4o-mini';

@@ -22,7 +22,7 @@ chrome.runtime.onInstalled.addListener(() => {
         initialized: true,
         provider: 'ollama',
         ollamaEndpoint: 'http://localhost:11434',
-        ollamaModel: 'deepseek-r1:8b',
+        ollamaModel: '',
         openaiApiKey: '',
         openaiModel: 'gpt-4o-mini',
         geminiApiKey: '',
@@ -279,7 +279,29 @@ async function handlePassiveScan(emailText, source) {
 
 async function callOllama(prompt, settings) {
   const endpoint = settings.ollamaEndpoint || 'http://localhost:11434';
-  const model = settings.ollamaModel || 'deepseek-r1:8b';
+  let model = settings.ollamaModel || '';
+
+  // Auto-detect model if none is selected or installed
+  try {
+    const tagsResp = await fetch(`${endpoint}/api/tags`);
+    if (tagsResp.ok) {
+      const tagsData = await tagsResp.json();
+      if (tagsData && tagsData.models && tagsData.models.length > 0) {
+        const availableModels = tagsData.models.map(m => m.name);
+        if (!model || !availableModels.includes(model)) {
+          // If no model is set or the set model doesn't exist, fallback to first available
+          model = availableModels[0];
+          // Save it back to settings to persist the choice
+          saveSettings({ ollamaModel: model });
+        }
+      }
+    }
+  } catch (err) {
+    // If we can't fetch tags, let it fail during the generation request
+  }
+
+  // Final fallback just in case
+  model = model || 'deepseek-r1:8b';
 
   let response;
   try {

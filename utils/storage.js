@@ -7,7 +7,7 @@ const DEFAULT_SETTINGS = {
   initialized: false,
   provider: 'ollama',
   ollamaEndpoint: 'http://localhost:11434',
-  ollamaModel: 'deepseek-r1:8b',
+  ollamaModel: '',
   openaiApiKey: '',
   openaiModel: 'gpt-4o-mini',
   geminiApiKey: '',
