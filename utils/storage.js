@@ -12,8 +12,8 @@ const DEFAULT_SETTINGS = {
   openaiModel: 'gpt-4o-mini',
   geminiApiKey: '',
   geminiModel: 'gemini-1.5-flash',
-  grokApiKey: '',
   sensitivityThreshold: 50,
+  autoScanEnabled: true,
   autoSave: true,
   showRuleBreakdown: true,
   maxHistoryEntries: 20,
@@ -134,7 +134,7 @@ export async function exportHistory() {
       exportedAt: new Date().toISOString(),
       extensionVersion: '1.0.0',
       stats,
-      settings: { ...settings, openaiApiKey: '[REDACTED]', geminiApiKey: '[REDACTED]', grokApiKey: '[REDACTED]' },
+      settings: { ...settings, openaiApiKey: '[REDACTED]', geminiApiKey: '[REDACTED]' },
       history: history.map((entry) => ({
         ...entry,
         fullResult: undefined, // Exclude full results for smaller export

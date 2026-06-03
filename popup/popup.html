@@ -7,7 +7,7 @@
   <link href="../assets/fonts/fonts.css" rel="stylesheet"/>
   <link href="popup-built.css" rel="stylesheet"/>
 </head>
-<body class="pg-shell bg-background text-on-surface min-h-[600px] w-[440px] flex flex-col font-body-md antialiased overflow-hidden border border-outline-variant/30">
+<body class="pg-shell bg-background text-on-surface min-h-[400px] w-[380px] flex flex-col font-body-md antialiased overflow-hidden border border-outline-variant/30">
 
 <!-- Global Header -->
 <header class="pg-header bg-surface border-b border-outline-variant flex justify-between items-center w-full px-container-padding py-stack-gap shrink-0 z-40 relative">
@@ -66,74 +66,86 @@
     </div>
   </div>
 
-  <!-- ─── INPUT VIEW ───────────────────────────────────────────────────── -->
-  <section id="input-view" class="pg-input-view view flex flex-col h-full flex-1 p-container-padding gap-4 overflow-y-auto custom-scrollbar">
-    
-    <div class="flex flex-col gap-2">
-      <div class="flex justify-between items-end">
-        <label class="text-[13px] font-bold text-on-surface-variant uppercase tracking-wider">Email Content</label>
-        <label for="file-upload" class="text-[11px] text-primary hover:underline cursor-pointer flex items-center gap-1">
-          <span class="material-symbols-outlined text-[14px]">upload</span> Upload .eml
-        </label>
-        <input type="file" id="file-upload" accept=".eml,.txt,.msg" class="hidden" />
-      </div>
-      <textarea id="email-input" class="w-full h-[240px] bg-surface-container rounded-lg border border-outline-variant/50 p-3 text-[13px] font-code-xs text-on-surface focus:outline-none focus:border-primary transition-colors custom-scrollbar resize-none placeholder-on-surface-variant/40" placeholder="Paste full email (headers + body) here..."></textarea>
-    </div>
+  <!-- ─── UNIFIED IDLE / SCAN / LOADING VIEW ──────────────────────────── -->
+  <section id="input-view" class="pg-input-view view flex flex-col h-full flex-1 items-center justify-center text-center" style="padding: 28px 24px; gap: 0; background: var(--background, #0d1117); position: relative; overflow: hidden;">
 
-    <div class="input-actions relative">
-      <div class="flex gap-2">
-        <button id="analyze-btn" class="flex-1 bg-primary text-on-primary font-bold rounded-lg py-2.5 flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(142,213,255,0.2)]">
-          <span class="material-symbols-outlined text-[18px]">psychology</span> Analyze
-        </button>
-        <button id="sample-btn" class="bg-surface-variant text-on-surface-variant px-3 rounded-lg font-bold hover:brightness-110 active:scale-95 transition-all">
-          Sample
-        </button>
-        <button id="clear-btn" class="bg-surface-variant text-on-surface-variant px-4 rounded-lg font-bold hover:brightness-110 active:scale-95 transition-all">
-          Clear
-        </button>
-      </div>
+    <!-- Ambient glow background -->
+    <div id="idle-glow" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%); width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(56,189,248,0.06) 0%, transparent 70%); pointer-events: none; transition: opacity 0.6s;"></div>
 
-      <div id="sample-menu" class="hidden bg-surface-container border border-outline-variant/40 rounded-lg overflow-hidden shadow-xl">
-        <button class="dropdown-item block w-full text-left px-3 py-2 text-[12px] text-on-surface hover:bg-surface-variant/40" data-sample="classic-phishing">Classic phishing</button>
-        <button class="dropdown-item block w-full text-left px-3 py-2 text-[12px] text-on-surface hover:bg-surface-variant/40" data-sample="bec-ceo-fraud">BEC invoice</button>
-        <button class="dropdown-item block w-full text-left px-3 py-2 text-[12px] text-on-surface hover:bg-surface-variant/40" data-sample="legitimate-google">Legitimate Google</button>
+    <!-- Shield Icon with Radar Rings -->
+    <div id="scan-icon-container" style="position: relative; width: 110px; height: 110px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+      <!-- Radar rings (hidden during loading) -->
+      <div id="radar-ring-1" style="position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid rgba(56,189,248,0.35); animation: radarPing 2s ease-out infinite;"></div>
+      <div id="radar-ring-2" style="position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid rgba(56,189,248,0.2); animation: radarPing 2s ease-out 0.7s infinite;"></div>
+      <!-- Icon disc -->
+      <div id="icon-disc" style="width: 68px; height: 68px; border-radius: 18px; background: linear-gradient(135deg, rgba(99,102,241,0.35), rgba(56,189,248,0.2)); border: 1.5px solid rgba(56,189,248,0.35); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 28px rgba(56,189,248,0.25); transition: all 0.5s ease;">
+        <svg id="scan-icon-svg" width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: #38bdf8; transition: color 0.4s;">
+          <path d="M12 2L4 6V12C4 16.4 7.4 20.5 12 22C16.6 20.5 20 16.4 20 12V6L12 2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" fill="rgba(56,189,248,0.1)"/>
+          <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
     </div>
 
-    <div class="bg-surface-container-low rounded-lg border border-outline-variant/30 p-3 mt-auto">
-      <div class="flex gap-2 items-center mb-2">
-        <span class="material-symbols-outlined text-[16px] text-primary">memory</span>
-        <span class="text-[12px] font-bold text-on-surface-variant uppercase">AI Provider</span>
+    <!-- Status title (idle: "Auto-Scan Active", loading: cycling messages) -->
+    <h2 id="idle-status-title" style="font-size: 16px; font-weight: 700; color: #e2e8f0; margin: 0 0 8px 0; letter-spacing: -0.01em; transition: opacity 0.3s; min-height: 24px;">Auto-Scan Active</h2>
+
+    <!-- Status message (idle: description, loading: phase) -->
+    <p id="idle-status-msg" style="font-size: 13px; color: #94a3b8; line-height: 1.6; max-width: 256px; margin: 0 0 0 0; transition: opacity 0.3s; min-height: 40px;">
+      Open an email in Gmail or Outlook — Revelio will automatically detect and analyze it for threats.
+    </p>
+
+    <!-- ── LOADING SECTION (hidden until analysis starts) ── -->
+    <div id="loading-section" style="display: none; flex-direction: column; align-items: center; gap: 0; width: 100%; margin-top: 20px;">
+      <!-- Progress bar -->
+      <div style="width: 200px; height: 2px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; margin-bottom: 10px;">
+        <div id="progress-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #6366f1, #38bdf8); border-radius: 999px; transition: width 0.5s ease-out;"></div>
       </div>
-      <div class="flex gap-2">
-        <select id="ollama-model" class="flex-1 bg-surface-container border border-outline-variant/50 rounded p-1.5 text-[12px] text-on-surface focus:outline-none focus:border-primary">
-          <option value="deepseek-r1:8b">deepseek-r1:8b</option>
-          <option value="llama3.1">llama3.1</option>
-        </select>
-      </div>
+      <!-- Sub-label -->
+      <p style="font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin: 0;">AI + Rule Engine Active</p>
     </div>
+
+    <!-- ── IDLE BOTTOM SECTION (hidden during loading) ── -->
+    <div id="idle-bottom" style="display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 24px;">
+      <!-- Provider pill -->
+      <div id="provider-badge" style="display: flex; align-items: center; gap: 6px; background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.2); border-radius: 999px; padding: 5px 14px; font-size: 11px; color: #38bdf8; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;">
+        <span style="width: 6px; height: 6px; border-radius: 50%; background: #38bdf8; display: inline-block; animation: pulse 2s infinite;"></span>
+        <span id="provider-badge-text">Gemini · Cloud</span>
+      </div>
+      <!-- Force Rescan button -->
+      <button id="rescan-btn" style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; padding: 9px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; letter-spacing: 0.01em;"
+        onmouseover="this.style.background='rgba(56,189,248,0.1)'; this.style.borderColor='rgba(56,189,248,0.3)'; this.style.color='#38bdf8';"
+        onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='#94a3b8';">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+        </svg>
+        Force Rescan
+      </button>
+    </div>
+
+    <!-- Keyframes -->
+    <style>
+      @keyframes radarPing {
+        0%   { transform: scale(0.65); opacity: 0.7; }
+        80%  { transform: scale(1.9); opacity: 0; }
+        100% { transform: scale(1.9); opacity: 0; }
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0.3; }
+      }
+      @keyframes scanBob {
+        0%, 100% { transform: translateY(0px); }
+        50%       { transform: translateY(-4px); }
+      }
+      #rescan-btn:active { transform: scale(0.97); }
+    </style>
   </section>
-
-
-  <!-- ─── LOADING VIEW ─────────────────────────────────────────────────── -->
-  <section id="loading-view" class="view hidden flex flex-col items-center justify-center h-full flex-1 relative bg-surface-container-lowest">
-    <div class="absolute inset-0 bg-primary/5 animate-pulse-ring blur-3xl rounded-full"></div>
-    <div class="relative z-10 flex flex-col items-center">
-      <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-primary flex items-center justify-center shadow-[0_0_30px_rgba(56,189,248,0.5)] animate-shield-bob mb-6">
-        <span class="material-symbols-outlined text-white text-[36px]" style="font-variation-settings: 'FILL' 1;">shield</span>
-      </div>
-      <h2 id="loading-message" class="text-[16px] font-bold text-on-surface mb-2">Extracting Metadata...</h2>
-      <div class="w-48 h-1.5 bg-surface-variant rounded-full overflow-hidden mb-3">
-        <div id="progress-bar" class="h-full bg-primary w-1/3 rounded-full transition-all duration-500 ease-out"></div>
-      </div>
-      <p class="text-[11px] text-on-surface-variant uppercase tracking-wider font-code-xs">AI + Rule Engine Active</p>
-    </div>
-  </section>
-
 
   <!-- ─── OFFLINE VIEW ──────────────────────────────────────────────────── -->
   <section id="offline-view" class="view hidden flex flex-col flex-1 h-full min-h-0 overflow-hidden bg-background">
     <!-- Scrolling Content -->
+
     <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col pb-4">
       <!-- Hero Card -->
     <div class="mx-4 mt-4 bg-surface-container-low/80 backdrop-blur-xl rounded-xl p-5 border border-tertiary-container/30 relative overflow-hidden glass-panel shrink-0">
@@ -244,7 +256,10 @@
 
         <!-- Details -->
         <div class="flex flex-col items-end gap-1.5 justify-center">
-          <div id="verdict-badge" class="border px-3 py-1 rounded text-[11px] font-bold tracking-widest uppercase">SAFE</div>
+          <div class="flex gap-1.5 items-center justify-end">
+            <span id="attack-vector-badge" class="hidden border px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase"></span>
+            <div id="verdict-badge" class="border px-3 py-1 rounded text-[11px] font-bold tracking-widest uppercase">SAFE</div>
+          </div>
           <div class="text-[11px] text-on-surface-variant font-code-xs">
             AI: <span id="ai-score-val">0</span> | Rules: <span id="rule-score-val">0</span>
           </div>
@@ -310,6 +325,27 @@
           <div id="category-bars" class="grid grid-cols-2 gap-x-4 gap-y-3.5 ml-2"></div>
         </div>
 
+        <!-- AI Analysis Card -->
+        <div id="ai-analysis-card" class="glass-panel relative overflow-hidden p-4 hidden">
+          <div class="finding-strip bg-primary shadow-[0_0_8px_rgba(var(--color-primary),0.6)]"></div>
+          <div class="flex items-start gap-3 ml-2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary mt-0.5 shrink-0">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+              <circle cx="12" cy="12" r="4"></circle>
+            </svg>
+            <div class="flex-1 min-w-0 flex flex-col gap-2">
+              <div class="flex items-center gap-1.5 shrink-0">
+                <h3 class="text-primary font-bold text-[12px] uppercase tracking-wider">AI Threat Narrative</h3>
+              </div>
+              <p id="ai-threat-narrative" class="text-on-surface text-[13px] leading-relaxed opacity-95"></p>
+              <div id="ai-bec-details-wrap" class="hidden mt-1 p-2 bg-error/10 border border-error/20 rounded-md">
+                <p class="text-error text-[11px] font-bold uppercase tracking-wider mb-1">BEC Pattern Detected</p>
+                <p id="ai-bec-details-text" class="text-error/90 text-[12px] leading-relaxed"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Analyst Assessment Card -->
         <div id="analyst-note-wrap" class="glass-panel relative overflow-hidden p-4 hidden">
           <div class="finding-strip bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></div>
@@ -327,12 +363,23 @@
 
       <!-- TAB: FINDINGS -->
       <div id="tab-findings" class="result-panel hidden p-3 flex flex-col gap-2">
-        <div id="rule-findings-list" class="flex flex-col gap-3"></div>
-        <div id="llm-findings-section" class="hidden flex flex-col gap-2 mt-1">
-          <h4 class="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest px-1">AI Insights</h4>
+        <div id="llm-findings-section" class="hidden flex flex-col gap-2 mt-1 mb-2">
+          <div class="flex items-center gap-2 px-1 mb-1">
+            <h4 class="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">AI Insights</h4>
+            <div class="h-px bg-outline-variant/30 flex-1"></div>
+          </div>
           <div id="llm-findings-list" class="flex flex-col gap-2"></div>
         </div>
-        <div id="suspicious-quotes-section" class="hidden flex flex-col gap-2 mt-1">
+        
+        <div id="rule-findings-section" class="flex flex-col gap-2">
+          <div class="flex items-center gap-2 px-1 mb-1">
+            <h4 class="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Rule Engine Checks</h4>
+            <div class="h-px bg-outline-variant/30 flex-1"></div>
+          </div>
+          <div id="rule-findings-list" class="flex flex-col gap-3"></div>
+        </div>
+
+        <div id="suspicious-quotes-section" class="hidden flex flex-col gap-2 mt-2">
           <h4 class="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest px-1">Suspicious Phrases</h4>
           <div id="suspicious-quotes-list" class="flex flex-col gap-2"></div>
         </div>

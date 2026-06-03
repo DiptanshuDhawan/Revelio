@@ -21,6 +21,8 @@ You have deep expertise in:
 
 // ─── Analysis Prompt Builder ──────────────────────────────────────────────────
 
+import { scoreToVerdict } from './analyzer.js';
+
 export function buildAnalysisPrompt(emailText, ruleContext = null) {
   const ruleSection = ruleContext
     ? `\n\nRULE ENGINE PRE-ANALYSIS (use as supporting context, not as definitive):
@@ -58,10 +60,13 @@ OUTPUT: Respond ONLY with a valid JSON object. No markdown fences. No text outsi
     "technicalIndicators": <0-100>,
     "aiGeneratedSigns": <0-100>
   },
+  "threatNarrative": "<2-3 sentence narrative explaining the attack story, intent, and risk in plain language>",
   "topFindings": [
-    "<specific finding 1 with reference to email content>",
-    "<specific finding 2>",
-    "<specific finding 3>"
+    {
+      "title": "<short finding title>",
+      "detail": "<explanation with reference to email content>",
+      "severity": "<critical|high|medium|low>"
+    }
   ],
   "suspiciousQuotes": [
     "<verbatim suspicious phrase from email 1>",
@@ -95,20 +100,21 @@ ${emailText}
 
 // ─── Fallback Analysis for Offline Mode ──────────────────────────────────────
 
-export function generateOfflineFallback(ruleResult) {
+export function generateOfflineFallback(ruleResult, sensitivity = 50) {
   const score = ruleResult.ruleScore;
   const findings = ruleResult.findings || [];
   const triggered = findings.filter((f) => !f.passed);
 
-  let verdict = 'Safe';
-  if (score >= 86) verdict = 'Confirmed Phishing';
-  else if (score >= 70) verdict = 'Likely Phishing';
-  else if (score >= 40) verdict = 'Suspicious';
+  let verdict = scoreToVerdict(score, sensitivity);
 
   const topFindings = triggered
     .sort((a, b) => b.score - a.score)
     .slice(0, 3)
-    .map((f) => f.finding);
+    .map((f) => ({
+      title: f.name,
+      detail: f.finding,
+      severity: f.severity || 'medium'
+    }));
 
   return {
     llmScore: score,
@@ -122,9 +128,14 @@ export function generateOfflineFallback(ruleResult) {
       technicalIndicators: triggered.find((f) => f.id === 'REPLY_TO_MISMATCH')?.score || 0,
       aiGeneratedSigns: 0,
     },
+    threatNarrative: 'AI analysis is currently offline. This assessment is based entirely on static rule-engine checks and deterministic heuristics. Connect an AI provider for a complete narrative analysis.',
     topFindings: topFindings.length > 0
       ? topFindings
-      : ['Rule engine analysis complete. Connect an AI provider for deeper insights.'],
+      : [{
+          title: 'Rule Engine Analysis Complete',
+          detail: 'Connect an AI provider for deeper semantic insights and threat narrative.',
+          severity: 'low'
+        }],
     suspiciousQuotes: triggered.filter((f) => f.quote).slice(0, 2).map((f) => f.quote),
     mitreAttack: { id: 'T1566', name: 'Phishing', url: 'https://attack.mitre.org/techniques/T1566/' },
     becRisk: false,
@@ -132,10 +143,10 @@ export function generateOfflineFallback(ruleResult) {
     aiGeneratedRisk: false,
     becDetails: null,
     recommendedAction: score >= 70
-      ? 'Do not click any links or download attachments. Report to your security team immediately.'
+      ? 'Do not click links or download attachments. Report to IT security.'
       : score >= 40
-        ? 'Exercise caution. Verify the sender through official channels before taking any action.'
-        : 'This email appears relatively safe based on rule analysis. Normal precautions apply.',
+      ? 'Verify the sender via another channel before taking action.'
+      : 'No immediate threats detected, but always remain cautious.',
     remediationSteps: [
       'Do not click any links in this email until verified.',
       'Contact the sender through a known, trusted channel to confirm authenticity.',

@@ -236,4 +236,45 @@
     return { emailText: null, source: null, error: 'Could not find email content on this page.' };
   }
 
-})();
+  // ─── Passive Background Scanning ─────────────────────────────────────────────
+  let lastScannedHash = 0;
+  
+  function hashCode(str) {
+    let hash = 0;
+    for (let i = 0, len = str.length; i < len; i++) {
+        let chr = str.charCodeAt(i);
+        hash = (hash << 5) - hash + chr;
+        hash |= 0; 
+    }
+    return hash;
+  }
+
+  function scanPassive() {
+    try {
+      const result = extractCurrentEmail();
+      if (result && result.emailText && result.emailText.length > 50) {
+        const currentHash = hashCode(result.emailText.slice(0, 500)); // Hash first 500 chars
+        if (currentHash !== lastScannedHash) {
+          lastScannedHash = currentHash;
+          chrome.runtime.sendMessage({ 
+            type: 'PASSIVE_SCAN', 
+            emailText: result.emailText,
+            source: result.source 
+          });
+        }
+      }
+    } catch (e) {
+      // Ignore extraction errors in passive mode
+    }
+  }
+
+  let scanTimeout;
+  const observer = new MutationObserver(() => {
+    clearTimeout(scanTimeout);
+    scanTimeout = setTimeout(scanPassive, 2000); // Wait 2s after DOM settles
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Initial check
+  setTimeout(scanPassive, 3000);})();

@@ -1,8 +1,10 @@
 // PhishGuard AI — Background Service Worker (Manifest V3)
 // All external API calls are routed through here to avoid CORS issues in the popup.
 
-import { getSettings, saveSettings } from './utils/storage.js';
+import { getSettings, saveSettings, saveAnalysis } from './utils/storage.js';
 import { checkSafeBrowsing, checkVirusTotal } from './utils/urlSafety.js';
+import { buildAnalysisPrompt, generateOfflineFallback } from './engine/prompts.js';
+import { analyzeEmail, computeFinalScore, scoreToVerdict } from './engine/analyzer.js';
 
 // ─── Context Menu Setup ───────────────────────────────────────────────────────
 
@@ -25,7 +27,7 @@ chrome.runtime.onInstalled.addListener(() => {
         openaiModel: 'gpt-4o-mini',
         geminiApiKey: '',
         geminiModel: 'gemini-1.5-flash',
-        grokApiKey: '',
+
         sensitivityThreshold: 50,
         autoSave: true,
         showRuleBreakdown: true,
@@ -131,6 +133,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return false;
   }
 
+  if (message.type === 'PASSIVE_SCAN') {
+    handlePassiveScan(message.emailText, message.source).catch(console.error);
+    sendResponse({ ok: true });
+    return false;
+  }
+
   if (message.type === 'CHECK_URL_SAFETY') {
     getSettings().then(settings => {
       checkSafeBrowsing(message.url, settings.safeBrowsingApiKey)
@@ -203,81 +211,69 @@ async function handleAnalyze({ emailText, settings }) {
   return llmResponse;
 }
 
-// ─── Prompt Builder ───────────────────────────────────────────────────────────
+// ─── Passive Scanning ─────────────────────────────────────────────────────────
 
-function buildAnalysisPrompt(emailText) {
-  return `You are PhishGuard, an elite AI analyst trained by a team of senior SOC engineers, threat intelligence specialists, and red team operators with 15+ years of combined experience in email security, phishing investigation, and business email compromise (BEC) forensics.
+async function handlePassiveScan(emailText, source) {
+  const settings = await getSettings();
+  if (settings.autoScanEnabled === false) return;
 
-Your mission: analyze emails with the precision of a forensic investigator and the communication clarity of a CISO-level executive briefing.
+  try {
+    // 1. Run local rules
+    const { emailData, ruleResult } = await analyzeEmail(emailText);
+    emailData.source = source;
 
-You have deep expertise in:
-- Social engineering psychology and manipulation techniques
-- Technical email authentication (SPF, DKIM, DMARC, email headers)
-- MITRE ATT&CK framework, specifically the Initial Access and Phishing tactic (T1566)
-- Business Email Compromise (BEC) patterns and financial fraud tactics
-- AI-generated phishing detection (hallmarks of LLM-written emails)
-- Spear-phishing vs mass phishing differentiation
-- Domain spoofing, homograph attacks, and lookalike infrastructure
-- Urgency and authority manipulation (pretexting, impersonation, fear tactics)
+    // 2. Call LLM
+    const prompt = buildAnalysisPrompt(emailText, ruleResult);
+    let llmResult;
+    try {
+      if (settings.provider === 'ollama') {
+        llmResult = await callOllama(prompt, settings);
+      } else if (settings.provider === 'openai') {
+        llmResult = await callOpenAI(prompt, settings);
+      } else if (settings.provider === 'gemini') {
+        llmResult = await callGemini(prompt, settings);
+      } else {
+        llmResult = generateOfflineFallback(ruleResult, settings.sensitivityThreshold);
+      }
+    } catch (llmError) {
+      console.warn('[PhishGuard] Passive scan LLM failed, using fallback:', llmError);
+      llmResult = generateOfflineFallback(ruleResult, settings.sensitivityThreshold);
+    }
 
-ANALYSIS APPROACH (Chain-of-Thought — execute internally):
-1. Read the full email. Note sender, subject, tone, and intent.
-2. Identify the primary attack vector (if any): credential theft, malware delivery, financial fraud, information gathering, or account takeover.
-3. Check for brand impersonation, domain mismatches, or authority abuse.
-4. Evaluate psychological manipulation: urgency, fear, scarcity, authority, social proof.
-5. Assess writing style: AI-generated patterns (overly formal, unnaturally perfect grammar, generic corporate template feel, excessive action button language).
-6. Identify spear-phishing signals: personalized details, specific company references, named individuals, role-specific language.
-7. Map to MITRE ATT&CK if applicable.
-8. Formulate a specific, actionable recommendation.
+    // 3. Compute Final Score & Verdict
+    const finalScore = computeFinalScore(llmResult.llmScore, ruleResult.ruleScore);
+    const verdict = scoreToVerdict(finalScore, settings.sensitivityThreshold);
 
-OUTPUT: Respond ONLY with a valid JSON object. No markdown fences. No text outside JSON.
+    // 4. Act on findings (Notify on Suspicious or worse)
+    updateBadge(finalScore);
 
-{
-  "llmScore": <integer 0-100, phishing probability>,
-  "verdict": "<Safe | Suspicious | Likely Phishing | Confirmed Phishing>",
-  "confidence": "<Low | Medium | High>",
-  "attackVector": "<Credential Theft | Malware Delivery | Financial Fraud | Info Gathering | Account Takeover | Unknown | N/A>",
-  "categories": {
-    "impersonation": <0-100>,
-    "urgencyManipulation": <0-100>,
-    "socialEngineering": <0-100>,
-    "technicalIndicators": <0-100>,
-    "aiGeneratedSigns": <0-100>
-  },
-  "topFindings": [
-    "<specific finding 1 with reference to email content>",
-    "<specific finding 2>",
-    "<specific finding 3>"
-  ],
-  "suspiciousQuotes": [
-    "<verbatim suspicious phrase from email 1>",
-    "<verbatim suspicious phrase from email 2>"
-  ],
-  "mitreAttack": {
-    "id": "<T1566 or sub-technique or null>",
-    "name": "<technique name or null>",
-    "url": "<https://attack.mitre.org/... or null>"
-  },
-  "becRisk": <true|false>,
-  "spearPhishingRisk": <true|false>,
-  "aiGeneratedRisk": <true|false>,
-  "becDetails": "<if becRisk true: describe the BEC pattern, else null>",
-  "recommendedAction": "<specific, actionable instruction for the recipient>",
-  "remediationSteps": [
-    "<step 1>",
-    "<step 2>",
-    "<step 3>",
-    "<step 4>",
-    "<step 5>"
-  ],
-  "analystNote": "<one sentence of expert color commentary a SOC analyst would add>"
+    if (finalScore >= 40) {
+      chrome.notifications.create({
+        type: 'basic',
+        iconUrl: 'icons/icon128.png',
+        title: `Revelio: ${verdict}`,
+        message: `Threat detected in open email (Score: ${finalScore}). ${llmResult.recommendedAction || ''}`,
+        priority: 2
+      });
+    }
+
+    // 5. Save to history
+    if (settings.autoSave !== false) {
+      await saveAnalysis({
+        emailData,
+        ruleResult,
+        llmResult,
+        finalScore,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+  } catch (err) {
+    console.error('[PhishGuard] Passive scan error:', err);
+  }
 }
 
-EMAIL TO ANALYZE:
----
-${emailText}
----`;
-}
+// Prompt Builder is now imported from engine/prompts.js
 
 // ─── AI Provider Implementations ─────────────────────────────────────────────
 
@@ -463,7 +459,15 @@ function parseAIResponse(rawText) {
       technicalIndicators: clamp(parseInt(parsed.categories?.technicalIndicators) || 0, 0, 100),
       aiGeneratedSigns: clamp(parseInt(parsed.categories?.aiGeneratedSigns) || 0, 0, 100),
     },
-    topFindings: Array.isArray(parsed.topFindings) ? parsed.topFindings.slice(0, 5) : [],
+    threatNarrative: parsed.threatNarrative || 'No specific narrative provided by the AI analysis.',
+    topFindings: Array.isArray(parsed.topFindings) ? parsed.topFindings.slice(0, 5).map(f => {
+      if (typeof f === 'string') return { title: 'AI Finding', detail: f, severity: 'medium' };
+      return {
+        title: f.title || 'AI Finding',
+        detail: f.detail || String(f),
+        severity: ['critical', 'high', 'medium', 'low'].includes(f.severity?.toLowerCase()) ? f.severity.toLowerCase() : 'medium'
+      };
+    }) : [],
     suspiciousQuotes: Array.isArray(parsed.suspiciousQuotes) ? parsed.suspiciousQuotes.slice(0, 5) : [],
     mitreAttack,
     becRisk: Boolean(parsed.becRisk),

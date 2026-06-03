@@ -23,7 +23,7 @@ Revelio is a Chrome Extension (Manifest V3) that lets you paste or upload any em
 
 - **Chrome 120+** (or any Chromium-based browser supporting Manifest V3)
 - **For local AI**: [Ollama](https://ollama.ai) installed (free, runs on your machine)
-- **For cloud AI**: API key for OpenAI, Google Gemini, or xAI Grok
+- **For cloud AI**: API key for OpenAI or Google Gemini
 
 ---
 
@@ -163,12 +163,6 @@ Estimated cost: ~$0.001–0.003 per email analysis with `gpt-4o-mini`.
 2. Enter the key in **Settings → AI Provider → Gemini**
 3. Select model: `gemini-1.5-flash` (recommended)
 
-### xAI Grok
-
-1. Get your API key from [console.x.ai](https://console.x.ai)
-2. Enter the key in **Settings → AI Provider → Grok**
-3. Model is fixed to `grok-beta`
-
 ---
 
 ## Troubleshooting
@@ -227,7 +221,7 @@ Estimated cost: ~$0.001–0.003 per email analysis with `gpt-4o-mini`.
 | **Ollama (Local)** | ✅ Zero data leaves your machine. All processing is 100% local. |
 | **OpenAI** | Email content is sent to OpenAI's API. Subject to their [privacy policy](https://openai.com/policies/privacy-policy). |
 | **Gemini** | Email content is sent to Google's API. Subject to their [privacy policy](https://policies.google.com/privacy). |
-| **Grok** | Email content is sent to xAI's API. Subject to their [privacy policy](https://x.ai/privacy). |
+
 
 **API keys** are stored locally in `chrome.storage.local` — never transmitted anywhere except to the respective AI provider's API.
 
@@ -271,7 +265,6 @@ User Input (paste/upload email)
     │   (background.js)   │  • Ollama (local)
     │                     │  • OpenAI GPT-4o
     │                     │  • Google Gemini
-    │                     │  • xAI Grok
     └────────┬────────────┘
     LLM Score (0-100)
              │

@@ -109,6 +109,7 @@ function loadSettingsIntoUI(settings) {
     $('sensitivity').value = settings.sensitivityThreshold || 50;
     if ($('sensitivity-val')) $('sensitivity-val').textContent = settings.sensitivityThreshold || 50;
   }
+  if ($('auto-scan')) $('auto-scan').checked = settings.autoScanEnabled !== false;
   if ($('auto-save')) $('auto-save').checked = settings.autoSave !== false;
   if ($('show-rules')) $('show-rules').checked = settings.showRuleBreakdown !== false;
   if ($('max-history')) $('max-history').value = String(settings.maxHistoryEntries || 20);
@@ -185,6 +186,7 @@ function collectSettings() {
     geminiApiKey: $('s-gemini-key')?.value || '',
     geminiModel,
     sensitivityThreshold: parseInt($('sensitivity')?.value) || 50,
+    autoScanEnabled: $('auto-scan')?.checked !== false,
     autoSave: $('auto-save')?.checked !== false,
     showRuleBreakdown: $('show-rules')?.checked !== false,
     maxHistoryEntries: parseInt($('max-history')?.value) || 20,

@@ -11,6 +11,7 @@ import { SAMPLE_EMAILS } from '../samples/sampleEmails.js';
 let currentResult = null;
 let currentSettings = {};
 let currentAnalysisId = null;
+let currentEmailText = '';
 
 // ─── Email Hash (simple fingerprint for cache keying) ────────────────────────
 function hashEmail(text) {
@@ -70,6 +71,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   populateSettingsFromStorage(currentSettings);
   startOllamaCheck();
   attachEventListeners();
+
+  // Update provider badge in idle view
+  const badgeText = document.getElementById('provider-badge-text');
+  if (badgeText) {
+    const prov = currentSettings.provider || 'ollama';
+    const provLabel = prov === 'ollama' ? 'Ollama · Local' : prov === 'openai' ? 'OpenAI · Cloud' : 'Gemini · Cloud';
+    badgeText.textContent = provLabel;
+  }
 
   // ── Auto-detect flow ─────────────────────────────────────────────────────
   // 1. Check if there is pending text from the right-click context menu
@@ -190,8 +199,15 @@ function startOllamaCheck() {
 }
 
 async function checkOllamaStatus() {
+  const provider = currentSettings.provider || 'ollama';
   const endpoint = currentSettings.ollamaEndpoint || 'http://localhost:11434';
   const pill = document.getElementById('ollama-status');
+
+  if (provider !== 'ollama') {
+    if (pill) setStatusPill(pill, 'online', `${capitalize(provider)}: Ready`);
+    return;
+  }
+
   if (pill) {
     setStatusPill(pill, 'checking', 'Checking...');
   }
@@ -310,9 +326,9 @@ async function checkForPendingText() {
     if (data.pendingEmailText) {
       const text = data.pendingEmailText;
       await chrome.storage.local.remove('pendingEmailText');
-      document.getElementById('email-input').value = text;
+      currentEmailText = text;
       showBanner('success', 'Email loaded from page selection — analyzing...');
-      setTimeout(() => handleAnalyze(), 300);
+      setTimeout(() => handleAnalyze(text), 300);
       return true;
     }
   } catch (e) { /* silent */ }
@@ -336,6 +352,24 @@ async function autoExtractAndAnalyze() {
   const tab = tabs?.[0];
   if (!tab?.id || !tab?.url) return;
 
+  // Show scanning state in idle view
+  const setIdleState = (title, msg, variant = 'scanning') => {
+    const titleEl = document.getElementById('idle-status-title');
+    const msgEl = document.getElementById('idle-status-msg');
+    const svgEl = document.getElementById('scan-icon-svg');
+    const containerEl = document.getElementById('scan-icon-container');
+    if (titleEl) titleEl.textContent = title;
+    if (msgEl) msgEl.textContent = msg;
+    // Update icon color per variant
+    if (svgEl) {
+      svgEl.style.color = variant === 'error' ? '#ef4444'
+        : variant === 'scanning' ? '#f59e0b'
+        : '#38bdf8';
+    }
+  };
+
+  setIdleState('Scanning...', 'Detecting email in current tab...', 'scanning');
+
   const url = tab.url;
   const isMailPage =
     url.includes('mail.google.com') ||
@@ -343,15 +377,12 @@ async function autoExtractAndAnalyze() {
     url.includes('outlook.office.com') ||
     url.includes('outlook.office365.com');
 
-  // Show banner only if we're on a mail page
-  if (isMailPage) {
-    showBanner('detecting', 'Detecting open email...');
-  } else {
-    showBanner('error', 'Not a supported mail page (Gmail/Outlook). Please upload or paste manually.');
+  if (!isMailPage) {
+    setIdleState('Not a Mail Page', 'Open Gmail or Outlook in a tab and click Force Rescan.', 'error');
     return;
   }
 
-  // Ping content script to confirm it's injected
+  // Ping content script to confirm it’s injected
   let ping;
   try {
     ping = await chrome.tabs.sendMessage(tab.id, { type: 'PING' });
@@ -366,37 +397,27 @@ async function autoExtractAndAnalyze() {
       await sleep(200);
       ping = await chrome.tabs.sendMessage(tab.id, { type: 'PING' });
     } catch {
-      showBanner('error', 'Could not connect to page. Try reloading the tab.');
+      setIdleState('Could Not Connect', 'Try reloading the Gmail/Outlook tab, then click Force Rescan.', 'error');
       return;
     }
   }
 
   if (!ping?.pong) {
-    showBanner('error', 'Content script not responding. Reload Gmail/Outlook and try again.');
+    setIdleState('Content Script Not Responding', 'Reload Gmail/Outlook and try again.', 'error');
     return;
   }
 
   // Request email extraction
-  let extracted;
-  try {
-    extracted = await chrome.tabs.sendMessage(tab.id, { type: 'EXTRACT_EMAIL' });
-  } catch (e) {
-    showBanner('error', 'Could not read email. Open an email first, then click the icon.');
+  const extracted = await chrome.tabs.sendMessage(tab.id, { type: 'EXTRACT_EMAIL' });
+  if (!extracted || !extracted.emailText) {
+    setIdleState('No Email Detected', 'Open a specific email (not just the inbox) and click Force Rescan.', 'error');
     return;
   }
 
-  if (!extracted?.emailText) {
-    const msg = extracted?.error || 'No email found. Please open an email in Gmail or Outlook first.';
-    showBanner('error', msg);
-    return;
-  }
-
-  // Populate the textarea (so the user can see what was captured)
-  const textarea = document.getElementById('email-input');
-  if (textarea) textarea.value = extracted.emailText;
+  currentEmailText = extracted.emailText;
 
   // ── Cache check: if this exact email was already analyzed, show cached result ──
-  const cached = await getCachedResult(extracted.emailText);
+  const cached = await getCachedResult(currentEmailText);
   if (cached) {
     currentResult = cached;
     // Route cached offline results to offline view
@@ -408,7 +429,8 @@ async function autoExtractAndAnalyze() {
       renderResults(cached);
       showView('results');
     }
-    showBanner('success', '✓ Showing cached result — click "Analyze Another" to re-scan');
+    const msgEl = document.getElementById('idle-status-msg');
+    if (msgEl) msgEl.textContent = '✓ Showing cached result — click "Analyze Another" to re-scan';
     return;
   }
 
@@ -418,13 +440,14 @@ async function autoExtractAndAnalyze() {
     ? 'Outlook email detected'
     : 'Email detected';
 
-  showBanner('success', `${sourceLabel}. Analyzing...`);
+  const msgEl = document.getElementById('idle-status-msg');
+  if (msgEl) msgEl.textContent = `${sourceLabel}. Analyzing...`;
 
   // Small visual pause so the user sees the banner before loading screen
   await sleep(400);
 
   // Fire analysis automatically
-  await handleAnalyze();
+  await handleAnalyze(currentEmailText);
 }
 
 function sleep(ms) {
@@ -450,64 +473,26 @@ function populateSettingsFromStorage(settings) {
 
 // ─── Collect Settings from UI ─────────────────────────────────────────────────
 function collectSettings() {
-  const ollamaModelEl = document.getElementById('ollama-model');
-  let ollamaModel = ollamaModelEl?.value;
-  if (!ollamaModel) ollamaModel = currentSettings.ollamaModel || 'deepseek-r1:8b';
-
-  return {
-    ...currentSettings,
-    ollamaModel
-  };
+  return currentSettings;
 }
 
 // ─── Main Event Listeners ─────────────────────────────────────────────────────
 function attachEventListeners() {
-  // Provider tabs
+  // Provider tabs (for future use)
   document.querySelectorAll('.provider-tab').forEach((tab) => {
     tab.addEventListener('click', () => switchProviderTab(tab.dataset.provider));
   });
 
-  // Ollama model custom toggle
-  document.getElementById('ollama-model')?.addEventListener('change', (e) => {
-    const custom = document.getElementById('ollama-model-custom');
-    if (custom) custom.style.display = e.target.value === 'custom' ? 'block' : 'none';
+  // Rescan button
+  document.getElementById('rescan-btn')?.addEventListener('click', () => {
+    // Reset status UI
+    document.getElementById('idle-status-title').textContent = 'Auto-Scan Active';
+    document.getElementById('idle-status-msg').textContent = 'Open an email in Gmail or Outlook. Revelio will automatically scan it for threats.';
+    autoExtractAndAnalyze();
   });
-
-  // Analyze button
-  document.getElementById('analyze-btn')?.addEventListener('click', handleAnalyze);
-
-  // Clear button
-  document.getElementById('clear-btn')?.addEventListener('click', () => {
-    document.getElementById('email-input').value = '';
-    hideBanner();
-    document.getElementById('email-input').focus();
-  });
-
-  // File upload
-  document.getElementById('file-upload')?.addEventListener('change', handleFileUpload);
 
   // Banner dismiss
   document.getElementById('auto-detect-dismiss')?.addEventListener('click', hideBanner);
-
-  // Sample dropdown
-  const sampleBtn = document.getElementById('sample-btn');
-  const sampleMenu = document.getElementById('sample-menu');
-  sampleBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    sampleMenu?.classList.toggle('hidden');
-  });
-  document.querySelectorAll('.dropdown-item').forEach((item) => {
-    item.addEventListener('click', () => {
-      const sample = SAMPLE_EMAILS.find((s) => s.id === item.dataset.sample);
-      if (sample) {
-        document.getElementById('email-input').value = sample.content;
-        sampleMenu?.classList.add('hidden');
-        hideBanner();
-        showToast(`Loaded: ${sample.label}`, 'success');
-      }
-    });
-  });
-  document.addEventListener('click', () => sampleMenu?.classList.add('hidden'));
 
   // Result tabs
   document.querySelectorAll('.result-tab').forEach((tab) => {
@@ -516,8 +501,7 @@ function attachEventListeners() {
 
   // Action bar
   document.getElementById('analyze-another-btn')?.addEventListener('click', async () => {
-    // Clear the cache so the next open will run a fresh analysis
-    await clearLastCache(document.getElementById('email-input')?.value || '');
+    await clearLastCache(currentEmailText);
     showView('input');
     // Re-attempt auto-detect when user clicks "New Analysis"
     setTimeout(() => autoExtractAndAnalyze(), 100);
@@ -532,50 +516,29 @@ function attachEventListeners() {
   // Offline view buttons
   document.getElementById('offline-retry-btn')?.addEventListener('click', async () => {
     showView('input');
-    await clearLastCache(document.getElementById('email-input')?.value || '');
-    await handleAnalyze();
+    await clearLastCache(currentEmailText);
+    await handleAnalyze(currentEmailText);
   });
   document.getElementById('offline-new-btn')?.addEventListener('click', async () => {
-    await clearLastCache(document.getElementById('email-input')?.value || '');
+    await clearLastCache(currentEmailText);
     showView('input');
     setTimeout(() => autoExtractAndAnalyze(), 100);
   });
   document.getElementById('offline-copy-btn')?.addEventListener('click', handleCopyReport);
   document.getElementById('offline-log-btn')?.addEventListener('click', openHistory);
-
-  // Keyboard shortcut: Ctrl/Cmd+Enter to analyze
-  document.getElementById('email-input')?.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') handleAnalyze();
-  });
-}
-
-// ─── File Upload Handler ──────────────────────────────────────────────────────
-async function handleFileUpload(e) {
-  const file = e.target.files?.[0];
-  if (!file) return;
-
-  try {
-    const text = await file.text();
-    document.getElementById('email-input').value = text;
-    showToast(`Loaded: ${file.name}`, 'success');
-  } catch {
-    showToast('Failed to read file', 'error');
-  }
-  e.target.value = '';
 }
 
 // ─── Analyze Handler ─────────────────────────────────────────────────────────
-async function handleAnalyze() {
-  const emailText = document.getElementById('email-input')?.value?.trim();
+async function handleAnalyze(textToAnalyze) {
+  const emailText = textToAnalyze || currentEmailText;
   if (!emailText || emailText.length < 10) {
     showToast('No email content found. Open an email in Gmail/Outlook first.', 'error');
     showBanner('error', 'Open an email in Gmail or Outlook, then click the PhishGuard icon.');
     return;
   }
 
-  const settings = collectSettings();
-  currentSettings = { ...currentSettings, ...settings };
-  await saveSettings(settings);
+  const freshSettings = await getSettings();
+  currentSettings = freshSettings;
 
   showView('loading');
   startLoadingAnimation();
@@ -590,7 +553,7 @@ async function handleAnalyze() {
       const response = await chrome.runtime.sendMessage({
         type: 'ANALYZE',
         emailText,
-        settings,
+        settings: freshSettings,
       });
 
       if (response.success) {
@@ -604,15 +567,15 @@ async function handleAnalyze() {
       } else {
         showToast(`AI error: ${llmError.message?.slice(0, 120)}`, 'error');
       }
-      llmResult = generateOfflineFallback(ruleResult);
+      llmResult = generateOfflineFallback(ruleResult, currentSettings?.sensitivityThreshold);
     }
 
     const finalScore = computeFinalScore(llmResult.llmScore, ruleResult.ruleScore);
 
-    currentResult = { emailData, ruleResult, llmResult, finalScore, settings };
+    currentResult = { emailData, ruleResult, llmResult, finalScore, settings: freshSettings };
     currentAnalysisId = null;
 
-    if (settings.autoSave !== false) {
+    if (freshSettings.autoSave !== false) {
       const entry = await saveAnalysis(currentResult);
       if (entry) currentAnalysisId = entry.id;
     }
@@ -634,6 +597,11 @@ async function handleAnalyze() {
 
   } catch (err) {
     showToast(`Error: ${err.message?.slice(0, 60)}`, 'error');
+    // Show idle screen so user can Force Rescan
+    const title = document.getElementById('idle-status-title');
+    const msg = document.getElementById('idle-status-msg');
+    if (title) title.textContent = 'Analysis Failed';
+    if (msg) msg.textContent = err.message?.slice(0, 120) || 'An error occurred.';
     showView('input');
   }
 }
@@ -651,26 +619,48 @@ const LOADING_MESSAGES = [
 ];
 
 function startLoadingAnimation() {
-  const bar = document.getElementById('progress-bar');
-  const msgEl = document.getElementById('loading-message');
-  if (!bar || !msgEl) return;
+  // Stay on input-view but switch it to 'loading mode'
+  showView('input');
 
-  bar.style.width = '0%';
+  // Show loading section, hide idle bottom
+  const loadingSection = document.getElementById('loading-section');
+  const idleBottom = document.getElementById('idle-bottom');
+  if (loadingSection) loadingSection.style.display = 'flex';
+  if (idleBottom) idleBottom.style.display = 'none';
+
+  // Start rotating the disc (bob animation on icon-disc)
+  const iconDisc = document.getElementById('icon-disc');
+  if (iconDisc) iconDisc.style.animation = 'scanBob 1.8s ease-in-out infinite';
+
+  // Speed up radar rings to look more active
+  const ring1 = document.getElementById('radar-ring-1');
+  const ring2 = document.getElementById('radar-ring-2');
+  if (ring1) ring1.style.animation = 'radarPing 1.2s ease-out infinite';
+  if (ring2) ring2.style.animation = 'radarPing 1.2s ease-out 0.4s infinite';
+
+  // Cycle title through loading messages
+  const bar = document.getElementById('progress-bar');
+  const msgEl = document.getElementById('idle-status-title');
+  const subMsgEl = document.getElementById('idle-status-msg');
+
+  if (bar) bar.style.width = '0%';
+  if (subMsgEl) subMsgEl.textContent = '';
+
   let msgIdx = 0;
   let progress = 0;
 
   const msgInterval = setInterval(() => {
     msgIdx = (msgIdx + 1) % LOADING_MESSAGES.length;
-    msgEl.textContent = LOADING_MESSAGES[msgIdx];
+    if (msgEl) msgEl.textContent = LOADING_MESSAGES[msgIdx];
   }, 1200);
 
   const progressInterval = setInterval(() => {
     progress = Math.min(progress + Math.random() * 8, 92);
-    bar.style.width = `${progress}%`;
+    if (bar) bar.style.width = `${progress}%`;
   }, 500);
 
   window._phishLoadIntervals = [msgInterval, progressInterval];
-  msgEl.textContent = LOADING_MESSAGES[0];
+  if (msgEl) msgEl.textContent = LOADING_MESSAGES[0];
 }
 
 function stopLoadingAnimation() {
@@ -680,22 +670,42 @@ function stopLoadingAnimation() {
   }
   const bar = document.getElementById('progress-bar');
   if (bar) bar.style.width = '100%';
+
+  // Restore idle mode UI
+  const loadingSection = document.getElementById('loading-section');
+  const idleBottom = document.getElementById('idle-bottom');
+  const iconDisc = document.getElementById('icon-disc');
+  const ring1 = document.getElementById('radar-ring-1');
+  const ring2 = document.getElementById('radar-ring-2');
+  const subMsgEl = document.getElementById('idle-status-msg');
+
+  if (loadingSection) loadingSection.style.display = 'none';
+  if (idleBottom) idleBottom.style.display = 'flex';
+  if (iconDisc) iconDisc.style.animation = '';
+  if (ring1) ring1.style.animation = 'radarPing 2s ease-out infinite';
+  if (ring2) ring2.style.animation = 'radarPing 2s ease-out 0.7s infinite';
+  // Restore idle description
+  if (subMsgEl && !subMsgEl.textContent.trim()) {
+    subMsgEl.textContent = 'Open an email in Gmail or Outlook — Revelio will automatically detect and analyze it for threats.';
+  }
 }
 
 // ─── View Switching ───────────────────────────────────────────────────────────
 function showView(view) {
+  // 'loading' is no longer a separate view — it's handled in-place by startLoadingAnimation
+  const resolvedView = view === 'loading' ? 'input' : view;
+
   document.querySelectorAll('.view').forEach((v) => {
     v.classList.remove('active');
     v.classList.add('hidden');
     v.hidden = true;
   });
 
-  const target = document.getElementById(`${view}-view`);
+  const target = document.getElementById(`${resolvedView}-view`);
   if (target) {
     target.classList.add('active');
     target.classList.remove('hidden');
     target.hidden = false;
-    // Deferred scroll reset — wait for browser to layout the newly-visible element
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         target.scrollTop = 0;
@@ -703,6 +713,7 @@ function showView(view) {
     });
   }
 
+  // Stop animation when leaving the loading state
   if (view !== 'loading') stopLoadingAnimation();
 }
 
@@ -789,16 +800,27 @@ function switchResultTab(tab) {
 }
 
 // ─── Score Helpers ────────────────────────────────────────────────────────────
+function getThresholds(sensitivity = 50) {
+  const offset = (50 - sensitivity) * 0.4;
+  return {
+    confirmed: Math.max(0, Math.min(100, 86 + offset)),
+    likely: Math.max(0, Math.min(100, 70 + offset)),
+    suspicious: Math.max(0, Math.min(100, 40 + offset))
+  };
+}
+
 function scoreToClass(score) {
-  if (score >= 86) return 'verdict-confirmed';
-  if (score >= 70) return 'verdict-likely';
-  if (score >= 40) return 'verdict-suspicious';
+  const t = getThresholds(currentSettings?.sensitivityThreshold);
+  if (score >= t.confirmed) return 'verdict-confirmed';
+  if (score >= t.likely) return 'verdict-likely';
+  if (score >= t.suspicious) return 'verdict-suspicious';
   return 'verdict-safe';
 }
 
 function categoryColor(score) {
-  if (score >= 70) return '#ef4444';
-  if (score >= 40) return '#f59e0b';
+  const t = getThresholds(currentSettings?.sensitivityThreshold);
+  if (score >= t.likely) return '#ef4444';
+  if (score >= t.suspicious) return '#f59e0b';
   return '#22c55e';
 }
 
@@ -844,10 +866,24 @@ function renderGauge(score, llm, ruleResult) {
 
   if (scoreText) scoreText.textContent = score;
 
-  const verdict = scoreToVerdict(score);
+  const verdict = scoreToVerdict(score, currentSettings?.sensitivityThreshold);
   if (verdictBadge) {
     verdictBadge.textContent = verdict.toUpperCase();
     verdictBadge.className = `border px-3 py-1 rounded text-[11px] font-bold tracking-widest uppercase ${scoreToClass(score)}`;
+  }
+
+  const attackVectorBadge = document.getElementById('attack-vector-badge');
+  if (attackVectorBadge) {
+    if (llm?.attackVector && llm.attackVector.toLowerCase() !== 'unknown' && llm.attackVector.toLowerCase() !== 'n/a') {
+      attackVectorBadge.textContent = llm.attackVector.toUpperCase();
+      attackVectorBadge.style.display = 'inline-block';
+      const t = getThresholds(currentSettings?.sensitivityThreshold);
+      attackVectorBadge.style.color = score >= t.likely ? '#EF4444' : score >= t.suspicious ? '#F59E0B' : '#10B981';
+      attackVectorBadge.style.borderColor = score >= t.likely ? 'rgba(239, 68, 68, 0.3)' : score >= t.suspicious ? 'rgba(245, 158, 11, 0.3)' : 'rgba(16, 185, 129, 0.3)';
+      attackVectorBadge.style.backgroundColor = score >= t.likely ? 'rgba(239, 68, 68, 0.1)' : score >= t.suspicious ? 'rgba(245, 158, 11, 0.1)' : 'rgba(16, 185, 129, 0.1)';
+    } else {
+      attackVectorBadge.style.display = 'none';
+    }
   }
 
   if (aiScoreVal) aiScoreVal.textContent = llm?.llmScore ?? '—';
@@ -876,20 +912,43 @@ function renderGauge(score, llm, ruleResult) {
 function renderSummaryTab(score, llm) {
   const stripEl = document.getElementById('summary-threat-strip');
   if (stripEl) {
-    const sev = score >= 70 ? 'danger' : score >= 40 ? 'warn' : 'safe';
+    const t = getThresholds(currentSettings?.sensitivityThreshold);
+    const sev = score >= t.likely ? 'danger' : score >= t.suspicious ? 'warn' : 'safe';
     stripEl.className = `threat-strip ${sev}`;
   }
 
   const verdictEl = document.getElementById('summary-verdict-text');
   if (verdictEl) {
-    const verdict = scoreToVerdict(score);
+    const verdict = scoreToVerdict(score, currentSettings?.sensitivityThreshold);
     verdictEl.textContent = verdict;
-    const color = score >= 70 ? '#EF4444' : score >= 40 ? '#F59E0B' : '#10B981';
+    const t = getThresholds(currentSettings?.sensitivityThreshold);
+    const color = score >= t.likely ? '#EF4444' : score >= t.suspicious ? '#F59E0B' : '#10B981';
     verdictEl.style.color = color;
   }
 
   const actionEl = document.getElementById('summary-recommended-action');
   if (actionEl) actionEl.textContent = llm?.recommendedAction || '';
+
+  const aiCardEl = document.getElementById('ai-analysis-card');
+  const aiNarrativeEl = document.getElementById('ai-threat-narrative');
+  const aiBecWrapEl = document.getElementById('ai-bec-details-wrap');
+  const aiBecTextEl = document.getElementById('ai-bec-details-text');
+  
+  if (aiCardEl) {
+    if (llm?.threatNarrative) {
+      aiCardEl.style.display = 'block';
+      if (aiNarrativeEl) aiNarrativeEl.textContent = llm.threatNarrative;
+      
+      if (llm.becRisk && llm.becDetails) {
+        if (aiBecWrapEl) aiBecWrapEl.style.display = 'block';
+        if (aiBecTextEl) aiBecTextEl.textContent = llm.becDetails;
+      } else {
+        if (aiBecWrapEl) aiBecWrapEl.style.display = 'none';
+      }
+    } else {
+      aiCardEl.style.display = 'none';
+    }
+  }
 
   const barsEl = document.getElementById('category-bars');
   if (!barsEl) return;
@@ -924,9 +983,10 @@ function renderSummaryTab(score, llm) {
 
   for (const cat of categories) {
     const val = llm?.categories?.[cat.key] ?? 0;
+    const t = getThresholds(currentSettings?.sensitivityThreshold);
     const color = categoryColor(val);
-    const gradId = val >= 70 ? 'sparkline-grad-danger' : val >= 40 ? 'sparkline-grad-warn' : 'sparkline-grad-safe';
-    const glowColor = val >= 70 ? 'rgba(239, 68, 68, 0.45)' : val >= 40 ? 'rgba(245, 158, 11, 0.45)' : 'rgba(16, 185, 129, 0.45)';
+    const gradId = val >= t.likely ? 'sparkline-grad-danger' : val >= t.suspicious ? 'sparkline-grad-warn' : 'sparkline-grad-safe';
+    const glowColor = val >= t.likely ? 'rgba(239, 68, 68, 0.45)' : val >= t.suspicious ? 'rgba(245, 158, 11, 0.45)' : 'rgba(16, 185, 129, 0.45)';
 
     const cell = document.createElement('div');
     cell.className = 'flex flex-col min-w-0';
@@ -995,8 +1055,11 @@ function renderFindingsTab(ruleResult, llm) {
         <span class="material-symbols-outlined ${iconColor} text-[18px] mt-0.5" style="font-variation-settings: 'FILL' 1;">${icon}</span>
         <div class="flex-1 min-w-0">
           <div class="flex justify-between items-start gap-2 mb-0.5">
-            <h3 class="${titleColor} font-semibold text-[13px] leading-tight">${sanitize(finding.name)}</h3>
-            <span class="finding-severity-pill ${severity}">${pillText}</span>
+            <div class="flex items-center gap-1.5 min-w-0">
+              <h3 class="${titleColor} font-semibold text-[13px] leading-tight truncate">${sanitize(finding.name)}</h3>
+              <span class="source-badge rule shrink-0">⚙️ Rules</span>
+            </div>
+            <span class="finding-severity-pill ${severity} shrink-0">${pillText}</span>
           </div>
           <p class="text-on-surface-variant text-[12px] leading-relaxed opacity-90">${sanitize(finding.finding)}</p>
           ${finding.quote && !finding.passed ? `<div class="mt-1.5 finding-quote-block">${sanitize(finding.quote.slice(0, 120))}</div>` : ''}
@@ -1009,11 +1072,49 @@ function renderFindingsTab(ruleResult, llm) {
   const llmSection = document.getElementById('llm-findings-section');
   const llmList = document.getElementById('llm-findings-list');
   if (llm?.topFindings?.length > 0) {
-    if (llmSection) llmSection.style.display = 'block';
+    if (llmSection) llmSection.style.display = 'flex';
     if (llmList) {
-      llmList.innerHTML = llm.topFindings.map((f) =>
-        `<li>${f.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</li>`
-      ).join('');
+      llmList.innerHTML = '';
+      llm.topFindings.forEach((f) => {
+        let title = 'AI Finding';
+        let detail = '';
+        let severity = 'medium';
+        
+        if (typeof f === 'string') {
+          detail = f;
+        } else {
+          title = f.title || title;
+          detail = f.detail || detail;
+          severity = f.severity?.toLowerCase() || severity;
+        }
+
+        const isError = severity === 'critical' || severity === 'high';
+        const sevClass = isError ? (severity === 'critical' ? 'critical' : 'high') : severity;
+        const iconColor = isError ? 'text-error' : severity === 'medium' ? 'text-amber-400' : 'text-emerald-400';
+        const titleColor = isError ? 'text-error' : severity === 'medium' ? 'text-amber-400' : 'text-on-surface';
+        const icon = isError ? 'warning' : severity === 'medium' ? 'info' : 'check_circle';
+        const pillText = severity.toUpperCase();
+
+        const card = document.createElement('div');
+        card.className = 'ai-finding-card glass-panel relative overflow-hidden p-3 flex flex-col gap-1.5';
+        card.innerHTML = `
+          <div class="finding-strip ${sevClass}"></div>
+          <div class="flex items-start gap-2.5 ml-2">
+            <span class="material-symbols-outlined ${iconColor} text-[18px] mt-0.5" style="font-variation-settings: 'FILL' 1;">${icon}</span>
+            <div class="flex-1 min-w-0">
+              <div class="flex justify-between items-start gap-2 mb-0.5">
+                <div class="flex items-center gap-1.5 min-w-0">
+                  <h3 class="${titleColor} font-semibold text-[13px] leading-tight truncate">${sanitize(title)}</h3>
+                  <span class="source-badge ai shrink-0">🤖 AI</span>
+                </div>
+                <span class="finding-severity-pill ${sevClass} shrink-0">${pillText}</span>
+              </div>
+              <p class="text-on-surface-variant text-[12px] leading-relaxed opacity-90">${sanitize(detail)}</p>
+            </div>
+          </div>
+        `;
+        llmList.appendChild(card);
+      });
     }
   } else {
     if (llmSection) llmSection.style.display = 'none';
@@ -1133,7 +1234,10 @@ function renderURLsTab(urls) {
           ${apiResultsHtml}
           <div class="mt-2 pt-2 border-t border-white/5">
             <button class="check-safety-btn deep-scan-btn" data-idx="${i}">
-              <span class="material-symbols-outlined text-[14px]">manage_search</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:5px;opacity:0.8;">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                <line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>
+              </svg>
               Deep Scan (Safe Browsing + VirusTotal)
             </button>
           </div>
@@ -1150,12 +1254,23 @@ function renderURLsTab(urls) {
       const idx = parseInt(e.currentTarget.dataset.idx, 10);
       const url = urls[idx];
       
-      if (!confirm('Running a Deep Scan will submit this URL to external databases (Google Safe Browsing & VirusTotal). Continue?')) {
-        return;
-      }
+      // Proceed immediately to scan
       
       e.currentTarget.disabled = true;
-      e.currentTarget.innerHTML = '<span class="material-symbols-outlined text-[14px] animate-spin">refresh</span> Scanning...';
+      e.currentTarget.innerHTML = `
+        <span style="display:inline-flex;align-items:center;gap:7px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:deepScanPulse 1s ease-in-out infinite;">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+          </svg>
+          <span style="letter-spacing:0.06em;">Scanning URLs<span class="scan-dots">...</span></span>
+        </span>
+        <style>
+          @keyframes deepScanPulse { 0%,100%{opacity:1;transform:rotate(0deg)} 50%{opacity:0.6;transform:rotate(180deg)} }
+          .scan-dots { animation: dotBlink 1.2s steps(4,end) infinite; }
+          @keyframes dotBlink { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} 100%{content:''} }
+        </style>
+      `;
       
       try {
         // Run Safe Browsing
