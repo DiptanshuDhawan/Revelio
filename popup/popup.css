@@ -659,3 +659,26 @@
   color: var(--color-on-surface-variant);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+/* ─── Deep Scan Button Animations ─────────────────────────────── */
+@keyframes deepScanPulse {
+  0%, 100% { opacity: 1; transform: rotate(0deg); }
+  50%       { opacity: 0.6; transform: rotate(180deg); }
+}
+
+@keyframes dotBlink {
+  0%   { content: '.'; }
+  33%  { content: '..'; }
+  66%  { content: '...'; }
+  100% { content: ''; }
+}
+
+.deep-scan-spinning {
+  animation: deepScanPulse 1s ease-in-out infinite;
+}
+
+.scan-dots::after {
+  content: '...';
+  animation: dotBlink 1.2s steps(4, end) infinite;
+}
+

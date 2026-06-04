@@ -1261,18 +1261,14 @@ function renderURLsTab(urls) {
       e.currentTarget.disabled = true;
       e.currentTarget.innerHTML = `
         <span style="display:inline-flex;align-items:center;gap:7px;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:deepScanPulse 1s ease-in-out infinite;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="deep-scan-spinning">
             <circle cx="12" cy="12" r="3"/>
             <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
           </svg>
-          <span style="letter-spacing:0.06em;">Scanning URLs<span class="scan-dots">...</span></span>
+          <span style="letter-spacing:0.06em;">Scanning URLs<span class="scan-dots"></span></span>
         </span>
-        <style>
-          @keyframes deepScanPulse { 0%,100%{opacity:1;transform:rotate(0deg)} 50%{opacity:0.6;transform:rotate(180deg)} }
-          .scan-dots { animation: dotBlink 1.2s steps(4,end) infinite; }
-          @keyframes dotBlink { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} 100%{content:''} }
-        </style>
       `;
+
       
       try {
         // Run Safe Browsing

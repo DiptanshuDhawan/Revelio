@@ -395,22 +395,41 @@ async function callGemini(prompt, settings) {
 function parseAIResponse(rawText) {
   if (!rawText) throw new Error('Empty response from AI');
 
-  // Strip markdown fences if present
   let cleaned = rawText.trim();
+
+  // Strip <think>...</think> reasoning blocks (deepseek-r1, qwen3 models emit these)
+  cleaned = cleaned.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+
+  // Strip markdown fences if present
   cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
 
-  // Find JSON object boundaries
+  // Strip any preamble text before the first { (e.g., "Here is the analysis:")
   const start = cleaned.indexOf('{');
   const end = cleaned.lastIndexOf('}');
   if (start === -1 || end === -1) throw new Error('No valid JSON in AI response');
 
-  const jsonStr = cleaned.slice(start, end + 1);
+  let jsonStr = cleaned.slice(start, end + 1);
 
   let parsed;
   try {
     parsed = JSON.parse(jsonStr);
   } catch (e) {
-    throw new Error('Invalid JSON from AI: ' + e.message);
+    // Retry with common fixes for small-model quirks
+    try {
+      let repaired = jsonStr;
+      // Remove trailing commas before } or ]
+      repaired = repaired.replace(/,\s*([}\]])/g, '$1');
+      // Remove control characters (tabs/newlines inside strings are fine but literal ones break)
+      repaired = repaired.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '');
+      // Fix single quotes used instead of double quotes (naive but helps)
+      // Only do this if there are no double quotes at all in the problematic areas
+      if (!repaired.includes('"') && repaired.includes("'")) {
+        repaired = repaired.replace(/'/g, '"');
+      }
+      parsed = JSON.parse(repaired);
+    } catch (e2) {
+      throw new Error('Invalid JSON from AI: ' + e.message);
+    }
   }
 
   // Sanitize and normalize MITRE ATT&CK information
