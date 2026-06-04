@@ -935,100 +935,83 @@ function renderSummaryTab(score, llm) {
   const aiNarrativeEl = document.getElementById('ai-threat-narrative');
   const aiBecWrapEl = document.getElementById('ai-bec-details-wrap');
   const aiBecTextEl = document.getElementById('ai-bec-details-text');
+  const analystNoteWrap = document.getElementById('analyst-note-wrap');
+  const analystNoteText = document.getElementById('analyst-note-text');
   
   if (aiCardEl) {
-    if (llm?.threatNarrative) {
+    if (llm?.threatNarrative || llm?.analystNote) {
       aiCardEl.style.display = 'block';
-      if (aiNarrativeEl) aiNarrativeEl.textContent = llm.threatNarrative;
+      if (aiNarrativeEl) aiNarrativeEl.textContent = llm.threatNarrative || 'No narrative provided.';
       
-      if (llm.becRisk && llm.becDetails) {
+      if (llm?.becRisk && llm?.becDetails) {
         if (aiBecWrapEl) aiBecWrapEl.style.display = 'block';
         if (aiBecTextEl) aiBecTextEl.textContent = llm.becDetails;
       } else {
         if (aiBecWrapEl) aiBecWrapEl.style.display = 'none';
+      }
+      
+      if (llm?.analystNote) {
+        if (analystNoteWrap) analystNoteWrap.style.display = 'flex';
+        if (analystNoteText) analystNoteText.textContent = llm.analystNote;
+      } else {
+        if (analystNoteWrap) analystNoteWrap.style.display = 'none';
       }
     } else {
       aiCardEl.style.display = 'none';
     }
   }
 
-  const barsEl = document.getElementById('category-bars');
-  if (!barsEl) return;
-  barsEl.innerHTML = '';
+  const gaugesEl = document.getElementById('category-gauges');
+  if (!gaugesEl) return;
+  gaugesEl.innerHTML = '';
+  // Set the container to flex-row for the 5-in-a-row layout
+  gaugesEl.className = 'flex justify-between items-start w-full mt-3 mb-2 px-1';
 
   const categories = [
-    { 
-      label: 'Impersonation', 
-      key: 'impersonation', 
-      path: 'M 0 32 C 20 32, 25 12, 45 12 C 65 12, 70 28, 90 28 C 105 28, 110 16, 120 16', 
-      fillPath: 'M 0 32 C 20 32, 25 12, 45 12 C 65 12, 70 28, 90 28 C 105 28, 110 16, 120 16 L 120 40 L 0 40 Z' 
-    },
-    { 
-      label: 'Urgency Manipulation', 
-      key: 'urgencyManipulation', 
-      path: 'M 0 28 C 20 28, 30 18, 50 18 C 70 18, 80 26, 100 26 C 110 26, 115 22, 120 22', 
-      fillPath: 'M 0 28 C 20 28, 30 18, 50 18 C 70 18, 80 26, 100 26 C 110 26, 115 22, 120 22 L 120 40 L 0 40 Z' 
-    },
-    { 
-      label: 'Social Engineering', 
-      key: 'socialEngineering', 
-      path: 'M 0 30 C 15 30, 25 14, 40 14 C 55 14, 65 26, 80 26 C 95 26, 105 18, 120 18', 
-      fillPath: 'M 0 30 C 15 30, 25 14, 40 14 C 55 14, 65 26, 80 26 C 95 26, 105 18, 120 18 L 120 40 L 0 40 Z' 
-    },
-    { 
-      label: 'Technical Indicators', 
-      key: 'technicalIndicators', 
-      path: 'M 0 26 C 15 26, 20 8, 35 8 C 50 8, 60 28, 80 28 C 95 28, 105 20, 120 20', 
-      fillPath: 'M 0 26 C 15 26, 20 8, 35 8 C 50 8, 60 28, 80 28 C 95 28, 105 20, 120 20 L 120 40 L 0 40 Z' 
-    },
+    { label: 'IMP.', key: 'impersonation' },
+    { label: 'URG.', key: 'urgencyManipulation' },
+    { label: 'SOC.', key: 'socialEngineering' },
+    { label: 'TECH.', key: 'technicalIndicators' },
+    { label: 'AI', key: 'aiGeneratedSigns' },
   ];
 
-  for (const cat of categories) {
+  categories.forEach((cat) => {
     const val = llm?.categories?.[cat.key] ?? 0;
-    const t = getThresholds(currentSettings?.sensitivityThreshold);
     const color = categoryColor(val);
-    const gradId = val >= t.likely ? 'sparkline-grad-danger' : val >= t.suspicious ? 'sparkline-grad-warn' : 'sparkline-grad-safe';
-    const glowColor = val >= t.likely ? 'rgba(239, 68, 68, 0.45)' : val >= t.suspicious ? 'rgba(245, 158, 11, 0.45)' : 'rgba(16, 185, 129, 0.45)';
+    const circumference = 119.38; // 2 * Math.PI * 19
+    const offset = circumference - (val / 100) * circumference;
 
-    const cell = document.createElement('div');
-    cell.className = 'flex flex-col min-w-0';
-    cell.innerHTML = `
-      <div class="flex justify-between items-center text-[12px] font-medium mb-1 shrink-0 px-0.5">
-        <span class="text-on-surface/90 truncate min-w-0 font-sans tracking-wide">${cat.label}</span>
-        <span class="font-bold ml-1.5 shrink-0" style="color:${color}">${val}</span>
-      </div>
-      <div class="w-full h-[36px] relative overflow-hidden rounded-lg border border-white/5 bg-white/[0.02]">
-        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 120 40" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Area gradient fill -->
-          <path class="sparkline-area-fill" d="${cat.fillPath}" fill="url(#${gradId})" style="transform: scaleY(0); transform-origin: bottom; transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);" />
-          <!-- Wavy stroke with dynamic drop shadow -->
-          <path class="sparkline-stroke-path" d="${cat.path}" stroke="${color}" stroke-width="2.2" stroke-linecap="round" fill="none" style="filter: drop-shadow(0px 2px 4px ${glowColor}); stroke-dasharray: 150; stroke-dashoffset: 150; transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1);" />
-        </svg>
+    const gaugeHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; width: 52px;">
+        <div style="position: relative; width: 44px; height: 44px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+          <svg width="44" height="44" viewBox="0 0 44 44" style="overflow: visible; transform: rotate(-90deg);">
+            <circle cx="22" cy="22" r="19" stroke="#303539" stroke-width="3.5" fill="none"/>
+            <circle class="category-gauge-arc" cx="22" cy="22" r="19" stroke="url(#gauge-gradient)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${circumference}"/>
+          </svg>
+          <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+            <span style="color: #ffffff; font-size: 13px; font-weight: 700; font-family: 'JetBrains Mono', monospace; line-height: 1;">${val}</span>
+          </div>
+        </div>
+        <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.7); margin-top: 6px; text-align: center; line-height: 1.1;">${cat.label}</span>
       </div>
     `;
-    barsEl.appendChild(cell);
-  }
 
-  // Trigger SVG animations
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = gaugeHTML;
+    gaugesEl.appendChild(wrapper.firstElementChild);
+  });
+
+  // Trigger animations
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      document.querySelectorAll('.sparkline-area-fill').forEach((el) => {
-        el.style.transform = 'scaleY(1)';
-      });
-      document.querySelectorAll('.sparkline-stroke-path').forEach((el) => {
-        el.style.strokeDashoffset = '0';
+      const arcs = gaugesEl.querySelectorAll('.category-gauge-arc');
+      arcs.forEach((arc, i) => {
+        const val = llm?.categories?.[categories[i].key] ?? 0;
+        const offset = 119.38 - (val / 100) * 119.38;
+        arc.style.strokeDashoffset = offset;
       });
     });
   });
-
-  const noteWrap = document.getElementById('analyst-note-wrap');
-  const noteText = document.getElementById('analyst-note-text');
-  if (llm?.analystNote) {
-    if (noteWrap) noteWrap.style.display = 'block';
-    if (noteText) noteText.textContent = llm.analystNote;
-  } else {
-    if (noteWrap) noteWrap.style.display = 'none';
-  }
 }
 
 // ─── Findings Tab ────────────────────────────────────────────────────────────

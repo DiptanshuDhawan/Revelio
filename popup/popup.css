@@ -682,3 +682,7 @@
   animation: dotBlink 1.2s steps(4, end) infinite;
 }
 
+/* ─── Threat Breakdown Mini Gauges ────────────────────────────── */
+.category-gauge-arc {
+  transition: stroke-dashoffset 1s ease-out;
+}
