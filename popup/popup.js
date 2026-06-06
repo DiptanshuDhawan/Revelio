@@ -12,6 +12,7 @@ let currentResult = null;
 let currentSettings = {};
 let currentAnalysisId = null;
 let currentEmailText = '';
+let threatChartInstance = null;
 
 // ─── Email Hash (simple fingerprint for cache keying) ────────────────────────
 function hashEmail(text) {
@@ -967,57 +968,78 @@ function renderSummaryTab(score, llm) {
     }
   }
 
-  const gaugesEl = document.getElementById('category-gauges');
-  if (!gaugesEl) return;
-  gaugesEl.innerHTML = '';
-  // Set the container to flex-row for the 5-in-a-row layout
-  gaugesEl.className = 'flex justify-between items-start w-full mt-3 mb-2 px-1';
+  const chartCanvas = document.getElementById('threat-radar-chart');
+  if (!chartCanvas) return;
+
+  const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const ctx = chartCanvas.getContext('2d');
 
   const categories = [
-    { label: 'IMP.', key: 'impersonation' },
-    { label: 'URG.', key: 'urgencyManipulation' },
-    { label: 'SOC.', key: 'socialEngineering' },
-    { label: 'TECH.', key: 'technicalIndicators' },
-    { label: 'AI', key: 'aiGeneratedSigns' },
+    { id: 'IMP', full: 'Impersonation', key: 'impersonation' },
+    { id: 'URG', full: 'Urgency', key: 'urgencyManipulation' },
+    { id: 'SOC', full: 'Social engineering', key: 'socialEngineering' },
+    { id: 'TECH', full: 'Tech. deception', key: 'technicalIndicators' },
+    { id: 'AI', full: 'AI-generated', key: 'aiGeneratedSigns' },
   ];
 
-  categories.forEach((cat) => {
-    const val = llm?.categories?.[cat.key] ?? 0;
-    const color = categoryColor(val);
-    const circumference = 119.38; // 2 * Math.PI * 19
-    const offset = circumference - (val / 100) * circumference;
+  const dataValues = categories.map(cat => llm?.categories?.[cat.key] ?? 0);
 
-    const gaugeHTML = `
-      <div style="display: flex; flex-direction: column; align-items: center; width: 52px;">
-        <div style="position: relative; width: 44px; height: 44px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
-          <svg width="44" height="44" viewBox="0 0 44 44" style="overflow: visible; transform: rotate(-90deg);">
-            <circle cx="22" cy="22" r="19" stroke="#303539" stroke-width="3.5" fill="none"/>
-            <circle class="category-gauge-arc" cx="22" cy="22" r="19" stroke="url(#gauge-gradient)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${circumference}"/>
-          </svg>
-          <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-            <span style="color: #ffffff; font-size: 13px; font-weight: 700; font-family: 'JetBrains Mono', monospace; line-height: 1;">${val}</span>
-          </div>
-        </div>
-        <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.7); margin-top: 6px; text-align: center; line-height: 1.1;">${cat.label}</span>
-      </div>
-    `;
+  // Dynamic Theme Colors (Cyan/Primary theme matching project)
+  const fillColor = isDarkMode ? 'rgba(56, 189, 248, 0.20)' : 'rgba(14, 165, 233, 0.15)';
+  const borderColor = isDarkMode ? '#38bdf8' : '#0ea5e9';
+  const pointBg = borderColor;
+  const pointBorder = isDarkMode ? '#1a1a1a' : '#ffffff';
+  const gridColor = isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)';
+  const tickColor = isDarkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
 
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = gaugeHTML;
-    gaugesEl.appendChild(wrapper.firstElementChild);
-  });
+  if (threatChartInstance) {
+    threatChartInstance.destroy();
+  }
 
-  // Trigger animations
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      const arcs = gaugesEl.querySelectorAll('.category-gauge-arc');
-      arcs.forEach((arc, i) => {
-        const val = llm?.categories?.[categories[i].key] ?? 0;
-        const offset = 119.38 - (val / 100) * 119.38;
-        arc.style.strokeDashoffset = offset;
-      });
+  // Fallback to window.Chart (loaded via script tag in HTML)
+  if (window.Chart) {
+    threatChartInstance = new window.Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: categories.map(c => c.full),
+        datasets: [{
+          data: dataValues,
+          backgroundColor: fillColor,
+          borderColor: borderColor,
+          borderWidth: 2,
+          pointBackgroundColor: pointBg,
+          pointBorderColor: pointBorder,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          r: {
+            min: 0,
+            max: 100,
+            ticks: {
+              stepSize: 25,
+              color: tickColor,
+              backdropColor: 'transparent',
+              font: { size: 9, family: 'Inter, sans-serif', weight: '600' }
+            },
+            grid: { color: gridColor },
+            angleLines: { color: gridColor },
+            pointLabels: {
+              color: tickColor,
+              font: { size: 10, family: 'Inter, sans-serif', weight: '600' }
+            }
+          }
+        }
+      }
     });
-  });
+  }
 }
 
 // ─── Findings Tab ────────────────────────────────────────────────────────────

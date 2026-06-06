@@ -4,143 +4,182 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Revelio — Settings</title>
-  <link rel="stylesheet" href="settings.css" />
+  <link rel="stylesheet" href="../popup/popup-built.css" />
+  <style>
+    .prov-btn.active { background: rgba(56,189,248,0.15); border-color: #38bdf8; color: #38bdf8; }
+    .model-chip {
+      padding: 4px 12px; border-radius: 9999px;
+      background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.2);
+      color: #38bdf8; font-size: 11px; cursor: pointer; transition: all 0.2s; font-weight: 700;
+    }
+    .model-chip:hover { background: rgba(56,189,248,0.2); }
+    .settings-toast {
+      position: fixed; bottom: 20px; right: 20px;
+      background: #303539; border: 1px solid #3e484f;
+      border-radius: 8px; padding: 10px 18px;
+      font-size: 13px; font-weight: 600; color: #dee3e8;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none; z-index: 999;
+    }
+    .settings-toast.show { opacity: 1; transform: translateY(0); }
+    .settings-toast.success { border-color: rgba(34,197,94,0.4); color: #22c55e; }
+    .settings-toast.error { border-color: rgba(239,68,68,0.4); color: #ef4444; }
+    .test-result { padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; margin-top: 8px; }
+    .test-result.success { background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
+    .test-result.error { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+    
+    /* Input styles */
+    .glass-input {
+      width: 100%; padding: 8px 12px;
+      background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; color: #fff; font-size: 13px; outline: none; transition: all 0.2s;
+    }
+    .glass-input:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56,189,248,0.2); }
+    
+    /* Custom Toggle Switch using pure CSS */
+    .toggle-switch { position: relative; display: inline-block; width: 42px; height: 24px; flex-shrink: 0; cursor: pointer; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-knob { position: absolute; inset: 0; background: rgba(255,255,255,0.15); border-radius: 24px; transition: 0.2s; border: 1px solid rgba(255,255,255,0.1); }
+    .toggle-knob::before { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; left: 2px; top: 2px; background: white; transition: 0.2s; }
+    .toggle-switch input:checked + .toggle-knob { background: #38bdf8; border-color: #38bdf8; }
+    .toggle-switch input:checked + .toggle-knob::before { transform: translateX(18px); }
+  </style>
 </head>
-<body class="dark-mode">
+<body class="dark-mode bg-background text-on-surface custom-scrollbar min-h-screen">
 
-<header class="settings-header">
-  <div class="header-brand">
-    <div class="brand-icon">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
-      </svg>
-    </div>
+<header class="bg-surface-container-high border-b border-outline-variant/50 backdrop-blur-md sticky top-0 z-50 flex items-center justify-between px-6 py-4 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+  <div class="flex items-center gap-3">
+    <img src="../icons/extension display logo.png" alt="Revelio Logo" class="w-10 h-10 object-contain drop-shadow-[0_2px_10px_rgba(56,189,248,0.3)]" />
     <div>
-      <div class="brand-name">Revelio</div>
-      <div class="brand-sub">Settings & Configuration</div>
+      <div class="text-[17px] font-bold text-white tracking-wide">Revelio</div>
+      <div class="text-[12px] text-on-surface-variant font-medium">Settings & Configuration</div>
     </div>
   </div>
-  <button id="save-btn" class="save-btn">
-    <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+  <button id="save-btn" class="bg-primary text-on-primary rounded-lg px-5 py-2.5 font-bold text-[13px] shadow-[0_0_15px_rgba(56,189,248,0.4)] hover:brightness-110 active:scale-95 transition-all flex items-center gap-2">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
     Save Settings
   </button>
 </header>
 
-<main class="settings-main">
+<main class="max-w-[760px] mx-auto p-6 flex flex-col gap-5">
 
   <!-- ─── AI PROVIDER SETTINGS ────────────────────────────────────────────── -->
-  <section class="settings-section">
-    <div class="section-title">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+  <section class="glass-panel p-5 flex flex-col gap-4 relative overflow-hidden">
+    <div class="finding-strip bg-primary/40"></div>
+    <div class="flex items-center gap-2 text-[14px] font-bold text-white pb-3 border-b border-outline-variant/30 uppercase tracking-widest">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
       AI Provider Settings
     </div>
 
-    <div class="form-group">
-      <label class="form-label">Active Provider</label>
-      <div class="provider-selector" id="provider-selector">
-        <button class="prov-btn active" data-prov="ollama">🖥 Ollama (Local)</button>
-        <button class="prov-btn" data-prov="openai">OpenAI</button>
-        <button class="prov-btn" data-prov="gemini">Gemini</button>
+    <div class="flex flex-col gap-2">
+      <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Active Provider</label>
+      <div class="flex gap-2 flex-wrap" id="provider-selector">
+        <button class="prov-btn active px-4 py-2 rounded-lg border border-outline-variant/50 text-on-surface-variant font-bold text-[12px] hover:bg-surface-variant transition-colors" data-prov="ollama">🖥 Ollama (Local)</button>
+        <button class="prov-btn px-4 py-2 rounded-lg border border-outline-variant/50 text-on-surface-variant font-bold text-[12px] hover:bg-surface-variant transition-colors" data-prov="openai">OpenAI</button>
+        <button class="prov-btn px-4 py-2 rounded-lg border border-outline-variant/50 text-on-surface-variant font-bold text-[12px] hover:bg-surface-variant transition-colors" data-prov="gemini">Gemini</button>
       </div>
     </div>
 
     <!-- Ollama Config -->
-    <div id="cfg-ollama" class="provider-cfg">
-      <div class="cfg-header">
-        <span class="cfg-badge cfg-local">LOCAL</span>
+    <div id="cfg-ollama" class="bg-surface-variant/20 border border-outline-variant/30 rounded-xl p-4 flex flex-col gap-4">
+      <div class="flex items-center gap-2 text-[12px] text-on-surface-variant font-medium">
+        <span class="bg-emerald-500/20 text-emerald-500 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider border border-emerald-500/30">LOCAL</span>
         Ollama — Zero data leaves your machine
       </div>
-      <div class="form-row">
-        <div class="form-group flex-1">
-          <label class="form-label" for="s-ollama-endpoint">API Endpoint</label>
-          <input type="text" id="s-ollama-endpoint" class="form-input" value="http://localhost:11434" placeholder="http://localhost:11434" />
+      <div class="flex items-end gap-3">
+        <div class="flex flex-col gap-1.5 flex-1">
+          <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-ollama-endpoint">API Endpoint</label>
+          <input type="text" id="s-ollama-endpoint" class="glass-input" value="http://localhost:11434" placeholder="http://localhost:11434" />
         </div>
-        <button id="test-ollama-btn" class="test-btn">Test Connection</button>
+        <button id="test-ollama-btn" class="px-4 py-2 bg-surface-variant text-on-surface border border-outline-variant/50 rounded-lg font-bold text-[12px] hover:bg-outline-variant/40 transition-colors shrink-0">Test Connection</button>
       </div>
       <div id="ollama-test-result" class="test-result" style="display:none;"></div>
-      <div class="form-group">
-        <label class="form-label" for="s-ollama-model">Model</label>
-        <select id="s-ollama-model" class="form-select">
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-ollama-model">Model</label>
+        <select id="s-ollama-model" class="glass-input">
           <option value="custom">Custom model name...</option>
         </select>
-        <input type="text" id="s-ollama-model-custom" class="form-input" placeholder="Enter model name (e.g. llama3:8b)" style="display:none;margin-top:6px;" />
+        <input type="text" id="s-ollama-model-custom" class="glass-input mt-2" placeholder="Enter model name (e.g. llama3:8b)" style="display:none;" />
       </div>
-      <div id="ollama-models-list" class="models-list" style="display:none;">
-        <div class="models-list-label">Installed models detected:</div>
-        <div id="ollama-models-chips" class="models-chips"></div>
+      <div id="ollama-models-list" class="border-t border-outline-variant/30 pt-3 mt-1" style="display:none;">
+        <div class="text-[11px] text-on-surface-variant mb-2 font-medium">Installed models detected:</div>
+        <div id="ollama-models-chips" class="flex flex-wrap gap-2"></div>
       </div>
     </div>
 
     <!-- OpenAI Config -->
-    <div id="cfg-openai" class="provider-cfg" style="display:none;">
-      <div class="cfg-header">
-        <span class="cfg-badge cfg-cloud">CLOUD</span>
+    <div id="cfg-openai" class="bg-surface-variant/20 border border-outline-variant/30 rounded-xl p-4 flex flex-col gap-4" style="display:none;">
+      <div class="flex items-center gap-2 text-[12px] text-on-surface-variant font-medium">
+        <span class="bg-primary/20 text-primary px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider border border-primary/30">CLOUD</span>
         OpenAI — API key stored locally in extension storage
       </div>
-      <div class="form-group">
-        <label class="form-label" for="s-openai-key">API Key</label>
-        <div class="input-with-toggle">
-          <input type="password" id="s-openai-key" class="form-input" placeholder="sk-..." autocomplete="off" />
-          <button class="toggle-visibility" data-target="s-openai-key" aria-label="Toggle key visibility">👁</button>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-openai-key">API Key</label>
+        <div class="flex gap-2 items-center">
+          <input type="password" id="s-openai-key" class="glass-input flex-1" placeholder="sk-..." autocomplete="off" />
+          <button class="toggle-visibility px-3 py-2 bg-surface-variant border border-outline-variant/50 rounded-lg text-on-surface-variant hover:text-white transition-colors" data-target="s-openai-key" aria-label="Toggle key visibility">👁</button>
         </div>
-        <p class="form-hint">Get your key at <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a></p>
+        <p class="text-[11px] text-on-surface-variant/70 mt-1">Get your key at <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" class="text-primary hover:underline">platform.openai.com/api-keys</a></p>
       </div>
-      <div class="form-group">
-        <label class="form-label" for="s-openai-model">Model</label>
-        <select id="s-openai-model" class="form-select">
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-openai-model">Model</label>
+        <select id="s-openai-model" class="glass-input">
           <option value="gpt-4o-mini">gpt-4o-mini (Fast, Cost-efficient)</option>
           <option value="gpt-4o">gpt-4o (Most Capable)</option>
           <option value="o1-mini">o1-mini (Reasoning)</option>
           <option value="o1-preview">o1-preview (Advanced Reasoning)</option>
           <option value="custom">Custom model name...</option>
         </select>
-        <input type="text" id="s-openai-model-custom" class="form-input" placeholder="Enter custom model (e.g. gpt-5)" style="display:none;margin-top:6px;" />
+        <input type="text" id="s-openai-model-custom" class="glass-input mt-2" placeholder="Enter custom model (e.g. gpt-5)" style="display:none;" />
       </div>
     </div>
 
     <!-- Gemini Config -->
-    <div id="cfg-gemini" class="provider-cfg" style="display:none;">
-      <div class="cfg-header">
-        <span class="cfg-badge cfg-cloud">CLOUD</span>
+    <div id="cfg-gemini" class="bg-surface-variant/20 border border-outline-variant/30 rounded-xl p-4 flex flex-col gap-4" style="display:none;">
+      <div class="flex items-center gap-2 text-[12px] text-on-surface-variant font-medium">
+        <span class="bg-primary/20 text-primary px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider border border-primary/30">CLOUD</span>
         Google Gemini — API key stored locally in extension storage
       </div>
-      <div class="form-group">
-        <label class="form-label" for="s-gemini-key">API Key</label>
-        <div class="input-with-toggle">
-          <input type="password" id="s-gemini-key" class="form-input" placeholder="AIza..." autocomplete="off" />
-          <button class="toggle-visibility" data-target="s-gemini-key" aria-label="Toggle key visibility">👁</button>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-gemini-key">API Key</label>
+        <div class="flex gap-2 items-center">
+          <input type="password" id="s-gemini-key" class="glass-input flex-1" placeholder="AIza..." autocomplete="off" />
+          <button class="toggle-visibility px-3 py-2 bg-surface-variant border border-outline-variant/50 rounded-lg text-on-surface-variant hover:text-white transition-colors" data-target="s-gemini-key" aria-label="Toggle key visibility">👁</button>
         </div>
-        <p class="form-hint">Get your key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a></p>
+        <p class="text-[11px] text-on-surface-variant/70 mt-1">Get your key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="text-primary hover:underline">aistudio.google.com</a></p>
       </div>
-      <div class="form-group">
-        <label class="form-label" for="s-gemini-model">Model</label>
-        <select id="s-gemini-model" class="form-select">
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-gemini-model">Model</label>
+        <select id="s-gemini-model" class="glass-input">
           <option value="gemini-3.5-flash">gemini-3.5-flash (Free Tier)</option>
           <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite (Free Tier)</option>
           <option value="custom">Custom model name...</option>
         </select>
-        <input type="text" id="s-gemini-model-custom" class="form-input" placeholder="Enter custom model (e.g. gemini-3.0-pro)" style="display:none;margin-top:6px;" />
+        <input type="text" id="s-gemini-model-custom" class="glass-input mt-2" placeholder="Enter custom model (e.g. gemini-3.0-pro)" style="display:none;" />
       </div>
     </div>
   </section>
 
   <!-- ─── ANALYSIS SETTINGS ──────────────────────────────────────────────── -->
-  <section class="settings-section">
-    <div class="section-title">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5z"/></svg>
+  <section class="glass-panel p-5 flex flex-col gap-5 relative overflow-hidden">
+    <div class="finding-strip bg-indigo-500/40"></div>
+    <div class="flex items-center gap-2 text-[14px] font-bold text-white pb-3 border-b border-outline-variant/30 uppercase tracking-widest">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5z"/></svg>
       Analysis Settings
     </div>
 
-    <div class="form-group">
-      <label class="form-label" for="sensitivity">Sensitivity Threshold: <span id="sensitivity-val">50</span></label>
-      <input type="range" id="sensitivity" class="form-range" min="0" max="100" value="50" />
-      <div class="range-labels"><span>Strict (more alerts)</span><span>Lenient (fewer alerts)</span></div>
+    <div class="flex flex-col gap-2">
+      <label class="text-[12px] font-bold text-white" for="sensitivity">Sensitivity Threshold: <span id="sensitivity-val" class="text-primary font-mono ml-1">50</span></label>
+      <input type="range" id="sensitivity" class="w-full accent-primary cursor-pointer my-1" min="0" max="100" value="50" />
+      <div class="flex justify-between text-[10px] text-on-surface-variant uppercase tracking-wider font-bold"><span>Strict (more alerts)</span><span>Lenient (fewer alerts)</span></div>
     </div>
 
-    <div class="toggle-row">
+    <div class="flex items-center justify-between gap-4 mt-2">
       <div>
-        <div class="toggle-label">Enable Automatic Background Scanning</div>
-        <div class="toggle-sub">Automatically scan emails as you open them (triggers notification on threat)</div>
+        <div class="text-[13px] font-bold text-white">Enable Automatic Background Scanning</div>
+        <div class="text-[11px] text-on-surface-variant/80 mt-0.5">Automatically scan emails as you open them (triggers notification on threat)</div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox" id="auto-scan" checked />
@@ -148,10 +187,10 @@
       </label>
     </div>
 
-    <div class="toggle-row">
+    <div class="flex items-center justify-between gap-4">
       <div>
-        <div class="toggle-label">Auto-save analyses</div>
-        <div class="toggle-sub">Automatically store each analysis in history</div>
+        <div class="text-[13px] font-bold text-white">Auto-save analyses</div>
+        <div class="text-[11px] text-on-surface-variant/80 mt-0.5">Automatically store each analysis in history</div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox" id="auto-save" checked />
@@ -159,10 +198,10 @@
       </label>
     </div>
 
-    <div class="toggle-row">
+    <div class="flex items-center justify-between gap-4">
       <div>
-        <div class="toggle-label">Show rule engine breakdown</div>
-        <div class="toggle-sub">Display individual rule check results in the Findings tab</div>
+        <div class="text-[13px] font-bold text-white">Show rule engine breakdown</div>
+        <div class="text-[11px] text-on-surface-variant/80 mt-0.5">Display individual rule check results in the Findings tab</div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox" id="show-rules" checked />
@@ -170,9 +209,9 @@
       </label>
     </div>
 
-    <div class="form-group">
-      <label class="form-label" for="max-history">Max History Entries</label>
-      <select id="max-history" class="form-select form-select-sm">
+    <div class="flex flex-col gap-1.5 mt-2">
+      <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="max-history">Max History Entries</label>
+      <select id="max-history" class="glass-input max-w-[200px]">
         <option value="10">10 entries</option>
         <option value="20" selected>20 entries</option>
         <option value="50">50 entries</option>
@@ -182,61 +221,67 @@
   </section>
 
   <!-- ─── URL SAFETY & API INTEGRATIONS ─────────────────────────────────── -->
-  <section class="settings-section">
-    <div class="section-title">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+  <section class="glass-panel p-5 flex flex-col gap-4 relative overflow-hidden">
+    <div class="finding-strip bg-emerald-500/40"></div>
+    <div class="flex items-center gap-2 text-[14px] font-bold text-white pb-3 border-b border-outline-variant/30 uppercase tracking-widest">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
       URL Safety & API Integrations
     </div>
     
-    <div class="toggle-row">
-      <div>
-        <div class="toggle-label">Enable Google Safe Browsing</div>
-        <div class="toggle-sub">Requires API Key. Uses privacy-preserving hash lookups.</div>
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <div class="text-[13px] font-bold text-white">Enable Google Safe Browsing</div>
+          <div class="text-[11px] text-on-surface-variant/80 mt-0.5">Requires API Key. Uses privacy-preserving hash lookups.</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="enable-safebrowsing" />
+          <span class="toggle-knob"></span>
+        </label>
       </div>
-      <label class="toggle-switch">
-        <input type="checkbox" id="enable-safebrowsing" />
-        <span class="toggle-knob"></span>
-      </label>
-    </div>
-    <div class="form-group" id="cfg-safebrowsing" style="display:none; margin-top: 10px; margin-left: 10px;">
-      <label class="form-label" for="s-safebrowsing-key">Safe Browsing API Key</label>
-      <div class="input-with-toggle">
-        <input type="password" id="s-safebrowsing-key" class="form-input" placeholder="AIza..." autocomplete="off" />
-        <button class="toggle-visibility" data-target="s-safebrowsing-key" aria-label="Toggle key visibility">👁</button>
+      <div id="cfg-safebrowsing" class="pl-4 border-l-2 border-outline-variant/30 ml-2 mt-2 flex flex-col gap-1.5" style="display:none;">
+        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-safebrowsing-key">Safe Browsing API Key</label>
+        <div class="flex gap-2 items-center">
+          <input type="password" id="s-safebrowsing-key" class="glass-input flex-1" placeholder="AIza..." autocomplete="off" />
+          <button class="toggle-visibility px-3 py-2 bg-surface-variant border border-outline-variant/50 rounded-lg text-on-surface-variant hover:text-white transition-colors" data-target="s-safebrowsing-key" aria-label="Toggle key visibility">👁</button>
+        </div>
+        <p class="text-[11px] text-on-surface-variant/70 mt-1">Get your key from Google Cloud Console.</p>
       </div>
-      <p class="form-hint">Get your key from Google Cloud Console.</p>
     </div>
 
-    <div class="toggle-row">
-      <div>
-        <div class="toggle-label">Enable VirusTotal Deep Scan</div>
-        <div class="toggle-sub">On-demand scanning. Requires API Key. (Public URL submission)</div>
+    <div class="flex flex-col gap-2 mt-2">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <div class="text-[13px] font-bold text-white">Enable VirusTotal Deep Scan</div>
+          <div class="text-[11px] text-on-surface-variant/80 mt-0.5">On-demand scanning. Requires API Key. (Public URL submission)</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="enable-virustotal" />
+          <span class="toggle-knob"></span>
+        </label>
       </div>
-      <label class="toggle-switch">
-        <input type="checkbox" id="enable-virustotal" />
-        <span class="toggle-knob"></span>
-      </label>
-    </div>
-    <div class="form-group" id="cfg-virustotal" style="display:none; margin-top: 10px; margin-left: 10px;">
-      <label class="form-label" for="s-virustotal-key">VirusTotal API Key</label>
-      <div class="input-with-toggle">
-        <input type="password" id="s-virustotal-key" class="form-input" placeholder="..." autocomplete="off" />
-        <button class="toggle-visibility" data-target="s-virustotal-key" aria-label="Toggle key visibility">👁</button>
+      <div id="cfg-virustotal" class="pl-4 border-l-2 border-outline-variant/30 ml-2 mt-2 flex flex-col gap-1.5" style="display:none;">
+        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-virustotal-key">VirusTotal API Key</label>
+        <div class="flex gap-2 items-center">
+          <input type="password" id="s-virustotal-key" class="glass-input flex-1" placeholder="..." autocomplete="off" />
+          <button class="toggle-visibility px-3 py-2 bg-surface-variant border border-outline-variant/50 rounded-lg text-on-surface-variant hover:text-white transition-colors" data-target="s-virustotal-key" aria-label="Toggle key visibility">👁</button>
+        </div>
+        <p class="text-[11px] text-on-surface-variant/70 mt-1">Get your free API key at virustotal.com.</p>
       </div>
-      <p class="form-hint">Get your free API key at virustotal.com.</p>
     </div>
   </section>
 
   <!-- ─── CONTEXT MENU ──────────────────────────────────────────────────── -->
-  <section class="settings-section">
-    <div class="section-title">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+  <section class="glass-panel p-5 flex flex-col gap-4 relative overflow-hidden">
+    <div class="finding-strip bg-amber-500/40"></div>
+    <div class="flex items-center gap-2 text-[14px] font-bold text-white pb-3 border-b border-outline-variant/30 uppercase tracking-widest">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
       Context Menu
     </div>
-    <div class="toggle-row">
+    <div class="flex items-center justify-between gap-4">
       <div>
-        <div class="toggle-label">Enable right-click "Analyze with PhishGuard"</div>
-        <div class="toggle-sub">Select any email text on a page and analyze it instantly</div>
+        <div class="text-[13px] font-bold text-white">Enable right-click "Analyze with PhishGuard"</div>
+        <div class="text-[11px] text-on-surface-variant/80 mt-0.5">Select any email text on a page and analyze it instantly</div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox" id="context-menu" checked />
@@ -246,45 +291,46 @@
   </section>
 
   <!-- ─── ABOUT & STATS ─────────────────────────────────────────────────── -->
-  <section class="settings-section">
-    <div class="section-title">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+  <section class="glass-panel p-5 flex flex-col gap-5 relative overflow-hidden">
+    <div class="finding-strip bg-surface-variant/80"></div>
+    <div class="flex items-center gap-2 text-[14px] font-bold text-white pb-3 border-b border-outline-variant/30 uppercase tracking-widest">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
       About & Statistics
     </div>
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-num" id="stat-total">0</div>
-        <div class="stat-label">Emails Analyzed</div>
+    <div class="grid grid-cols-3 gap-3">
+      <div class="bg-surface-variant/30 border border-outline-variant/30 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+        <div class="text-[28px] font-black text-primary" id="stat-total">0</div>
+        <div class="text-[10px] text-on-surface-variant mt-1 uppercase tracking-widest font-bold">Emails Analyzed</div>
       </div>
-      <div class="stat-card stat-card-danger">
-        <div class="stat-num" id="stat-caught">0</div>
-        <div class="stat-label">Threats Caught</div>
+      <div class="bg-error/10 border border-error/20 rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+        <div class="text-[28px] font-black text-error" id="stat-caught">0</div>
+        <div class="text-[10px] text-error/80 mt-1 uppercase tracking-widest font-bold">Threats Caught</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-num" id="stat-version">1.0.0</div>
-        <div class="stat-label">Version</div>
+      <div class="bg-surface-variant/30 border border-outline-variant/30 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+        <div class="text-[24px] font-black text-on-surface mt-1" id="stat-version">1.0.0</div>
+        <div class="text-[10px] text-on-surface-variant mt-2 uppercase tracking-widest font-bold">Version</div>
       </div>
     </div>
 
-    <div class="last-analysis-row">
-      <span class="form-hint">Last analysis: <span id="stat-last">Never</span></span>
+    <div class="text-[12px] text-on-surface-variant font-medium">
+      Last analysis: <span id="stat-last" class="text-white">Never</span>
     </div>
 
-    <div class="about-actions">
-      <button id="export-history-btn" class="outline-btn">
+    <div class="flex gap-3 flex-wrap">
+      <button id="export-history-btn" class="px-4 py-2 bg-surface-variant border border-outline-variant/50 rounded-lg text-on-surface-variant font-bold text-[12px] hover:text-white hover:bg-outline-variant/30 transition-colors flex items-center gap-2">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
         Export History as JSON
       </button>
-      <button id="clear-all-btn" class="danger-btn">
+      <button id="clear-all-btn" class="px-4 py-2 bg-error/10 border border-error/30 rounded-lg text-error font-bold text-[12px] hover:bg-error/20 transition-colors flex items-center gap-2">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
         Clear All History
       </button>
     </div>
 
-    <div class="about-info">
-      <p><strong>PhishGuard AI</strong> — Open-source email threat analyzer for security professionals.</p>
-      <p style="margin-top:6px;">Uses a multi-layer approach: 12 rule-based checks + LLM analysis (Ollama, OpenAI, or Gemini). All data stays local when using Ollama.</p>
+    <div class="p-4 bg-primary/5 border border-primary/10 rounded-xl text-[13px] text-on-surface-variant leading-relaxed">
+      <p><strong class="text-white">PhishGuard AI</strong> — Open-source email threat analyzer for security professionals.</p>
+      <p class="mt-2">Uses a multi-layer approach: 12 rule-based checks + LLM analysis (Ollama, OpenAI, or Gemini). All data stays local when using Ollama.</p>
     </div>
   </section>
 
