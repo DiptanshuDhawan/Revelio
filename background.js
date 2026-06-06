@@ -139,6 +139,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return false;
   }
 
+  if (message.type === 'CHECK_ACTIVE_SCAN') {
+    const hash = hashEmail(message.emailText);
+    if (activePassiveScans.has(hash)) {
+      activePassiveScans.get(hash).then(result => sendResponse({ active: true, result })).catch(() => sendResponse({ active: false }));
+      return true;
+    }
+    sendResponse({ active: false });
+    return false;
+  }
+
   if (message.type === 'CHECK_URL_SAFETY') {
     getSettings().then(settings => {
       checkSafeBrowsing(message.url, settings.safeBrowsingApiKey)
@@ -235,15 +245,23 @@ async function cacheAnalysisResult(emailText, result) {
   } catch (e) { /* silent */ }
 }
 
+const activePassiveScans = new Map();
+
 async function handlePassiveScan(emailText, source, tabId) {
   const settings = await getSettings();
   if (settings.autoScanEnabled === false) return;
 
-  if (tabId) {
-    chrome.tabs.sendMessage(tabId, { type: 'SCAN_STARTED' }).catch(() => {});
+  const hash = hashEmail(emailText);
+  if (activePassiveScans.has(hash)) {
+    return activePassiveScans.get(hash);
   }
 
-  try {
+  const scanPromise = (async () => {
+    if (tabId) {
+      chrome.tabs.sendMessage(tabId, { type: 'SCAN_STARTED' }).catch(() => {});
+    }
+
+    try {
     // 1. Run local rules
     const { emailData, ruleResult } = await analyzeEmail(emailText);
     emailData.source = source;
@@ -296,15 +314,24 @@ async function handlePassiveScan(emailText, source, tabId) {
       await saveAnalysis(analysisResult);
     }
     
-    // Always update cache so the popup can see this result immediately
     await cacheAnalysisResult(emailText, analysisResult);
+    return analysisResult;
 
   } catch (err) {
     console.error('[PhishGuard] Passive scan pipeline error:', err);
+    throw err;
   } finally {
     if (tabId) {
       chrome.tabs.sendMessage(tabId, { type: 'SCAN_FINISHED' }).catch(() => {});
     }
+  }
+  })();
+
+  activePassiveScans.set(hash, scanPromise);
+  try {
+    return await scanPromise;
+  } finally {
+    activePassiveScans.delete(hash);
   }
 }
 

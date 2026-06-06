@@ -440,6 +440,27 @@ async function autoExtractAndAnalyze() {
     return;
   }
 
+  // ── Active Background Scan check: if passive scan is running, hook into it ──
+  showView('loading');
+  startLoadingAnimation();
+  const activeCheck = await chrome.runtime.sendMessage({ type: 'CHECK_ACTIVE_SCAN', emailText: currentEmailText }).catch(() => ({}));
+  if (activeCheck && activeCheck.active) {
+    if (activeCheck.result) {
+      currentResult = activeCheck.result;
+      if (currentResult.llmResult?._offlineMode) {
+        renderOfflineView(currentResult.ruleResult, currentResult.finalScore);
+        showView('offline');
+        hideBanner();
+      } else {
+        renderResults(currentResult);
+        showView('results');
+      }
+    } else {
+      setIdleState('Analysis Failed', 'Background scan failed.', 'error');
+    }
+    return;
+  }
+
   const sourceLabel = extracted.source === 'gmail'
     ? 'Gmail email detected'
     : extracted.source === 'outlook'
@@ -810,7 +831,7 @@ function switchResultTab(tab) {
 
 // ─── Score Helpers ────────────────────────────────────────────────────────────
 function getThresholds(sensitivity = 50) {
-  const offset = (50 - sensitivity) * 0.4;
+  const offset = (sensitivity - 50) * 0.4;
   return {
     confirmed: Math.max(0, Math.min(100, 86 + offset)),
     likely: Math.max(0, Math.min(100, 70 + offset)),
