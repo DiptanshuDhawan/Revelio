@@ -782,7 +782,10 @@ function renderOfflineView(ruleResult, finalScore) {
     return;
   }
 
-  const sanitize = (s) => (s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const sanitize = (s) => {
+    if (typeof s === 'object') s = JSON.stringify(s);
+    return String(s || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  };
 
   for (const finding of allToShow) {
     const isHigh = finding.severity === 'critical' || finding.severity === 'high';
@@ -1070,7 +1073,10 @@ function renderFindingsTab(ruleResult, llm) {
   listEl.innerHTML = '';
 
   const findings = ruleResult?.findings || [];
-  const sanitize = (str) => str ? str.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+  const sanitize = (str) => {
+    if (typeof str === 'object') str = JSON.stringify(str);
+    return String(str || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  };
 
   for (const finding of findings) {
     const card = document.createElement('div');
