@@ -52,6 +52,48 @@
   padding: 0.5rem 0.875rem;
 }
 
+.pg-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.pg-brand-logo {
+  width: 92px;
+  height: 32px;
+  flex: 0 0 auto;
+}
+
+.pg-brand-wordmark {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: -2.9rem;
+}
+
+.pg-brand-name {
+  font-family: Geist, Inter, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: #e6f4ff;
+  text-shadow: 0 0 18px rgba(142, 213, 255, 0.18);
+}
+
+.pg-brand-sub {
+  font-family: Inter, sans-serif;
+  font-size: 0.4rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: #c4e7ffb8;
+}
+
 .pg-header h1,
 .pg-header p {
   overflow: hidden;
