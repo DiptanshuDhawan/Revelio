@@ -555,6 +555,7 @@ async function handleAnalyze(textToAnalyze) {
       const response = await chrome.runtime.sendMessage({
         type: 'ANALYZE',
         emailText,
+        ruleResult, // Pass rule engine findings for LLM context
         settings: freshSettings,
       });
 

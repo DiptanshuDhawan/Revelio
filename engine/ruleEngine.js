@@ -324,8 +324,7 @@ function checkDisplayNameMismatch(emailData) {
   const isRandomEmail = /^[a-z]{1,3}\d+[a-z]@/.test(fromEmail) ||
     /^[\w]{2,4}\d{4,}@/.test(fromEmail);
 
-  const isFreeProvider = FREE_EMAIL_PROVIDERS.includes(emailDomain + '.com') ||
-    FREE_EMAIL_PROVIDERS.includes(emailDomain);
+  const isFreeProvider = FREE_EMAIL_PROVIDERS.includes(emailDomain);
 
   if (!overlap && (isRandomEmail || (isFreeProvider && displayWords.length >= 2))) {
     return {
@@ -535,13 +534,14 @@ function checkHTMLObfuscation(emailData) {
   const body = emailData.body || '';
 
   // Pattern: <a href="...">visible text</a>
-  const linkPattern = /href=["']([^"']+)["'][^>]*>([^<]+)</gi;
+  const linkPattern = /<a[^>]*href=["']([^"']+)["'][^>]*>(.*?)<\/a>/gi;
   let match;
   const mismatches = [];
 
   while ((match = linkPattern.exec(body)) !== null) {
     const href = match[1].trim();
-    const visibleText = match[2].trim();
+    // Strip nested tags from visible text (e.g. <b>...</b>)
+    const visibleText = match[2].replace(/<[^>]*>/g, '').trim();
 
     // Check if visible text looks like a URL/domain but doesn't match href
     const looksLikeURL = /\.(com|org|net|gov|io|co)\b/i.test(visibleText);
@@ -633,21 +633,27 @@ function calculateRuleScore(findings) {
   const triggeredFindings = findings.filter((f) => !f.passed && f.score > 0);
   if (triggeredFindings.length === 0) return 0;
 
-  // Weighted scoring: highest-scoring rule gets more weight
+  // Weighted scoring: highest-scoring rule gets the most weight
   const scores = triggeredFindings.map((f) => f.score).sort((a, b) => b - a);
 
-  // Primary signal (highest score) gets 50% weight, rest shared
   const primary = scores[0];
   const secondary = scores.slice(1);
 
-  if (secondary.length === 0) return Math.round(primary * 0.7); // Single indicator, dampened
+  // Less aggressive dampening for single indicators, especially critical ones
+  if (secondary.length === 0) {
+    if (primary >= 90) return Math.round(primary * 0.85); // Critical: 95 -> 81 (Likely Phishing)
+    if (primary >= 70) return Math.round(primary * 0.80); // High: 75 -> 60 (Suspicious)
+    return Math.round(primary * 0.70);                   // Med/Low: dampened
+  }
 
+  // Weight the primary signal more heavily (70%) to prevent it being drowned out by low-score noise
   const secondaryAvg = secondary.reduce((s, v) => s + v, 0) / secondary.length;
-  const score = primary * 0.55 + secondaryAvg * 0.45;
+  const score = (primary * 0.7) + (secondaryAvg * 0.3);
 
-  // Boost for multiple critical findings
+  // Boost for multiple critical/high findings
   const criticalCount = triggeredFindings.filter((f) => f.severity === 'critical').length;
-  const boost = Math.min(criticalCount * 5, 20);
+  const highCount = triggeredFindings.filter((f) => f.severity === 'high').length;
+  const boost = Math.min((criticalCount * 10) + (highCount * 3), 25);
 
   return Math.min(Math.round(score + boost), 100);
 }

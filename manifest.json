@@ -12,7 +12,8 @@
     "tabs",
     "scripting",
     "alarms",
-    "notifications"
+    "notifications",
+    "unlimitedStorage"
   ],
 
   "host_permissions": [
@@ -35,9 +36,9 @@
     "default_popup": "popup/popup.html",
     "default_title": "Revelio",
     "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
+      "16": "icons/Revelio logo.png",
+      "48": "icons/Revelio logo.png",
+      "128": "icons/Revelio logo.png"
     }
   },
 
@@ -60,9 +61,9 @@
   ],
 
   "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+    "16": "icons/Revelio logo.png",
+    "48": "icons/Revelio logo.png",
+    "128": "icons/Revelio logo.png"
   },
 
   "options_page": "settings/settings.html",

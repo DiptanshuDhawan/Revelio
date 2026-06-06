@@ -55,6 +55,19 @@ export async function saveAnalysis(result) {
     const history = Array.isArray(data.history) ? data.history : [];
     const stats = data.stats || { totalAnalyzed: 0, phishingCaught: 0 };
 
+    // Deep clone the result to avoid modifying the original in-memory object
+    const resultClone = JSON.parse(JSON.stringify(result));
+    
+    // Strip redundant raw text to save storage space
+    if (resultClone.emailData) {
+      delete resultClone.emailData.raw;
+      // We keep resultClone.emailData.body for the full report view, 
+      // but ensure it's not excessively large (cap at 30k chars)
+      if (resultClone.emailData.body && resultClone.emailData.body.length > 30000) {
+        resultClone.emailData.body = resultClone.emailData.body.slice(0, 30000) + '... [Body Truncated]';
+      }
+    }
+
     // Create history entry
     const entry = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
@@ -70,7 +83,7 @@ export async function saveAnalysis(result) {
       becRisk: result.llmResult?.becRisk,
       spearPhishingRisk: result.llmResult?.spearPhishingRisk,
       mitreId: result.llmResult?.mitreAttack?.id,
-      fullResult: result,
+      fullResult: resultClone, // Save the stripped clone
     };
 
     // Prepend and trim to max

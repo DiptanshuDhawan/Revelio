@@ -188,9 +188,9 @@ async function getOllamaModels(endpoint = 'http://localhost:11434') {
 
 // ─── Main Analysis Handler ────────────────────────────────────────────────────
 
-async function handleAnalyze({ emailText, settings }) {
+async function handleAnalyze({ emailText, settings, ruleResult }) {
   const provider = settings.provider || 'ollama';
-  const prompt = buildAnalysisPrompt(emailText);
+  const prompt = buildAnalysisPrompt(emailText, ruleResult);
 
   let llmResponse;
 
@@ -212,6 +212,28 @@ async function handleAnalyze({ emailText, settings }) {
 }
 
 // ─── Passive Scanning ─────────────────────────────────────────────────────────
+
+
+// —— Shared Cache Utilities (Sync with popup.js) ———————————————————————————————
+
+function hashEmail(text) {
+  let hash = 5381;
+  for (let i = 0; i < Math.min(text.length, 2000); i++) {
+    hash = ((hash << 5) + hash) ^ text.charCodeAt(i);
+    hash = hash & 0xffffffff;
+  }
+  return 'phishcache_v2_' + Math.abs(hash).toString(36);
+}
+
+async function cacheAnalysisResult(emailText, result) {
+  try {
+    const key = hashEmail(emailText);
+    await chrome.storage.local.set({
+      [key]: { result, cachedAt: Date.now(), emailPreview: emailText.slice(0, 80) },
+      phishguard_last_cache_key: key,
+    });
+  } catch (e) { /* silent */ }
+}
 
 async function handlePassiveScan(emailText, source) {
   const settings = await getSettings();
@@ -247,7 +269,7 @@ async function handlePassiveScan(emailText, source) {
     // 4. Act on findings (Notify on Suspicious or worse)
     updateBadge(finalScore);
 
-    if (finalScore >= 40) {
+    if (finalScore >= 70) {
       chrome.notifications.create({
         type: 'basic',
         iconUrl: 'icons/icon128.png',
@@ -257,16 +279,21 @@ async function handlePassiveScan(emailText, source) {
       });
     }
 
-    // 5. Save to history
+    // 5. Save to history & Update Cache
+    const analysisResult = {
+      emailData,
+      ruleResult,
+      llmResult,
+      finalScore,
+      timestamp: new Date().toISOString()
+    };
+
     if (settings.autoSave !== false) {
-      await saveAnalysis({
-        emailData,
-        ruleResult,
-        llmResult,
-        finalScore,
-        timestamp: new Date().toISOString()
-      });
+      await saveAnalysis(analysisResult);
     }
+    
+    // Always update cache so the popup can see this result immediately
+    await cacheAnalysisResult(emailText, analysisResult);
 
   } catch (err) {
     console.error('[PhishGuard] Passive scan error:', err);

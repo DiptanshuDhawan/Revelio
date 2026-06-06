@@ -95,9 +95,9 @@ function loadSettingsIntoUI(settings) {
   // Gemini
   if ($('s-gemini-key')) $('s-gemini-key').value = settings.geminiApiKey || '';
   if ($('s-gemini-model')) {
-    const geminiKnown = ['gemini-3.5-flash', 'gemini-3.1-flash-lite'];
+    const geminiKnown = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash-exp'];
     if (geminiKnown.includes(settings.geminiModel) || !settings.geminiModel) {
-      $('s-gemini-model').value = settings.geminiModel || 'gemini-3.5-flash';
+      $('s-gemini-model').value = settings.geminiModel || 'gemini-1.5-flash';
     } else {
       $('s-gemini-model').value = 'custom';
       if ($('s-gemini-model-custom')) {

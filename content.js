@@ -53,7 +53,7 @@
       document.querySelector('.ha h2') ||
       document.querySelector('title');                          // Last resort
     const subject = subjectEl
-      ? subjectEl.textContent.trim().replace(/^PhishGuard AI.*/, '').trim()
+      ? subjectEl.textContent.trim()
       : '';
 
     // ── 3. Sender ─────────────────────────────────────────────────────────────
@@ -103,11 +103,8 @@
       bodyText = clone.innerText || clone.textContent || '';
     }
 
-    // If no body found through .a3s, try the full reading pane
-    if (!bodyText.trim()) {
-      const pane = document.querySelector('.AO, .nH.aHU, [role="main"]');
-      if (pane) bodyText = pane.innerText?.slice(0, 8000) || '';
-    }
+    // We only want to scan if a specific message body (.a3s) is found.
+    // Scrapping the whole pane leads to false positives in the inbox view.
 
     if (!bodyText.trim() && !subject) {
       return { emailText: null, source: 'gmail', error: 'No email open in Gmail. Please open an email first.' };
@@ -184,7 +181,6 @@
       document.querySelector('[aria-label="Message body"]') ||
       document.querySelector('.ReadMsgBody') ||
       document.querySelector('[class*="body"]') ||
-      document.querySelector('[role="main"] .allowTextSelection') ||
       document.querySelector('[contenteditable="false"][class*="content"]');
 
     let bodyText = '';
@@ -269,9 +265,17 @@
   }
 
   let scanTimeout;
-  const observer = new MutationObserver(() => {
-    clearTimeout(scanTimeout);
-    scanTimeout = setTimeout(scanPassive, 2000); // Wait 2s after DOM settles
+  const observer = new MutationObserver((mutations) => {
+    // Only trigger if a relevant container changed or many nodes were added
+    const isSignificant = mutations.some(m => 
+      (m.target.closest && m.target.closest('.AO, [role="main"], [data-testid="emailBodyContent"]')) ||
+      m.addedNodes.length > 10
+    );
+
+    if (isSignificant) {
+      clearTimeout(scanTimeout);
+      scanTimeout = setTimeout(scanPassive, 3000); // Increased debounce to 3s
+    }
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
