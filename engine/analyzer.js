@@ -59,7 +59,7 @@ export function computeFinalScore(llmScore, ruleScore) {
 // ─── Verdict from Score ───────────────────────────────────────────────────────
 
 export function scoreToVerdict(score, sensitivity = 50) {
-  const offset = (50 - sensitivity) * 0.4;
+  const offset = (sensitivity - 50) * 0.4;
   if (score >= Math.max(0, Math.min(100, 86 + offset))) return 'Confirmed Phishing';
   if (score >= Math.max(0, Math.min(100, 70 + offset))) return 'Likely Phishing';
   if (score >= Math.max(0, Math.min(100, 40 + offset))) return 'Suspicious';

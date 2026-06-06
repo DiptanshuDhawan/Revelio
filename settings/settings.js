@@ -209,6 +209,69 @@ function attachEventListeners() {
     btn.addEventListener('click', () => switchProvider(btn.dataset.prov));
   });
 
+  // Sidebar Scroll Spy and Navigation
+  const sidebarItems = document.querySelectorAll('.sidebar-item');
+  const scrollContainer = document.getElementById('scroll-container');
+  
+  // 1. Click to scroll
+  sidebarItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const targetId = item.dataset.target;
+      const targetSection = document.getElementById(targetId);
+      if (targetSection && scrollContainer) {
+        // Find position of target relative to scroll container
+        const containerRect = scrollContainer.getBoundingClientRect();
+        const targetRect = targetSection.getBoundingClientRect();
+        const scrollOffset = targetRect.top - containerRect.top + scrollContainer.scrollTop - 24; // 24px padding
+        scrollContainer.scrollTo({ top: scrollOffset, behavior: 'smooth' });
+      }
+    });
+  });
+
+  // 2. Intersection Observer to highlight active item
+  const observerOptions = {
+    root: scrollContainer,
+    rootMargin: '-20px 0px -60% 0px', // Trigger when section hits the upper third of screen
+    threshold: 0
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        // Remove active class from all
+        sidebarItems.forEach(item => item.classList.remove('active', 'bg-[rgba(37,99,235,0.18)]', 'border', 'border-[rgba(37,99,235,0.4)]', 'text-[#e0eeff]'));
+        sidebarItems.forEach(item => item.classList.add('hover:bg-[rgba(255,255,255,0.05)]', 'text-[rgba(255,255,255,0.45)]'));
+        
+        // Add active class to intersecting item
+        const activeItem = document.querySelector(`.sidebar-item[data-target="${id}"]`);
+        if (activeItem) {
+          activeItem.classList.remove('hover:bg-[rgba(255,255,255,0.05)]', 'text-[rgba(255,255,255,0.45)]');
+          activeItem.classList.add('active', 'bg-[rgba(37,99,235,0.18)]', 'border', 'border-[rgba(37,99,235,0.4)]', 'text-[#e0eeff]');
+          
+          // Also swap icon colors
+          sidebarItems.forEach(item => {
+             const svg = item.querySelector('svg');
+             if (svg) {
+                svg.classList.remove('text-[#4a9eff]');
+                svg.classList.add('text-[rgba(255,255,255,0.3)]');
+             }
+          });
+          const activeSvg = activeItem.querySelector('svg');
+          if (activeSvg) {
+             activeSvg.classList.remove('text-[rgba(255,255,255,0.3)]');
+             activeSvg.classList.add('text-[#4a9eff]');
+          }
+        }
+      }
+    });
+  }, observerOptions);
+
+  ['sec-ai', 'sec-analysis', 'sec-url', 'sec-context', 'sec-stats', 'sec-about'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+
   // Ollama model custom input
   $('s-ollama-model')?.addEventListener('change', (e) => {
     const custom = $('s-ollama-model-custom');
