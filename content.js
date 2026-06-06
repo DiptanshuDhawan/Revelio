@@ -163,10 +163,9 @@
       bodyText = clone.innerText || clone.textContent || '';
     }
 
-    // We only want to scan if a specific message body (.a3s) is found.
-    // Scrapping the whole pane leads to false positives in the inbox view.
-
-    if (!bodyText.trim() && !subject) {
+    // We strictly check if the actual message container (.a3s) was found.
+    // Otherwise we might scrape the inbox list view and trigger false positives.
+    if (!msgEl) {
       return { emailText: null, source: 'gmail', error: 'No email open in Gmail. Please open an email first.' };
     }
 
@@ -243,16 +242,15 @@
       document.querySelector('[class*="body"]') ||
       document.querySelector('[contenteditable="false"][class*="content"]');
 
-    let bodyText = '';
-    if (bodyEl) {
-      const clone = bodyEl.cloneNode(true);
-      clone.querySelectorAll('blockquote, [class*="quote"], [class*="previousMessage"]').forEach(el => el.remove());
-      bodyText = clone.innerText || clone.textContent || '';
-    }
-
-    if (!bodyText.trim() && !subject) {
+    // Strictly ensure we found an email body container
+    if (!bodyEl) {
       return { emailText: null, source: 'outlook', error: 'No email open in Outlook. Please open an email first.' };
     }
+
+    let bodyText = '';
+    const clone = bodyEl.cloneNode(true);
+    clone.querySelectorAll('blockquote, [class*="quote"], [class*="previousMessage"]').forEach(el => el.remove());
+    bodyText = clone.innerText || clone.textContent || '';
 
     const headers = [];
     if (fromName || fromEmail) headers.push(`From: ${fromName}${fromEmail ? ` <${fromEmail}>` : ''}`);
