@@ -6,337 +6,436 @@
   <title>Revelio — Settings</title>
   <link rel="stylesheet" href="../popup/popup-built.css" />
   <style>
-    .prov-btn.active { background: rgba(56,189,248,0.15); border-color: #38bdf8; color: #38bdf8; }
+    /* Provider Tabs */
+    .prov-btn {
+      padding: 7px 14px; border-radius: 7px; font-size: 13px; font-weight: 500;
+      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.45);
+      border: 1px solid transparent; cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .prov-btn:hover { background: rgba(255,255,255,0.08); }
+    .prov-btn.active {
+      background: rgba(56,189,248,0.15); border-color: rgba(56,189,248,0.4);
+      color: #7eb8ff;
+    }
+
+    /* Model Chips */
     .model-chip {
       padding: 4px 12px; border-radius: 9999px;
       background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.2);
       color: #38bdf8; font-size: 11px; cursor: pointer; transition: all 0.2s; font-weight: 700;
     }
     .model-chip:hover { background: rgba(56,189,248,0.2); }
+
+    /* Toast */
     .settings-toast {
-      position: fixed; bottom: 20px; right: 20px;
-      background: #303539; border: 1px solid #3e484f;
-      border-radius: 8px; padding: 10px 18px;
-      font-size: 13px; font-weight: 600; color: #dee3e8;
+      position: fixed; bottom: 24px; right: 24px;
+      background: #161b27; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 10px 16px;
+      font-size: 13px; color: rgba(255,255,255,0.8);
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
       opacity: 0; transform: translateY(10px);
       transition: opacity 0.3s, transform 0.3s;
       pointer-events: none; z-index: 999;
+      display: flex; align-items: center; gap: 8px;
     }
     .settings-toast.show { opacity: 1; transform: translateY(0); }
     .settings-toast.success { border-color: rgba(34,197,94,0.4); color: #22c55e; }
     .settings-toast.error { border-color: rgba(239,68,68,0.4); color: #ef4444; }
+
+    /* Test Results */
     .test-result { padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; margin-top: 8px; }
     .test-result.success { background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.2); }
     .test-result.error { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
     
     /* Input styles */
     .glass-input {
-      width: 100%; padding: 8px 12px;
-      background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; color: #fff; font-size: 13px; outline: none; transition: all 0.2s;
+      width: 100%; padding: 8px 10px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 7px; color: rgba(255,255,255,0.85); font-size: 13px; font-family: monospace; outline: none; transition: all 0.2s;
     }
     .glass-input:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56,189,248,0.2); }
     
     /* Custom Toggle Switch using pure CSS */
-    .toggle-switch { position: relative; display: inline-block; width: 42px; height: 24px; flex-shrink: 0; cursor: pointer; }
+    .toggle-switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; cursor: pointer; }
     .toggle-switch input { opacity: 0; width: 0; height: 0; }
-    .toggle-knob { position: absolute; inset: 0; background: rgba(255,255,255,0.15); border-radius: 24px; transition: 0.2s; border: 1px solid rgba(255,255,255,0.1); }
-    .toggle-knob::before { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; left: 2px; top: 2px; background: white; transition: 0.2s; }
-    .toggle-switch input:checked + .toggle-knob { background: #38bdf8; border-color: #38bdf8; }
-    .toggle-switch input:checked + .toggle-knob::before { transform: translateX(18px); }
+    .toggle-knob { position: absolute; inset: 0; background: rgba(255,255,255,0.12); border-radius: 99px; transition: 0.2s; }
+    .toggle-knob::before { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; left: 3px; top: 3px; background: white; transition: left 0.15s cubic-bezier(0.4, 0, 0.2, 1); }
+    .toggle-switch input:checked + .toggle-knob { background: #2563eb; }
+    .toggle-switch input:checked + .toggle-knob::before { left: 19px; }
+
+    /* Range Slider */
+    .range-input {
+      -webkit-appearance: none; width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; outline: none;
+    }
+    .range-input::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #2563eb; border: 2px solid white; cursor: pointer;
+    }
   </style>
 </head>
-<body class="dark-mode bg-background text-on-surface custom-scrollbar min-h-screen">
+<body class="dark-mode bg-[#0f1117] text-[#d9d9d9] flex flex-col h-screen overflow-hidden custom-scrollbar">
 
-<header class="bg-surface-container-high border-b border-outline-variant/50 backdrop-blur-md sticky top-0 z-50 flex items-center justify-between px-6 py-4 shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
+<!-- TOP BAR -->
+<header class="h-[56px] bg-[#0f1117] border-b border-[rgba(255,255,255,0.08)] px-8 flex items-center justify-between shrink-0">
   <div class="flex items-center gap-3">
-    <img src="../icons/extension display logo.png" alt="Revelio Logo" class="w-10 h-10 object-contain drop-shadow-[0_2px_10px_rgba(56,189,248,0.3)]" />
-    <div>
-      <div class="text-[17px] font-bold text-white tracking-wide">Revelio</div>
-      <div class="text-[12px] text-on-surface-variant font-medium">Settings & Configuration</div>
+    <img src="../icons/extension display logo.png" alt="Revelio Logo" class="w-8 h-8 object-contain drop-shadow-[0_2px_10px_rgba(56,189,248,0.3)]" />
+    <div class="flex flex-col leading-tight">
+      <div class="text-[15px] font-medium text-white">Revelio</div>
+      <div class="text-[12px] text-[rgba(255,255,255,0.25)]">Settings & configuration</div>
     </div>
   </div>
-  <button id="save-btn" class="bg-primary text-on-primary rounded-lg px-5 py-2.5 font-bold text-[13px] shadow-[0_0_15px_rgba(56,189,248,0.4)] hover:brightness-110 active:scale-95 transition-all flex items-center gap-2">
+  <button id="save-btn" class="bg-[#2563eb] text-white rounded-lg px-[18px] py-[8px] font-medium text-[13px] hover:bg-blue-500 active:bg-blue-700 transition-colors flex items-center gap-2">
     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
-    Save Settings
+    Save settings
   </button>
 </header>
 
-<main class="max-w-[760px] mx-auto p-6 flex flex-col gap-5">
+<!-- MAIN TWO-PANEL LAYOUT -->
+<div class="flex-1 min-h-0 grid grid-cols-[200px_1fr]">
 
-  <!-- ─── AI PROVIDER SETTINGS ────────────────────────────────────────────── -->
-  <section class="glass-panel p-5 flex flex-col gap-4 relative overflow-hidden">
-    <div class="finding-strip bg-primary/40"></div>
-    <div class="flex items-center gap-2 text-[14px] font-bold text-white pb-3 border-b border-outline-variant/30 uppercase tracking-widest">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
-      AI Provider Settings
-    </div>
-
-    <div class="flex flex-col gap-2">
-      <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Active Provider</label>
-      <div class="flex gap-2 flex-wrap" id="provider-selector">
-        <button class="prov-btn active px-4 py-2 rounded-lg border border-outline-variant/50 text-on-surface-variant font-bold text-[12px] hover:bg-surface-variant transition-colors" data-prov="ollama">🖥 Ollama (Local)</button>
-        <button class="prov-btn px-4 py-2 rounded-lg border border-outline-variant/50 text-on-surface-variant font-bold text-[12px] hover:bg-surface-variant transition-colors" data-prov="openai">OpenAI</button>
-        <button class="prov-btn px-4 py-2 rounded-lg border border-outline-variant/50 text-on-surface-variant font-bold text-[12px] hover:bg-surface-variant transition-colors" data-prov="gemini">Gemini</button>
-      </div>
-    </div>
-
-    <!-- Ollama Config -->
-    <div id="cfg-ollama" class="bg-surface-variant/20 border border-outline-variant/30 rounded-xl p-4 flex flex-col gap-4">
-      <div class="flex items-center gap-2 text-[12px] text-on-surface-variant font-medium">
-        <span class="bg-emerald-500/20 text-emerald-500 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider border border-emerald-500/30">LOCAL</span>
-        Ollama — Zero data leaves your machine
-      </div>
-      <div class="flex items-end gap-3">
-        <div class="flex flex-col gap-1.5 flex-1">
-          <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-ollama-endpoint">API Endpoint</label>
-          <input type="text" id="s-ollama-endpoint" class="glass-input" value="http://localhost:11434" placeholder="http://localhost:11434" />
-        </div>
-        <button id="test-ollama-btn" class="px-4 py-2 bg-surface-variant text-on-surface border border-outline-variant/50 rounded-lg font-bold text-[12px] hover:bg-outline-variant/40 transition-colors shrink-0">Test Connection</button>
-      </div>
-      <div id="ollama-test-result" class="test-result" style="display:none;"></div>
-      <div class="flex flex-col gap-1.5">
-        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-ollama-model">Model</label>
-        <select id="s-ollama-model" class="glass-input">
-          <option value="custom">Custom model name...</option>
-        </select>
-        <input type="text" id="s-ollama-model-custom" class="glass-input mt-2" placeholder="Enter model name (e.g. llama3:8b)" style="display:none;" />
-      </div>
-      <div id="ollama-models-list" class="border-t border-outline-variant/30 pt-3 mt-1" style="display:none;">
-        <div class="text-[11px] text-on-surface-variant mb-2 font-medium">Installed models detected:</div>
-        <div id="ollama-models-chips" class="flex flex-wrap gap-2"></div>
-      </div>
-    </div>
-
-    <!-- OpenAI Config -->
-    <div id="cfg-openai" class="bg-surface-variant/20 border border-outline-variant/30 rounded-xl p-4 flex flex-col gap-4" style="display:none;">
-      <div class="flex items-center gap-2 text-[12px] text-on-surface-variant font-medium">
-        <span class="bg-primary/20 text-primary px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider border border-primary/30">CLOUD</span>
-        OpenAI — API key stored locally in extension storage
-      </div>
-      <div class="flex flex-col gap-1.5">
-        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-openai-key">API Key</label>
-        <div class="flex gap-2 items-center">
-          <input type="password" id="s-openai-key" class="glass-input flex-1" placeholder="sk-..." autocomplete="off" />
-          <button class="toggle-visibility px-3 py-2 bg-surface-variant border border-outline-variant/50 rounded-lg text-on-surface-variant hover:text-white transition-colors" data-target="s-openai-key" aria-label="Toggle key visibility">👁</button>
-        </div>
-        <p class="text-[11px] text-on-surface-variant/70 mt-1">Get your key at <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" class="text-primary hover:underline">platform.openai.com/api-keys</a></p>
-      </div>
-      <div class="flex flex-col gap-1.5">
-        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-openai-model">Model</label>
-        <select id="s-openai-model" class="glass-input">
-          <option value="gpt-4o-mini">gpt-4o-mini (Fast, Cost-efficient)</option>
-          <option value="gpt-4o">gpt-4o (Most Capable)</option>
-          <option value="o1-mini">o1-mini (Reasoning)</option>
-          <option value="o1-preview">o1-preview (Advanced Reasoning)</option>
-          <option value="custom">Custom model name...</option>
-        </select>
-        <input type="text" id="s-openai-model-custom" class="glass-input mt-2" placeholder="Enter custom model (e.g. gpt-5)" style="display:none;" />
-      </div>
-    </div>
-
-    <!-- Gemini Config -->
-    <div id="cfg-gemini" class="bg-surface-variant/20 border border-outline-variant/30 rounded-xl p-4 flex flex-col gap-4" style="display:none;">
-      <div class="flex items-center gap-2 text-[12px] text-on-surface-variant font-medium">
-        <span class="bg-primary/20 text-primary px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider border border-primary/30">CLOUD</span>
-        Google Gemini — API key stored locally in extension storage
-      </div>
-      <div class="flex flex-col gap-1.5">
-        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-gemini-key">API Key</label>
-        <div class="flex gap-2 items-center">
-          <input type="password" id="s-gemini-key" class="glass-input flex-1" placeholder="AIza..." autocomplete="off" />
-          <button class="toggle-visibility px-3 py-2 bg-surface-variant border border-outline-variant/50 rounded-lg text-on-surface-variant hover:text-white transition-colors" data-target="s-gemini-key" aria-label="Toggle key visibility">👁</button>
-        </div>
-        <p class="text-[11px] text-on-surface-variant/70 mt-1">Get your key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="text-primary hover:underline">aistudio.google.com</a></p>
-      </div>
-      <div class="flex flex-col gap-1.5">
-        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-gemini-model">Model</label>
-        <select id="s-gemini-model" class="glass-input">
-          <option value="gemini-3.5-flash">gemini-3.5-flash (Free Tier)</option>
-          <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite (Free Tier)</option>
-          <option value="custom">Custom model name...</option>
-        </select>
-        <input type="text" id="s-gemini-model-custom" class="glass-input mt-2" placeholder="Enter custom model (e.g. gemini-3.0-pro)" style="display:none;" />
-      </div>
-    </div>
-  </section>
-
-  <!-- ─── ANALYSIS SETTINGS ──────────────────────────────────────────────── -->
-  <section class="glass-panel p-5 flex flex-col gap-5 relative overflow-hidden">
-    <div class="finding-strip bg-indigo-500/40"></div>
-    <div class="flex items-center gap-2 text-[14px] font-bold text-white pb-3 border-b border-outline-variant/30 uppercase tracking-widest">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5z"/></svg>
-      Analysis Settings
-    </div>
-
-    <div class="flex flex-col gap-2">
-      <label class="text-[12px] font-bold text-white" for="sensitivity">Sensitivity Threshold: <span id="sensitivity-val" class="text-primary font-mono ml-1">50</span></label>
-      <input type="range" id="sensitivity" class="w-full accent-primary cursor-pointer my-1" min="0" max="100" value="50" />
-      <div class="flex justify-between text-[10px] text-on-surface-variant uppercase tracking-wider font-bold"><span>Strict (more alerts)</span><span>Lenient (fewer alerts)</span></div>
-    </div>
-
-    <div class="flex items-center justify-between gap-4 mt-2">
-      <div>
-        <div class="text-[13px] font-bold text-white">Enable Automatic Background Scanning</div>
-        <div class="text-[11px] text-on-surface-variant/80 mt-0.5">Automatically scan emails as you open them (triggers notification on threat)</div>
-      </div>
-      <label class="toggle-switch">
-        <input type="checkbox" id="auto-scan" checked />
-        <span class="toggle-knob"></span>
-      </label>
-    </div>
-
-    <div class="flex items-center justify-between gap-4">
-      <div>
-        <div class="text-[13px] font-bold text-white">Auto-save analyses</div>
-        <div class="text-[11px] text-on-surface-variant/80 mt-0.5">Automatically store each analysis in history</div>
-      </div>
-      <label class="toggle-switch">
-        <input type="checkbox" id="auto-save" checked />
-        <span class="toggle-knob"></span>
-      </label>
-    </div>
-
-    <div class="flex items-center justify-between gap-4">
-      <div>
-        <div class="text-[13px] font-bold text-white">Show rule engine breakdown</div>
-        <div class="text-[11px] text-on-surface-variant/80 mt-0.5">Display individual rule check results in the Findings tab</div>
-      </div>
-      <label class="toggle-switch">
-        <input type="checkbox" id="show-rules" checked />
-        <span class="toggle-knob"></span>
-      </label>
-    </div>
-
-    <div class="flex flex-col gap-1.5 mt-2">
-      <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="max-history">Max History Entries</label>
-      <select id="max-history" class="glass-input max-w-[200px]">
-        <option value="10">10 entries</option>
-        <option value="20" selected>20 entries</option>
-        <option value="50">50 entries</option>
-        <option value="100">100 entries</option>
-      </select>
-    </div>
-  </section>
-
-  <!-- ─── URL SAFETY & API INTEGRATIONS ─────────────────────────────────── -->
-  <section class="glass-panel p-5 flex flex-col gap-4 relative overflow-hidden">
-    <div class="finding-strip bg-emerald-500/40"></div>
-    <div class="flex items-center gap-2 text-[14px] font-bold text-white pb-3 border-b border-outline-variant/30 uppercase tracking-widest">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
-      URL Safety & API Integrations
-    </div>
+  <!-- SIDEBAR -->
+  <nav class="bg-[#0a0d14] border-r border-[rgba(255,255,255,0.08)] py-5 px-3 overflow-y-auto custom-scrollbar flex flex-col gap-5 relative z-10 shadow-[4px_0_15px_rgba(0,0,0,0.1)]" id="sidebar-nav">
     
-    <div class="flex flex-col gap-2">
-      <div class="flex items-center justify-between gap-4">
-        <div>
-          <div class="text-[13px] font-bold text-white">Enable Google Safe Browsing</div>
-          <div class="text-[11px] text-on-surface-variant/80 mt-0.5">Requires API Key. Uses privacy-preserving hash lookups.</div>
+    <div>
+      <div class="text-[10px] uppercase tracking-[0.1em] text-[rgba(255,255,255,0.25)] mb-2 px-2">Configuration</div>
+      <div class="flex flex-col gap-[2px]">
+        <div class="sidebar-item active flex items-center gap-2.5 px-2.5 py-2 rounded-[7px] cursor-pointer transition-colors bg-[rgba(37,99,235,0.18)] border border-[rgba(37,99,235,0.4)] text-[#e0eeff] font-medium" data-target="sec-ai">
+          <svg class="w-[15px] h-[15px] text-[#4a9eff] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+          <span class="text-[13px]">AI Provider</span>
         </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="enable-safebrowsing" />
-          <span class="toggle-knob"></span>
-        </label>
-      </div>
-      <div id="cfg-safebrowsing" class="pl-4 border-l-2 border-outline-variant/30 ml-2 mt-2 flex flex-col gap-1.5" style="display:none;">
-        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-safebrowsing-key">Safe Browsing API Key</label>
-        <div class="flex gap-2 items-center">
-          <input type="password" id="s-safebrowsing-key" class="glass-input flex-1" placeholder="AIza..." autocomplete="off" />
-          <button class="toggle-visibility px-3 py-2 bg-surface-variant border border-outline-variant/50 rounded-lg text-on-surface-variant hover:text-white transition-colors" data-target="s-safebrowsing-key" aria-label="Toggle key visibility">👁</button>
+        <div class="sidebar-item flex items-center gap-2.5 px-2.5 py-2 rounded-[7px] cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.45)]" data-target="sec-analysis">
+          <svg class="w-[15px] h-[15px] text-[rgba(255,255,255,0.3)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+          <span class="text-[13px]">Analysis</span>
         </div>
-        <p class="text-[11px] text-on-surface-variant/70 mt-1">Get your key from Google Cloud Console.</p>
-      </div>
-    </div>
-
-    <div class="flex flex-col gap-2 mt-2">
-      <div class="flex items-center justify-between gap-4">
-        <div>
-          <div class="text-[13px] font-bold text-white">Enable VirusTotal Deep Scan</div>
-          <div class="text-[11px] text-on-surface-variant/80 mt-0.5">On-demand scanning. Requires API Key. (Public URL submission)</div>
+        <div class="sidebar-item flex items-center gap-2.5 px-2.5 py-2 rounded-[7px] cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.45)]" data-target="sec-url">
+          <svg class="w-[15px] h-[15px] text-[rgba(255,255,255,0.3)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+          <span class="text-[13px]">URL Safety</span>
         </div>
-        <label class="toggle-switch">
-          <input type="checkbox" id="enable-virustotal" />
-          <span class="toggle-knob"></span>
-        </label>
-      </div>
-      <div id="cfg-virustotal" class="pl-4 border-l-2 border-outline-variant/30 ml-2 mt-2 flex flex-col gap-1.5" style="display:none;">
-        <label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider" for="s-virustotal-key">VirusTotal API Key</label>
-        <div class="flex gap-2 items-center">
-          <input type="password" id="s-virustotal-key" class="glass-input flex-1" placeholder="..." autocomplete="off" />
-          <button class="toggle-visibility px-3 py-2 bg-surface-variant border border-outline-variant/50 rounded-lg text-on-surface-variant hover:text-white transition-colors" data-target="s-virustotal-key" aria-label="Toggle key visibility">👁</button>
+        <div class="sidebar-item flex items-center gap-2.5 px-2.5 py-2 rounded-[7px] cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.45)]" data-target="sec-context">
+          <svg class="w-[15px] h-[15px] text-[rgba(255,255,255,0.3)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+          <span class="text-[13px]">Context Menu</span>
         </div>
-        <p class="text-[11px] text-on-surface-variant/70 mt-1">Get your free API key at virustotal.com.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─── CONTEXT MENU ──────────────────────────────────────────────────── -->
-  <section class="glass-panel p-5 flex flex-col gap-4 relative overflow-hidden">
-    <div class="finding-strip bg-amber-500/40"></div>
-    <div class="flex items-center gap-2 text-[14px] font-bold text-white pb-3 border-b border-outline-variant/30 uppercase tracking-widest">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
-      Context Menu
-    </div>
-    <div class="flex items-center justify-between gap-4">
-      <div>
-        <div class="text-[13px] font-bold text-white">Enable right-click "Analyze with PhishGuard"</div>
-        <div class="text-[11px] text-on-surface-variant/80 mt-0.5">Select any email text on a page and analyze it instantly</div>
-      </div>
-      <label class="toggle-switch">
-        <input type="checkbox" id="context-menu" checked />
-        <span class="toggle-knob"></span>
-      </label>
-    </div>
-  </section>
-
-  <!-- ─── ABOUT & STATS ─────────────────────────────────────────────────── -->
-  <section class="glass-panel p-5 flex flex-col gap-5 relative overflow-hidden">
-    <div class="finding-strip bg-surface-variant/80"></div>
-    <div class="flex items-center gap-2 text-[14px] font-bold text-white pb-3 border-b border-outline-variant/30 uppercase tracking-widest">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-      About & Statistics
-    </div>
-
-    <div class="grid grid-cols-3 gap-3">
-      <div class="bg-surface-variant/30 border border-outline-variant/30 rounded-xl p-4 flex flex-col items-center justify-center text-center">
-        <div class="text-[28px] font-black text-primary" id="stat-total">0</div>
-        <div class="text-[10px] text-on-surface-variant mt-1 uppercase tracking-widest font-bold">Emails Analyzed</div>
-      </div>
-      <div class="bg-error/10 border border-error/20 rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-[0_0_15px_rgba(239,68,68,0.1)]">
-        <div class="text-[28px] font-black text-error" id="stat-caught">0</div>
-        <div class="text-[10px] text-error/80 mt-1 uppercase tracking-widest font-bold">Threats Caught</div>
-      </div>
-      <div class="bg-surface-variant/30 border border-outline-variant/30 rounded-xl p-4 flex flex-col items-center justify-center text-center">
-        <div class="text-[24px] font-black text-on-surface mt-1" id="stat-version">1.0.0</div>
-        <div class="text-[10px] text-on-surface-variant mt-2 uppercase tracking-widest font-bold">Version</div>
       </div>
     </div>
 
-    <div class="text-[12px] text-on-surface-variant font-medium">
-      Last analysis: <span id="stat-last" class="text-white">Never</span>
+    <div>
+      <div class="text-[10px] uppercase tracking-[0.1em] text-[rgba(255,255,255,0.25)] mb-2 px-2">System</div>
+      <div class="flex flex-col gap-[2px]">
+        <div class="sidebar-item flex items-center gap-2.5 px-2.5 py-2 rounded-[7px] cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.45)]" data-target="sec-stats">
+          <svg class="w-[15px] h-[15px] text-[rgba(255,255,255,0.3)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          <span class="text-[13px]">Statistics</span>
+        </div>
+        <div class="sidebar-item flex items-center gap-2.5 px-2.5 py-2 rounded-[7px] cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.45)]" data-target="sec-about">
+          <svg class="w-[15px] h-[15px] text-[rgba(255,255,255,0.3)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span class="text-[13px]">About</span>
+        </div>
+      </div>
     </div>
 
-    <div class="flex gap-3 flex-wrap">
-      <button id="export-history-btn" class="px-4 py-2 bg-surface-variant border border-outline-variant/50 rounded-lg text-on-surface-variant font-bold text-[12px] hover:text-white hover:bg-outline-variant/30 transition-colors flex items-center gap-2">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-        Export History as JSON
-      </button>
-      <button id="clear-all-btn" class="px-4 py-2 bg-error/10 border border-error/30 rounded-lg text-error font-bold text-[12px] hover:bg-error/20 transition-colors flex items-center gap-2">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-        Clear All History
-      </button>
+  </nav>
+
+  <!-- CONTENT AREA -->
+  <main class="overflow-y-auto p-8 flex flex-col gap-10 custom-scrollbar scroll-smooth" id="scroll-container">
+
+    <!-- ─── SECTION 1: AI PROVIDER ────────────────────────────────────────── -->
+    <div id="sec-ai" class="scroll-mt-6">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-[30px] h-[30px] rounded-[8px] bg-[rgba(37,99,235,0.15)] text-[#4a9eff] flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+        </div>
+        <h2 class="text-[13px] font-medium text-[rgba(255,255,255,0.85)]">AI Provider</h2>
+      </div>
+
+      <section class="bg-[#161b27] border border-[rgba(255,255,255,0.08)] rounded-[12px] overflow-hidden flex flex-col">
+        <div class="flex gap-1.5 pt-4 px-4" id="provider-selector">
+          <button class="prov-btn active" data-prov="ollama">Ollama (local)</button>
+          <button class="prov-btn" data-prov="openai">OpenAI</button>
+          <button class="prov-btn" data-prov="gemini">Gemini</button>
+        </div>
+
+        <div class="p-4 border-t border-[rgba(255,255,255,0.04)] mt-2 bg-[#161b27]">
+          
+          <!-- Ollama Config -->
+          <div id="cfg-ollama" class="flex flex-col gap-4">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="bg-[rgba(20,184,166,0.12)] border border-[rgba(45,212,191,0.25)] text-[#2dd4bf] px-[10px] py-[4px] rounded-[6px] text-[11px] font-bold tracking-wide flex items-center gap-1.5">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Local — zero data leaves your machine
+              </span>
+            </div>
+            
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-ollama-endpoint">API Endpoint</label>
+              <div class="flex items-center gap-2">
+                <input type="text" id="s-ollama-endpoint" class="glass-input flex-1" value="http://localhost:11434" placeholder="http://localhost:11434" />
+                <button id="test-ollama-btn" class="px-3 py-2 bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] text-[rgba(255,255,255,0.85)] rounded-[7px] text-[12px] hover:bg-[rgba(255,255,255,0.1)] transition-colors shrink-0 font-medium">Test connection</button>
+              </div>
+            </div>
+            <div id="ollama-test-result" class="test-result" style="display:none;"></div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-ollama-model">Model</label>
+              <select id="s-ollama-model" class="glass-input cursor-pointer">
+                <option value="custom">Custom model name...</option>
+              </select>
+              <input type="text" id="s-ollama-model-custom" class="glass-input mt-1" placeholder="Enter model name (e.g. llama3:8b)" style="display:none;" />
+            </div>
+
+            <div id="ollama-models-list" class="mt-1" style="display:none;">
+              <div class="text-[11px] text-[rgba(255,255,255,0.25)] mb-2 uppercase tracking-wider font-bold">Installed models detected</div>
+              <div id="ollama-models-chips" class="flex flex-wrap gap-2"></div>
+            </div>
+          </div>
+
+          <!-- OpenAI Config -->
+          <div id="cfg-openai" class="flex-col gap-4" style="display:none;">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-openai-key">API Key</label>
+              <div class="flex items-center gap-2">
+                <input type="password" id="s-openai-key" class="glass-input flex-1" placeholder="sk-..." autocomplete="off" />
+                <button class="toggle-visibility px-3 py-[7px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] rounded-[7px] text-[rgba(255,255,255,0.45)] hover:text-white transition-colors" data-target="s-openai-key" aria-label="Toggle key visibility">👁</button>
+              </div>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-openai-model">Model</label>
+              <select id="s-openai-model" class="glass-input cursor-pointer">
+                <option value="gpt-4o">gpt-4o</option>
+                <option value="gpt-4o-mini">gpt-4o-mini</option>
+                <option value="gpt-4-turbo">gpt-4-turbo</option>
+                <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+                <option value="custom">Custom model name...</option>
+              </select>
+              <input type="text" id="s-openai-model-custom" class="glass-input mt-1" placeholder="Enter custom model (e.g. gpt-5)" style="display:none;" />
+            </div>
+            <div class="text-[11px] text-[rgba(255,255,255,0.25)] italic mt-1">Data is sent to OpenAI servers for processing.</div>
+          </div>
+
+          <!-- Gemini Config -->
+          <div id="cfg-gemini" class="flex-col gap-4" style="display:none;">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-gemini-key">API Key</label>
+              <div class="flex items-center gap-2">
+                <input type="password" id="s-gemini-key" class="glass-input flex-1" placeholder="AIza..." autocomplete="off" />
+                <button class="toggle-visibility px-3 py-[7px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] rounded-[7px] text-[rgba(255,255,255,0.45)] hover:text-white transition-colors" data-target="s-gemini-key" aria-label="Toggle key visibility">👁</button>
+              </div>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-gemini-model">Model</label>
+              <select id="s-gemini-model" class="glass-input cursor-pointer">
+                <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+                <option value="gemini-pro">gemini-pro</option>
+                <option value="custom">Custom model name...</option>
+              </select>
+              <input type="text" id="s-gemini-model-custom" class="glass-input mt-1" placeholder="Enter custom model" style="display:none;" />
+            </div>
+            <div class="text-[11px] text-[rgba(255,255,255,0.25)] italic mt-1">Data is sent to Google servers for processing.</div>
+          </div>
+
+        </div>
+      </section>
     </div>
 
-    <div class="p-4 bg-primary/5 border border-primary/10 rounded-xl text-[13px] text-on-surface-variant leading-relaxed">
-      <p><strong class="text-white">PhishGuard AI</strong> — Open-source email threat analyzer for security professionals.</p>
-      <p class="mt-2">Uses a multi-layer approach: 12 rule-based checks + LLM analysis (Ollama, OpenAI, or Gemini). All data stays local when using Ollama.</p>
+    <!-- ─── SECTION 2: ANALYSIS SETTINGS ──────────────────────────────────── -->
+    <div id="sec-analysis" class="scroll-mt-6">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-[30px] h-[30px] rounded-[8px] bg-[rgba(20,184,166,0.12)] text-[#2dd4bf] flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+        </div>
+        <h2 class="text-[13px] font-medium text-[rgba(255,255,255,0.85)]">Analysis</h2>
+      </div>
+
+      <section class="bg-[#161b27] border border-[rgba(255,255,255,0.08)] rounded-[12px] overflow-hidden flex flex-col">
+        <!-- Top part -->
+        <div class="p-4 flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <span class="text-[13px] font-medium text-[rgba(255,255,255,0.85)]">Sensitivity threshold</span>
+            <span id="sensitivity-val" class="bg-[rgba(37,99,235,0.15)] text-[#4a9eff] px-2 py-[2px] rounded-[5px] text-[12px] font-mono font-bold">50</span>
+          </div>
+          <input type="range" id="sensitivity" class="range-input" min="0" max="100" value="50" />
+          <div class="flex justify-between text-[10px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider mt-1">
+            <span>Strict (more alerts)</span>
+            <span>Lenient (fewer alerts)</span>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="h-[1px] w-full bg-[rgba(255,255,255,0.08)]"></div>
+
+        <!-- Toggles -->
+        <div class="flex flex-col">
+          <div class="flex items-center justify-between p-4 gap-3 border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.01)] transition-colors">
+            <div class="flex flex-col gap-1">
+              <span class="text-[13px] font-medium text-[rgba(255,255,255,0.85)]">Automatic background scanning</span>
+              <span class="text-[11px] text-[rgba(255,255,255,0.25)]">Scan emails as you open them and trigger notifications on threat</span>
+            </div>
+            <label class="toggle-switch shrink-0">
+              <input type="checkbox" id="auto-scan" checked />
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div class="flex items-center justify-between p-4 gap-3 border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.01)] transition-colors">
+            <div class="flex flex-col gap-1">
+              <span class="text-[13px] font-medium text-[rgba(255,255,255,0.85)]">Auto-save analyses</span>
+              <span class="text-[11px] text-[rgba(255,255,255,0.25)]">Automatically store each analysis result in history</span>
+            </div>
+            <label class="toggle-switch shrink-0">
+              <input type="checkbox" id="auto-save" checked />
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <!-- Show rule engine breakdown (keeping this to avoid breaking JS if checked) -->
+          <div class="flex items-center justify-between p-4 gap-3 hover:bg-[rgba(255,255,255,0.01)] transition-colors">
+            <div class="flex flex-col gap-1">
+              <span class="text-[13px] font-medium text-[rgba(255,255,255,0.85)]">Show rule engine breakdown</span>
+              <span class="text-[11px] text-[rgba(255,255,255,0.25)]">Display individual rule check results in the Findings tab</span>
+            </div>
+            <label class="toggle-switch shrink-0">
+              <input type="checkbox" id="show-rules" checked />
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+        </div>
+      </section>
     </div>
-  </section>
 
-</main>
+    <!-- ─── SECTION 3: URL SAFETY ─────────────────────────────────────────── -->
+    <div id="sec-url" class="scroll-mt-6">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-[30px] h-[30px] rounded-[8px] bg-[rgba(245,158,11,0.12)] text-[#fbbf24] flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+        </div>
+        <h2 class="text-[13px] font-medium text-[rgba(255,255,255,0.85)]">URL Safety & API Integrations</h2>
+      </div>
 
-<div id="settings-toast" class="settings-toast" role="alert" aria-live="polite"></div>
+      <section class="bg-[#161b27] border border-[rgba(255,255,255,0.08)] rounded-[12px] overflow-hidden flex flex-col">
+        <div class="flex flex-col p-4 border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.01)] transition-colors">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex flex-col gap-1">
+              <span class="text-[13px] font-medium text-[rgba(255,255,255,0.85)]">Google Safe Browsing</span>
+              <span class="text-[11px] text-[rgba(255,255,255,0.25)]">Requires API key · Uses privacy-preserving hash lookups</span>
+            </div>
+            <label class="toggle-switch shrink-0">
+              <input type="checkbox" id="enable-safebrowsing" />
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div id="cfg-safebrowsing" class="mt-3 w-full" style="display:none;">
+            <input type="password" id="s-safebrowsing-key" class="glass-input" placeholder="API Key (AIza...)" autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="flex flex-col p-4 hover:bg-[rgba(255,255,255,0.01)] transition-colors">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex flex-col gap-1">
+              <span class="text-[13px] font-medium text-[rgba(255,255,255,0.85)]">VirusTotal deep scan</span>
+              <span class="text-[11px] text-[rgba(255,255,255,0.25)]">On-demand scanning · Requires API key · Public URL submission</span>
+            </div>
+            <label class="toggle-switch shrink-0">
+              <input type="checkbox" id="enable-virustotal" />
+              <span class="toggle-knob"></span>
+            </label>
+          </div>
+          <div id="cfg-virustotal" class="mt-3 w-full" style="display:none;">
+            <input type="password" id="s-virustotal-key" class="glass-input" placeholder="VirusTotal API Key..." autocomplete="off" />
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ─── SECTION 4: CONTEXT MENU ───────────────────────────────────────── -->
+    <div id="sec-context" class="scroll-mt-6">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-[30px] h-[30px] rounded-[8px] bg-[rgba(139,92,246,0.12)] text-[#a78bfa] flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+        </div>
+        <h2 class="text-[13px] font-medium text-[rgba(255,255,255,0.85)]">Context Menu</h2>
+      </div>
+
+      <section class="bg-[#161b27] border border-[rgba(255,255,255,0.08)] rounded-[12px] overflow-hidden">
+        <div class="flex items-center justify-between p-4 gap-3 hover:bg-[rgba(255,255,255,0.01)] transition-colors">
+          <div class="flex flex-col gap-1">
+            <span class="text-[13px] font-medium text-[rgba(255,255,255,0.85)]">Enable right-click 'Analyze with Revelio'</span>
+            <span class="text-[11px] text-[rgba(255,255,255,0.25)]">Select any email text on a page and analyze it instantly</span>
+          </div>
+          <label class="toggle-switch shrink-0">
+            <input type="checkbox" id="context-menu" checked />
+            <span class="toggle-knob"></span>
+          </label>
+        </div>
+      </section>
+    </div>
+
+    <!-- ─── SECTION 5: STATISTICS ─────────────────────────────────────────── -->
+    <div id="sec-stats" class="scroll-mt-6">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-[30px] h-[30px] rounded-[8px] bg-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.4)] flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+        </div>
+        <h2 class="text-[13px] font-medium text-[rgba(255,255,255,0.85)]">Statistics & history</h2>
+      </div>
+
+      <section class="bg-[#161b27] border border-[rgba(255,255,255,0.08)] rounded-[12px] overflow-hidden flex flex-col">
+        <!-- Grid Top -->
+        <div class="grid grid-cols-3 bg-[rgba(255,255,255,0.08)] gap-[1px]">
+          <div class="bg-[#161b27] p-5 flex flex-col items-center justify-center text-center">
+            <div class="text-[28px] font-medium text-[#4a9eff] leading-none mb-2" id="stat-total">0</div>
+            <div class="text-[10px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider">EMAILS ANALYZED</div>
+          </div>
+          <div class="bg-[#161b27] p-5 flex flex-col items-center justify-center text-center">
+            <div class="text-[28px] font-medium text-[#f87171] leading-none mb-2" id="stat-caught">0</div>
+            <div class="text-[10px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider">THREATS CAUGHT</div>
+          </div>
+          <div class="bg-[#161b27] p-5 flex flex-col items-center justify-center text-center">
+            <div class="text-[28px] font-medium text-[rgba(255,255,255,0.6)] leading-none mb-2" id="stat-version">1.0.0</div>
+            <div class="text-[10px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider">VERSION</div>
+          </div>
+        </div>
+
+        <!-- Action Row -->
+        <div class="flex items-center justify-between p-3 border-t border-[rgba(255,255,255,0.08)]">
+          <div class="text-[11px] text-[rgba(255,255,255,0.25)] pl-2">
+            Last analysis: <span id="stat-last" class="text-[rgba(255,255,255,0.45)]">Never</span>
+          </div>
+          <div class="flex gap-2">
+            <button id="export-history-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] text-[12px] font-medium text-[rgba(255,255,255,0.85)] bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.1)] transition-colors border border-[rgba(255,255,255,0.08)]">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Export JSON
+            </button>
+            <button id="clear-all-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] text-[12px] font-medium text-[#f87171] bg-[rgba(239,68,68,0.08)] hover:bg-[rgba(239,68,68,0.15)] transition-colors border border-[rgba(239,68,68,0.2)]">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              Clear history
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ─── SECTION 6: ABOUT ────────────────────────────────────────────── -->
+    <div id="sec-about" class="scroll-mt-6 mb-16">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-[30px] h-[30px] rounded-[8px] bg-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.4)] flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <h2 class="text-[13px] font-medium text-[rgba(255,255,255,0.85)]">About</h2>
+      </div>
+
+      <section class="bg-[#161b27] border border-[rgba(255,255,255,0.08)] rounded-[12px] overflow-hidden p-4">
+        <p class="text-[12px] text-[rgba(255,255,255,0.25)] leading-[1.6]">
+          <span class="font-medium text-[rgba(255,255,255,0.45)]">Revelio</span> — Open-source email threat analyzer for security professionals. Built with AI-powered analysis and rule-based detection to identify phishing, BEC, and social engineering attacks.
+        </p>
+      </section>
+    </div>
+
+  </main>
+</div>
+
+<div id="settings-toast" class="settings-toast" role="alert" aria-live="polite">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-[#2dd4bf]"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+  <span>Settings saved</span>
+</div>
 
 <script src="settings.js" type="module"></script>
 </body>
