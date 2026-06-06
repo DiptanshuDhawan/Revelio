@@ -189,6 +189,11 @@ document.getElementById('theme-toggle').addEventListener('click', async () => {
   applyTheme(newTheme);
   await saveSettings({ theme: newTheme });
 });
+document.getElementById('settings-link').addEventListener('click', (e) => {
+  e.preventDefault();
+  chrome.runtime.openOptionsPage();
+});
+
 
 // ─── Ollama Health Check ──────────────────────────────────────────────────────
 function startOllamaCheck() {
