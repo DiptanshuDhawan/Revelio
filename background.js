@@ -134,7 +134,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === 'PASSIVE_SCAN') {
-    handlePassiveScan(message.emailText, message.source).catch(console.error);
+    handlePassiveScan(message.emailText, message.source, sender.tab?.id).catch(console.error);
     sendResponse({ ok: true });
     return false;
   }
@@ -235,9 +235,13 @@ async function cacheAnalysisResult(emailText, result) {
   } catch (e) { /* silent */ }
 }
 
-async function handlePassiveScan(emailText, source) {
+async function handlePassiveScan(emailText, source, tabId) {
   const settings = await getSettings();
   if (settings.autoScanEnabled === false) return;
+
+  if (tabId) {
+    chrome.tabs.sendMessage(tabId, { type: 'SCAN_STARTED' }).catch(() => {});
+  }
 
   try {
     // 1. Run local rules
@@ -269,7 +273,7 @@ async function handlePassiveScan(emailText, source) {
     // 4. Act on findings (Notify on Suspicious or worse)
     updateBadge(finalScore);
 
-    if (finalScore >= 70) {
+    if (verdict !== 'Safe') {
       chrome.notifications.create({
         type: 'basic',
         iconUrl: 'icons/icon128.png',
@@ -296,7 +300,11 @@ async function handlePassiveScan(emailText, source) {
     await cacheAnalysisResult(emailText, analysisResult);
 
   } catch (err) {
-    console.error('[PhishGuard] Passive scan error:', err);
+    console.error('[PhishGuard] Passive scan pipeline error:', err);
+  } finally {
+    if (tabId) {
+      chrome.tabs.sendMessage(tabId, { type: 'SCAN_FINISHED' }).catch(() => {});
+    }
   }
 }
 

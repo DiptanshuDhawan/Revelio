@@ -22,7 +22,67 @@
       sendResponse({ pong: true, url: window.location.href });
       return false;
     }
+    if (message.type === 'SCAN_STARTED') {
+      showScanningIndicator();
+      return false;
+    }
+    if (message.type === 'SCAN_FINISHED') {
+      hideScanningIndicator();
+      return false;
+    }
   });
+
+  // ─── Visual Indicator ────────────────────────────────────────────────────────
+  let indicatorEl = null;
+
+  function showScanningIndicator() {
+    if (indicatorEl) return;
+    
+    indicatorEl = document.createElement('div');
+    indicatorEl.id = 'revelio-scan-indicator';
+    indicatorEl.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <svg style="animation: revelio-spin 1s linear infinite; width: 16px; height: 16px; color: #38bdf8;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" style="opacity: 0.25;"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" style="opacity: 0.75;"></path>
+        </svg>
+        <span style="font-family: system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); letter-spacing: 0.2px;">Revelio is analyzing...</span>
+      </div>
+      <style>
+        @keyframes revelio-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        #revelio-scan-indicator {
+          position: fixed; bottom: 24px; right: 24px; z-index: 2147483647;
+          background: rgba(15, 17, 23, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 999px;
+          padding: 10px 18px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(56, 189, 248, 0.15);
+          opacity: 0; transform: translateY(10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          pointer-events: none;
+        }
+        #revelio-scan-indicator.show {
+          opacity: 1; transform: translateY(0);
+        }
+      </style>
+    `;
+    document.body.appendChild(indicatorEl);
+    
+    // Trigger animation
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        indicatorEl.classList.add('show');
+      });
+    });
+  }
+
+  function hideScanningIndicator() {
+    if (!indicatorEl) return;
+    indicatorEl.classList.remove('show');
+    setTimeout(() => {
+      if (indicatorEl && indicatorEl.parentNode) {
+        indicatorEl.parentNode.removeChild(indicatorEl);
+        indicatorEl = null;
+      }
+    }, 300); // Wait for transition
+  }
 
   // ─── Main Dispatcher ────────────────────────────────────────────────────────
   function extractCurrentEmail() {
