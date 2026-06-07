@@ -343,7 +343,7 @@ async function runAnalysisPipeline(emailText, source, settings, isPassive = fals
     throw err;
   } finally {
     if (isPassive && tabId) {
-      chrome.tabs.sendMessage(tabId, { type: 'SCAN_COMPLETE' }).catch(() => {});
+      chrome.tabs.sendMessage(tabId, { type: 'SCAN_FINISHED' }).catch(() => {});
     }
   }
   })();
