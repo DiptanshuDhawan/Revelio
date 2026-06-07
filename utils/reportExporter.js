@@ -178,10 +178,10 @@ export async function exportPDF(analysisResult) {
 
   (llm.topFindings || []).forEach(f => {
     reportData.findings.push({
-      title: 'AI Finding',
-      description: f,
+      title: f.title || 'AI Finding',
+      description: f.detail || f.description || '',
       evidence: null,
-      severity: 'high'
+      severity: f.severity || 'high'
     });
   });
 
