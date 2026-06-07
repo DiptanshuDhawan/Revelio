@@ -1485,9 +1485,14 @@ function renderRemediationTab(score, llm) {
       item.className = 'flex items-start gap-2.5 p-2.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer group';
       item.innerHTML = `
         <input type="checkbox" class="cyber-checkbox mt-0.5" id="check-step-${i}">
-        <div class="flex flex-col checkbox-label">
+        <div class="flex flex-col checkbox-label w-full pr-1">
           <span class="text-body-md font-body-md ${stepTextColor} font-medium">${esc(step)}</span>
-          ${fallbackSubs[i] ? `<span class="text-[11.5px] text-outline mt-1 leading-tight">${esc(fallbackSubs[i])}</span>` : ''}
+          ${fallbackSubs[i] ? `
+            <div class="mt-2 pl-2.5 border-l-2 border-[#38bdf8]/40 text-[11.5px] text-white/60 bg-gradient-to-r from-[#38bdf8]/10 to-transparent py-1.5 pr-2 rounded-r flex items-start gap-2">
+              <svg class="w-3.5 h-3.5 text-[#38bdf8] shrink-0 mt-[1px] opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span class="leading-relaxed">${esc(fallbackSubs[i])}</span>
+            </div>
+          ` : ''}
         </div>
       `;
       stepsInner.appendChild(item);
