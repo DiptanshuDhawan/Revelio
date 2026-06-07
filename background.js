@@ -120,6 +120,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Keep message channel open for async response
   }
 
+  if (message.type === 'MANUAL_SCAN') {
+    getSettings().then(settings => {
+      runAnalysisPipeline(message.emailText, message.source, settings, false)
+        .then((result) => sendResponse({ success: true, data: result }))
+        .catch((err) => sendResponse({ success: false, error: err.message }));
+    });
+    return true;
+  }
+
   if (message.type === 'CHECK_OLLAMA') {
     checkOllama(message.endpoint)
       .then((online) => sendResponse({ online }))
@@ -258,12 +267,18 @@ async function handlePassiveScan(emailText, source, tabId) {
     return; // Already scanned and cached, do nothing
   }
 
+  return runAnalysisPipeline(emailText, source, settings, true, tabId);
+}
+
+async function runAnalysisPipeline(emailText, source, settings, isPassive = false, tabId = null) {
+  const hash = hashEmail(emailText);
+
   if (activePassiveScans.has(hash)) {
     return activePassiveScans.get(hash);
   }
 
   const scanPromise = (async () => {
-    if (tabId) {
+    if (isPassive && tabId) {
       chrome.tabs.sendMessage(tabId, { type: 'SCAN_STARTED' }).catch(() => {});
     }
 
@@ -294,10 +309,10 @@ async function handlePassiveScan(emailText, source, tabId) {
     const finalScore = computeFinalScore(llmResult.llmScore, ruleResult.ruleScore);
     const verdict = scoreToVerdict(finalScore, settings.sensitivityThreshold);
 
-    // 4. Act on findings (Notify on Suspicious or worse)
+    // 4. Act on findings (Notify on Suspicious or worse if passive)
     updateBadge(finalScore);
 
-    if (verdict !== 'Safe') {
+    if (isPassive && verdict !== 'Safe') {
       chrome.notifications.create({
         type: 'basic',
         iconUrl: 'icons/icon128.png',
@@ -324,11 +339,11 @@ async function handlePassiveScan(emailText, source, tabId) {
     return analysisResult;
 
   } catch (err) {
-    console.error('[PhishGuard] Passive scan pipeline error:', err);
+    console.error('[PhishGuard] Pipeline error:', err);
     throw err;
   } finally {
-    if (tabId) {
-      chrome.tabs.sendMessage(tabId, { type: 'SCAN_FINISHED' }).catch(() => {});
+    if (isPassive && tabId) {
+      chrome.tabs.sendMessage(tabId, { type: 'SCAN_COMPLETE' }).catch(() => {});
     }
   }
   })();

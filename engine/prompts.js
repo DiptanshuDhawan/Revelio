@@ -36,7 +36,7 @@ TASK: Analyze the email below for phishing indicators. Think through these steps
 ${ruleSection}
 Respond with ONLY this JSON structure (no other text):
 
-{"llmScore":0,"verdict":"Safe","confidence":"Medium","attackVector":"N/A","categories":{"impersonation":0,"urgencyManipulation":0,"socialEngineering":0,"technicalIndicators":0,"aiGeneratedSigns":0},"threatNarrative":"","topFindings":[{"title":"","detail":"","severity":"low"}],"suspiciousQuotes":[],"mitreAttack":{"id":null,"name":null,"url":null},"becRisk":false,"spearPhishingRisk":false,"aiGeneratedRisk":false,"becDetails":null,"recommendedAction":"","remediationSteps":["","",""],"analystNote":""}
+{"llmScore":0,"verdict":"Safe","confidence":"Medium","attackVector":"N/A","categories":{"impersonation":"<0-100>","urgencyManipulation":"<0-100>","socialEngineering":"<0-100>","technicalIndicators":"<0-100>","aiGeneratedSigns":"<0-100>"},"threatNarrative":"","topFindings":[{"title":"","detail":"","severity":"low"}],"suspiciousQuotes":[],"mitreAttack":{"id":null,"name":null,"url":null},"becRisk":false,"spearPhishingRisk":false,"aiGeneratedRisk":false,"becDetails":null,"recommendedAction":"","remediationSteps":["","",""],"analystNote":""}
 
 FIELD RULES:
 - llmScore: integer 0 to 100 (phishing probability)

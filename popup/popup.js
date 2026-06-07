@@ -562,7 +562,7 @@ async function handleAnalyze(textToAnalyze) {
   const emailText = textToAnalyze || currentEmailText;
   if (!emailText || emailText.length < 10) {
     showToast('No email content found. Open an email in Gmail/Outlook first.', 'error');
-    showBanner('error', 'Open an email in Gmail or Outlook, then click the PhishGuard icon.');
+    showBanner('error', 'Open an email in Gmail or Outlook, then click the Revelio icon.');
     return;
   }
 
@@ -573,54 +573,27 @@ async function handleAnalyze(textToAnalyze) {
   startLoadingAnimation();
 
   try {
-    // Run rule engine locally
-    const { emailData, ruleResult } = await analyzeEmail(emailText);
+    const response = await chrome.runtime.sendMessage({
+      type: 'MANUAL_SCAN',
+      emailText: emailText,
+      source: 'manual'
+    });
 
-    // Call LLM via background service worker
-    let llmResult;
-    try {
-      const response = await chrome.runtime.sendMessage({
-        type: 'ANALYZE',
-        emailText,
-        ruleResult, // Pass rule engine findings for LLM context
-        settings: freshSettings,
-      });
-
-      if (response.success) {
-        llmResult = response.data;
-      } else {
-        throw new Error(response.error || 'Analysis failed');
-      }
-    } catch (llmError) {
-      if (llmError.message === 'OLLAMA_OFFLINE') {
-        showToast('Ollama offline - using rule engine only', 'error');
-      } else {
-        showToast(`AI error: ${llmError.message?.slice(0, 120)}`, 'error');
-      }
-      llmResult = generateOfflineFallback(ruleResult, currentSettings?.sensitivityThreshold);
+    if (!response || !response.success) {
+      throw new Error(response ? response.error : 'Background scan failed');
     }
 
-    const finalScore = computeFinalScore(llmResult.llmScore, ruleResult.ruleScore);
-
-    currentResult = { emailData, ruleResult, llmResult, finalScore, settings: freshSettings };
-    currentAnalysisId = null;
-
-    if (freshSettings.autoSave !== false) {
-      const entry = await saveAnalysis(currentResult);
-      if (entry) currentAnalysisId = entry.id;
-    }
-
-    chrome.runtime.sendMessage({ type: 'UPDATE_BADGE', score: finalScore }).catch(() => {});
+    currentResult = response.data;
+    // Inject the settings for the UI since background scan doesn't provide them
+    currentResult.settings = freshSettings;
+    currentAnalysisId = null; 
 
     // Route to offline view if AI was unavailable
-    if (llmResult._offlineMode) {
-      // Don't cache offline results — we want a fresh try when Ollama comes back
-      renderOfflineView(ruleResult, finalScore);
+    if (currentResult.llmResult && currentResult.llmResult._offlineMode) {
+      renderOfflineView(currentResult.ruleResult, currentResult.finalScore);
       showView('offline');
       hideBanner();
     } else {
-      // Cache this result so reopening popup for same email skips re-analysis
-      await cacheResult(emailText, currentResult);
       renderResults(currentResult);
       showView('results');
     }
@@ -633,6 +606,8 @@ async function handleAnalyze(textToAnalyze) {
     if (title) title.textContent = 'Analysis Failed';
     if (msg) msg.textContent = err.message?.slice(0, 120) || 'An error occurred.';
     showView('input');
+  } finally {
+    stopLoadingAnimation();
   }
 }
 
@@ -1502,7 +1477,7 @@ function renderRemediationTab(score, llm) {
           <span class="text-body-md font-body-md ${stepTextColor} font-medium">${esc(step)}</span>
           ${fallbackSubs[i] ? `
             <div class="mt-2 pl-2.5 border-l-2 border-[#38bdf8]/40 text-[11.5px] text-white/60 bg-gradient-to-r from-[#38bdf8]/10 to-transparent py-1.5 pr-2 rounded-r flex items-start gap-2">
-              <svg class="w-3.5 h-3.5 text-[#38bdf8] shrink-0 mt-[1px] opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <svg class="text-[#38bdf8] shrink-0 mt-[1px] opacity-80" style="width: 14px; height: 14px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               <span class="leading-relaxed">${esc(fallbackSubs[i])}</span>
             </div>
           ` : ''}
