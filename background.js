@@ -252,6 +252,12 @@ async function handlePassiveScan(emailText, source, tabId) {
   if (settings.autoScanEnabled === false) return;
 
   const hash = hashEmail(emailText);
+  
+  const cachedData = await chrome.storage.local.get(hash);
+  if (cachedData[hash] && cachedData[hash].result) {
+    return; // Already scanned and cached, do nothing
+  }
+
   if (activePassiveScans.has(hash)) {
     return activePassiveScans.get(hash);
   }
