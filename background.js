@@ -300,11 +300,11 @@ async function runAnalysisPipeline(emailText, source, settings, isPassive = fals
       } else if (settings.provider === 'openrouter') {
         llmResult = await callOpenRouter(prompt, settings);
       } else {
-        llmResult = generateOfflineFallback(ruleResult, settings.sensitivityThreshold);
+        llmResult = generateOfflineFallback(ruleResult, settings.sensitivityThreshold, 'Unknown provider');
       }
     } catch (llmError) {
       console.warn('[PhishGuard] Passive scan LLM failed, using fallback:', llmError);
-      llmResult = generateOfflineFallback(ruleResult, settings.sensitivityThreshold);
+      llmResult = generateOfflineFallback(ruleResult, settings.sensitivityThreshold, llmError.message);
     }
 
     // 3. Compute Final Score & Verdict

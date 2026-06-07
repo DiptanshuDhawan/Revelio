@@ -835,6 +835,13 @@ function categoryColor(score) {
 function renderResults(result) {
   const { finalScore, llmResult, ruleResult, emailData } = result;
 
+  if (llmResult.isFallback) {
+    const desc = document.getElementById('offline-fallback-desc');
+    if (desc && llmResult.analystNote) {
+      desc.textContent = llmResult.analystNote.replace(/\[|\]/g, '');
+    }
+  }
+
   renderGauge(finalScore, llmResult, ruleResult);
   renderSummaryTab(finalScore, llmResult);
   renderFindingsTab(ruleResult, llmResult);

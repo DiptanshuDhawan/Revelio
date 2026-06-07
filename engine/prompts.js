@@ -60,7 +60,7 @@ ${emailText}
 
 // ─── Fallback Analysis for Offline Mode ──────────────────────────────────────
 
-export function generateOfflineFallback(ruleResult, sensitivity = 50) {
+export function generateOfflineFallback(ruleResult, sensitivity = 50, fallbackReason = 'Unknown error') {
   const score = ruleResult.ruleScore;
   const findings = ruleResult.findings || [];
   const triggered = findings.filter((f) => !f.passed);
@@ -114,7 +114,7 @@ export function generateOfflineFallback(ruleResult, sensitivity = 50) {
       'Do not provide any personal information in response to this email.',
       'If you clicked any links, run a security scan on your device immediately.',
     ],
-    analystNote: '[AI provider offline — analysis based on rule engine only. Connect Ollama or configure an API key for full AI analysis.]',
+    analystNote: `[AI Engine Offline. Reason: ${fallbackReason}. Analysis based on rule engine only.]`,
     _offlineMode: true,
   };
 }
