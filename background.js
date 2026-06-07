@@ -297,6 +297,8 @@ async function runAnalysisPipeline(emailText, source, settings, isPassive = fals
         llmResult = await callOpenAI(prompt, settings);
       } else if (settings.provider === 'gemini') {
         llmResult = await callGemini(prompt, settings);
+      } else if (settings.provider === 'openrouter') {
+        llmResult = await callOpenRouter(prompt, settings);
       } else {
         llmResult = generateOfflineFallback(ruleResult, settings.sensitivityThreshold);
       }
@@ -470,6 +472,38 @@ async function callGemini(prompt, settings) {
 
   const data = await response.json();
   const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  return parseAIResponse(content);
+}
+
+async function callOpenRouter(prompt, settings) {
+  const apiKey = settings.openrouterApiKey;
+  if (!apiKey) throw new Error('OpenRouter API key not configured');
+
+  let model = settings.openrouterModel || 'deepseek/deepseek-r1:free';
+
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+      'HTTP-Referer': 'https://github.com/DiptanshuDhawan/Revelio',
+      'X-Title': 'Revelio Extension'
+    },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.1,
+      response_format: { type: 'json_object' },
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(`OpenRouter error: ${err.error?.message || response.status}`);
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content;
   return parseAIResponse(content);
 }
 
