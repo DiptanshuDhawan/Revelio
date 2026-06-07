@@ -303,7 +303,7 @@
     return hash;
   }
 
-  function triggerUnifiedScan() {
+  function scanPassive() {
     try {
       const result = extractCurrentEmail();
       if (result && result.emailText && result.emailText.length > 50) {
@@ -311,7 +311,7 @@
         if (currentHash !== lastScannedHash) {
           lastScannedHash = currentHash;
           chrome.runtime.sendMessage({ 
-            type: 'TRIGGER_SCAN', 
+            type: 'PASSIVE_SCAN', 
             emailText: result.emailText,
             source: result.source 
           });
@@ -332,11 +332,11 @@
 
     if (isSignificant) {
       clearTimeout(scanTimeout);
-      scanTimeout = setTimeout(triggerUnifiedScan, 3000); // Increased debounce to 3s
+      scanTimeout = setTimeout(scanPassive, 3000); // Increased debounce to 3s
     }
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
 
   // Initial check
-  setTimeout(triggerUnifiedScan, 3000);})();
+  setTimeout(scanPassive, 3000);})();

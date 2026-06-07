@@ -573,31 +573,18 @@ async function handleAnalyze(textToAnalyze) {
   startLoadingAnimation();
 
   try {
-    // 1. Tell background script to start the unified scan
-    chrome.runtime.sendMessage({
-      type: 'TRIGGER_SCAN',
+    // Trigger background scan and wait for the result
+    const response = await chrome.runtime.sendMessage({
+      type: 'MANUAL_SCAN',
       emailText: emailText,
       source: 'manual'
-    }).catch(() => {});
+    });
 
-    // 2. Wait a moment for the background script to register the promise
-    await sleep(200);
-
-    // 3. Just poll CHECK_ACTIVE_SCAN which blocks until the background scan finishes
-    const activeCheck = await chrome.runtime.sendMessage({ type: 'CHECK_ACTIVE_SCAN', emailText: emailText }).catch(() => ({}));
-    
-    if (activeCheck && activeCheck.active && activeCheck.result) {
-      currentResult = activeCheck.result;
-    } else {
-      // If it finished instantly, grab from cache
-      const cached = await getCachedResult(emailText);
-      if (cached) {
-        currentResult = cached;
-      } else {
-        throw new Error('Background scan failed to start or cache result.');
-      }
+    if (!response || !response.success) {
+      throw new Error(response ? response.error : 'Background scan failed');
     }
 
+    currentResult = response.data;
     // Inject the settings the popup needs
     currentResult.settings = freshSettings;
     currentAnalysisId = null; // Will fetch from history if needed
