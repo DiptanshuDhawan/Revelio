@@ -1487,7 +1487,7 @@ function renderRemediationTab(score, llm) {
         <input type="checkbox" class="cyber-checkbox mt-0.5" id="check-step-${i}">
         <div class="flex flex-col checkbox-label">
           <span class="text-body-md font-body-md ${stepTextColor} font-medium">${esc(step)}</span>
-          ${fallbackSubs[i] ? `<span class="text-code-xs font-code-xs text-outline mt-1">${esc(fallbackSubs[i])}</span>` : ''}
+          ${fallbackSubs[i] ? `<span class="text-[11.5px] text-outline mt-1 leading-tight">${esc(fallbackSubs[i])}</span>` : ''}
         </div>
       `;
       stepsInner.appendChild(item);
