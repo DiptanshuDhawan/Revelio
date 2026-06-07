@@ -223,13 +223,26 @@
               </div>
             </div>
 
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-gemini-model">Model</label>
+              <select id="s-gemini-model" class="glass-input cursor-pointer">
+                <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+                <option value="gemini-pro">gemini-pro</option>
+                <option value="custom">Custom model name...</option>
+              </select>
+              <input type="text" id="s-gemini-model-custom" class="glass-input mt-1" placeholder="Enter custom model" style="display:none;" />
+            </div>
+            <div class="text-[11px] text-[rgba(255,255,255,0.25)] italic mt-1">Data is sent to Google servers for processing.</div>
+          </div>
+
           <!-- OpenRouter Config -->
           <div id="cfg-openrouter" class="flex-col gap-4" style="display:none;">
             <div class="flex flex-col gap-1.5">
               <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-openrouter-key">API Key</label>
               <div class="flex items-center gap-2">
                 <input type="password" id="s-openrouter-key" class="glass-input flex-1" placeholder="sk-or-v1-..." autocomplete="off" />
-                <button class="toggle-visibility px-3 py-[7px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] rounded-[7px] text-[rgba(255,255,255,0.45)] hover:text-white transition-colors" data-target="s-openrouter-key" aria-label="Toggle key visibility">ðŸ‘</button>
+                <button class="toggle-visibility px-3 py-[7px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] rounded-[7px] text-[rgba(255,255,255,0.45)] hover:text-white transition-colors" data-target="s-openrouter-key" aria-label="Toggle key visibility">👁</button>
               </div>
             </div>
             <div class="flex flex-col gap-1.5">
@@ -244,19 +257,6 @@
               <input type="text" id="s-openrouter-model-custom" class="glass-input mt-1" placeholder="Enter custom model" style="display:none;" />
             </div>
             <div class="text-[11px] text-[rgba(255,255,255,0.25)] italic mt-1">Data is sent to OpenRouter API for processing.</div>
-          </div>
-
-            <div class="flex flex-col gap-1.5">
-              <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-gemini-model">Model</label>
-              <select id="s-gemini-model" class="glass-input cursor-pointer">
-                <option value="gemini-1.5-pro">gemini-1.5-pro</option>
-                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-                <option value="gemini-pro">gemini-pro</option>
-                <option value="custom">Custom model name...</option>
-              </select>
-              <input type="text" id="s-gemini-model-custom" class="glass-input mt-1" placeholder="Enter custom model" style="display:none;" />
-            </div>
-            <div class="text-[11px] text-[rgba(255,255,255,0.25)] italic mt-1">Data is sent to Google servers for processing.</div>
           </div>
 
         </div>
