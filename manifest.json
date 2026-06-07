@@ -20,6 +20,7 @@
     "http://localhost:11434/*",
     "https://api.openai.com/*",
     "https://generativelanguage.googleapis.com/*",
+    "https://openrouter.ai/*",
     "https://mail.google.com/*",
     "https://outlook.live.com/*",
     "https://outlook.office.com/*",
