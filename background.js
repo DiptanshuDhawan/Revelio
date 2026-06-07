@@ -113,18 +113,10 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 // ─── Message Handler ──────────────────────────────────────────────────────────
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'ANALYZE') {
-    handleAnalyze(message)
-      .then((result) => sendResponse({ success: true, data: result }))
-      .catch((err) => sendResponse({ success: false, error: err.message }));
-    return true; // Keep message channel open for async response
-  }
-
-  if (message.type === 'MANUAL_SCAN') {
-    handlePassiveScan(message.emailText, message.source, sender.tab?.id)
-      .then((result) => sendResponse({ success: true, data: result }))
-      .catch((err) => sendResponse({ success: false, error: err.message }));
-    return true;
+  if (message.type === 'TRIGGER_SCAN') {
+    runUnifiedScan(message.emailText, message.source, sender.tab?.id).catch(console.error);
+    sendResponse({ ok: true });
+    return false;
   }
 
   if (message.type === 'CHECK_OLLAMA') {
@@ -136,12 +128,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === 'UPDATE_BADGE') {
     updateBadge(message.score);
-    sendResponse({ ok: true });
-    return false;
-  }
-
-  if (message.type === 'PASSIVE_SCAN') {
-    handlePassiveScan(message.emailText, message.source, sender.tab?.id).catch(console.error);
     sendResponse({ ok: true });
     return false;
   }
@@ -203,33 +189,6 @@ async function getOllamaModels(endpoint = 'http://localhost:11434') {
   return (data.models || []).map((m) => m.name);
 }
 
-// ─── Main Analysis Handler ────────────────────────────────────────────────────
-
-async function handleAnalyze({ emailText, settings, ruleResult }) {
-  const provider = settings.provider || 'ollama';
-  const prompt = buildAnalysisPrompt(emailText, ruleResult);
-
-  let llmResponse;
-
-  switch (provider) {
-    case 'ollama':
-      llmResponse = await callOllama(prompt, settings);
-      break;
-    case 'openai':
-      llmResponse = await callOpenAI(prompt, settings);
-      break;
-    case 'gemini':
-      llmResponse = await callGemini(prompt, settings);
-      break;
-    case 'openrouter':
-      llmResponse = await callOpenRouter(prompt, settings);
-      break;
-    default:
-      throw new Error('Unknown AI provider: ' + provider);
-  }
-
-  return llmResponse;
-}
 
 // ─── Passive Scanning ─────────────────────────────────────────────────────────
 
@@ -257,9 +216,9 @@ async function cacheAnalysisResult(emailText, result) {
 
 const activePassiveScans = new Map();
 
-async function handlePassiveScan(emailText, source, tabId) {
+async function runUnifiedScan(emailText, source, tabId) {
   const settings = await getSettings();
-  if (settings.autoScanEnabled === false) return;
+  if (settings.autoScanEnabled === false && source !== 'manual') return;
 
   const hash = hashEmail(emailText);
   
