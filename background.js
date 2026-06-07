@@ -493,7 +493,6 @@ async function callOpenRouter(prompt, settings) {
       model,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.1,
-      response_format: { type: 'json_object' },
     }),
   });
 
@@ -503,7 +502,14 @@ async function callOpenRouter(prompt, settings) {
   }
 
   const data = await response.json();
+  if (data.error) {
+    throw new Error(`OpenRouter API error: ${data.error.message}`);
+  }
+
   const content = data.choices?.[0]?.message?.content;
+  if (!content) {
+    throw new Error(`OpenRouter empty content. Raw data: ${JSON.stringify(data).substring(0, 100)}`);
+  }
   return parseAIResponse(content);
 }
 

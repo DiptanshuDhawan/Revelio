@@ -428,7 +428,7 @@ async function autoExtractAndAnalyze() {
     currentResult = cached;
     // Route cached offline results to offline view
     if (cached.llmResult?._offlineMode) {
-      renderOfflineView(cached.ruleResult, cached.finalScore);
+      renderOfflineView(cached.ruleResult, cached.finalScore, cached.llmResult);
       showView('offline');
       hideBanner();
     } else {
@@ -448,7 +448,7 @@ async function autoExtractAndAnalyze() {
     if (activeCheck.result) {
       currentResult = activeCheck.result;
       if (currentResult.llmResult?._offlineMode) {
-        renderOfflineView(currentResult.ruleResult, currentResult.finalScore);
+        renderOfflineView(currentResult.ruleResult, currentResult.finalScore, currentResult.llmResult);
         showView('offline');
         hideBanner();
       } else {
@@ -590,7 +590,7 @@ async function handleAnalyze(textToAnalyze) {
 
     // Route to offline view if AI was unavailable
     if (currentResult.llmResult && currentResult.llmResult._offlineMode) {
-      renderOfflineView(currentResult.ruleResult, currentResult.finalScore);
+      renderOfflineView(currentResult.ruleResult, currentResult.finalScore, currentResult.llmResult);
       showView('offline');
       hideBanner();
     } else {
@@ -722,10 +722,15 @@ function showView(view) {
 }
 
 // ─── Offline View Renderer ────────────────────────────────────────────────────
-function renderOfflineView(ruleResult, finalScore) {
+function renderOfflineView(ruleResult, finalScore, llmResult = null) {
   const scoreEl = document.getElementById('offline-rule-score');
   const verdictEl = document.getElementById('offline-verdict-badge');
   const findingsEl = document.getElementById('offline-findings-list');
+
+  const desc = document.getElementById('offline-fallback-desc');
+  if (desc && llmResult && llmResult.analystNote) {
+    desc.textContent = llmResult.analystNote.replace(/\[|\]/g, '');
+  }
 
   const score = ruleResult?.ruleScore ?? finalScore ?? 0;
   const findings = ruleResult?.findings || [];
