@@ -583,7 +583,11 @@ function parseAIResponse(rawText) {
       technicalIndicators: clamp(parseInt(parsed.categories?.technicalIndicators) || 0, 0, 100),
       aiGeneratedSigns: clamp(parseInt(parsed.categories?.aiGeneratedSigns) || 0, 0, 100),
     },
-    threatNarrative: parsed.threatNarrative || 'No specific narrative provided by the AI analysis.',
+    threatNarrative: (parsed.threatNarrative && !parsed.threatNarrative.startsWith('<') && !parsed.threatNarrative.includes('No specific narrative')) 
+      ? parsed.threatNarrative 
+      : (Array.isArray(parsed.topFindings) && parsed.topFindings[0]?.detail) 
+        ? parsed.topFindings[0].detail 
+        : (parsed.analystNote || 'No specific narrative provided by the AI analysis.'),
     topFindings: Array.isArray(parsed.topFindings) ? parsed.topFindings.slice(0, 5).map(f => {
       if (typeof f === 'string') return { title: 'AI Finding', detail: f, severity: 'medium' };
       return {

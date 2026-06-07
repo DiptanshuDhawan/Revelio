@@ -36,7 +36,7 @@ TASK: Analyze the email below for phishing indicators. Think through these steps
 ${ruleSection}
 Respond with ONLY this JSON structure (no other text):
 
-{"llmScore":0,"verdict":"Safe","confidence":"Medium","attackVector":"N/A","categories":{"impersonation":"<0-100>","urgencyManipulation":"<0-100>","socialEngineering":"<0-100>","technicalIndicators":"<0-100>","aiGeneratedSigns":"<0-100>"},"threatNarrative":"","topFindings":[{"title":"","detail":"","severity":"low"}],"suspiciousQuotes":[],"mitreAttack":{"id":null,"name":null,"url":null},"becRisk":false,"spearPhishingRisk":false,"aiGeneratedRisk":false,"becDetails":null,"recommendedAction":"","remediationSteps":["","",""],"analystNote":""}
+{"llmScore":"<0-100>","verdict":"<Safe|Suspicious|Likely Phishing|Confirmed Phishing>","confidence":"<Low|Medium|High>","attackVector":"<vector>","categories":{"impersonation":"<0-100>","urgencyManipulation":"<0-100>","socialEngineering":"<0-100>","technicalIndicators":"<0-100>","aiGeneratedSigns":"<0-100>"},"threatNarrative":"<2-3 sentences explaining the threat or safety>","topFindings":[{"title":"<finding title>","detail":"<finding description>","severity":"<critical|high|medium|low>"}],"suspiciousQuotes":["<quote 1>"],"mitreAttack":{"id":"<T-code>","name":"<technique name>","url":"<mitre url>"},"becRisk":false,"spearPhishingRisk":false,"aiGeneratedRisk":false,"becDetails":"<details if BEC risk is true>","recommendedAction":"<one actionable recommendation>","remediationSteps":["<step 1>","<step 2>"],"analystNote":"<brief analyst summary>"}
 
 FIELD RULES:
 - llmScore: integer 0 to 100 (phishing probability)
@@ -44,6 +44,8 @@ FIELD RULES:
 - confidence: exactly one of "Low", "Medium", "High"
 - attackVector: one of "Credential Theft", "Malware Delivery", "Financial Fraud", "Info Gathering", "Account Takeover", "Unknown", "N/A"
 - categories: each value is integer 0 to 100
+- threatNarrative: MANDATORY 2-3 sentences summarizing the email and explaining why it is safe or a threat
+- analystNote: MANDATORY 1 sentence explaining the final decision
 - topFindings: 1-4 objects, severity is "critical", "high", "medium", or "low"
 - suspiciousQuotes: 0-3 verbatim phrases copied from the email
 - mitreAttack.id: "T1566", "T1566.001", "T1566.002", "T1566.003", "T1566.004", or null
