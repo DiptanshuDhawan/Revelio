@@ -728,3 +728,39 @@
 .category-gauge-arc {
   transition: stroke-dashoffset 1s ease-out;
 }
+
+/* ─── Skeleton Loading Screen Styles ─────────────────────────── */
+@keyframes skeleton-shimmer {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.85; }
+}
+
+.sk-base {
+  background: #1e2230 !important;
+  border-color: #1e2230 !important;
+  border-radius: 4px;
+  color: transparent !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  animation: skeleton-shimmer 2s ease-in-out infinite;
+}
+
+.sk-pill {
+  border-radius: 20px !important;
+}
+
+.sk-circle {
+  border-radius: 50% !important;
+}
+
+.sk-emphasis {
+  background: #232840 !important;
+  border-color: #232840 !important;
+}
+
+.sk-delay-1 { animation-delay: 0.1s !important; }
+.sk-delay-2 { animation-delay: 0.2s !important; }
+.sk-delay-3 { animation-delay: 0.3s !important; }
+.sk-delay-4 { animation-delay: 0.4s !important; }
+.sk-delay-5 { animation-delay: 0.5s !important; }
+

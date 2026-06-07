@@ -245,6 +245,90 @@
 
   </section>
 
+  <!-- ─── SKELETON LOADING VIEW ────────────────────────────────────────── -->
+  <section id="loading-view" class="view hidden flex-col h-full flex-1" style="background: #111318;">
+    
+    <!-- Score section skeleton -->
+    <div class="flex px-[14px] py-4 border-b border-[#1a1d28] gap-4 items-center shrink-0">
+      <!-- Left: semicircle gauge -->
+      <div class="flex flex-col items-center w-[90px] gap-1.5 shrink-0">
+        <svg width="90" height="50" viewBox="0 0 100 50" style="overflow: visible;">
+          <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#1e2230" stroke-width="8" stroke-linecap="round"></path>
+          <path d="M 10 50 A 40 40 0 0 1 50 10" fill="none" stroke="#232840" stroke-width="8" stroke-linecap="round"></path>
+        </svg>
+        <div class="sk-base sk-emphasis sk-delay-1" style="width: 42px; height: 16px; margin-top: 4px;"></div>
+        <div class="sk-base sk-delay-2" style="width: 28px; height: 8px;"></div>
+      </div>
+      
+      <!-- Right: details -->
+      <div class="flex-1 flex flex-col gap-2">
+        <div class="flex gap-1.5">
+          <div class="sk-base sk-pill sk-delay-3" style="width: 78px; height: 16px;"></div>
+          <div class="sk-base sk-pill sk-delay-4" style="width: 96px; height: 16px;"></div>
+        </div>
+        <div class="sk-base sk-delay-5" style="width: 100%; height: 8px;"></div>
+        <div class="sk-base sk-pill sk-delay-1" style="width: 60px; height: 14px;"></div>
+        <div class="sk-base sk-emphasis sk-delay-2" style="width: 100%; height: 26px; border-radius: 6px;"></div>
+      </div>
+    </div>
+
+    <!-- Tab bar skeleton -->
+    <nav class="flex justify-between items-center px-[14px] border-b border-[#1a1d28] h-9 shrink-0">
+      <div class="flex items-center justify-center h-full border-b-2 border-[#2e3550]" style="width: 52px;">
+        <div class="sk-base sk-delay-3" style="width: 36px; height: 8px;"></div>
+      </div>
+      <div class="flex items-center justify-center h-full" style="width: 52px;">
+        <div class="sk-base sk-delay-4" style="width: 36px; height: 8px;"></div>
+      </div>
+      <div class="flex items-center justify-center h-full" style="width: 36px;">
+        <div class="sk-base sk-delay-5" style="width: 24px; height: 8px;"></div>
+      </div>
+      <div class="flex items-center justify-center h-full" style="width: 52px;">
+        <div class="sk-base sk-delay-1" style="width: 36px; height: 8px;"></div>
+      </div>
+      <div class="flex items-center justify-center h-full" style="width: 80px;">
+        <div class="sk-base sk-delay-2" style="width: 56px; height: 8px;"></div>
+      </div>
+    </nav>
+
+    <!-- Content area skeleton -->
+    <div class="flex-1 p-[14px] flex flex-col gap-2.5 overflow-hidden">
+      <div class="sk-base sk-delay-3" style="width: 45%; height: 10px; margin-bottom: 6px;"></div>
+      
+      <!-- Ghost Radar Chart -->
+      <div class="flex justify-center items-center py-2.5">
+        <svg width="160" height="160" viewBox="0 0 160 160">
+          <polygon points="80,65 94.3,75.4 88.8,92.1 71.2,92.1 65.7,75.4" fill="none" stroke="#1a1f2e" stroke-width="1"></polygon>
+          <polygon points="80,50 108.5,70.7 97.6,104.3 62.4,104.3 51.5,70.7" fill="none" stroke="#1a1f2e" stroke-width="1"></polygon>
+          <polygon points="80,35 122.8,66.1 106.5,116.4 53.5,116.4 37.2,66.1" fill="none" stroke="#1a1f2e" stroke-width="1"></polygon>
+          <polygon points="80,20 137.1,61.5 115.3,128.5 44.7,128.5 22.9,61.5" fill="none" stroke="#1a1f2e" stroke-width="1"></polygon>
+          
+          <line x1="80" y1="80" x2="80" y2="20" stroke="#1a1f2e" stroke-width="1"></line>
+          <line x1="80" y1="80" x2="137.1" y2="61.5" stroke="#1a1f2e" stroke-width="1"></line>
+          <line x1="80" y1="80" x2="115.3" y2="128.5" stroke="#1a1f2e" stroke-width="1"></line>
+          <line x1="80" y1="80" x2="44.7" y2="128.5" stroke="#1a1f2e" stroke-width="1"></line>
+          <line x1="80" y1="80" x2="22.9" y2="61.5" stroke="#1a1f2e" stroke-width="1"></line>
+          
+          <polygon points="80,38 128.5,64.2 94.1,99.4 48.2,123.7 51.5,70.7" fill="#1e2535" stroke="#2a3050" stroke-width="1.5" style="opacity: 0.6; animation: skeleton-shimmer 2s ease-in-out infinite; animation-delay: 0.4s;"></polygon>
+          
+          <text x="80" y="13" text-anchor="middle" font-size="9" fill="#2e3450" font-family="system-ui, sans-serif">Impersonation</text>
+          <text x="142" y="64" text-anchor="start" font-size="9" fill="#2e3450" font-family="system-ui, sans-serif">Urgency</text>
+          <text x="120" y="137" text-anchor="start" font-size="9" fill="#2e3450" font-family="system-ui, sans-serif">Social eng.</text>
+          <text x="40" y="137" text-anchor="end" font-size="9" fill="#2e3450" font-family="system-ui, sans-serif">Tech. dec.</text>
+          <text x="18" y="64" text-anchor="end" font-size="9" fill="#2e3450" font-family="system-ui, sans-serif">AI-gen.</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Footer button row skeleton -->
+    <footer class="flex gap-2 p-[14px] border-t border-[#1a1d28] shrink-0 mt-auto">
+      <div class="sk-base sk-delay-4" style="flex: 1; height: 32px; border-radius: 6px;"></div>
+      <div class="sk-base sk-delay-5" style="flex: 1; height: 32px; border-radius: 6px;"></div>
+      <div class="sk-base sk-delay-1" style="flex: 1; height: 32px; border-radius: 6px; background: #1a2035 !important; border: 1px solid #2e3a5a !important;"></div>
+      <div class="sk-base sk-delay-2" style="flex: 1; height: 32px; border-radius: 6px;"></div>
+    </footer>
+
+  </section>
 
   <!-- ─── RESULTS VIEW ─────────────────────────────────────────────────── -->
   <section id="results-view" class="pg-results-view view hidden flex flex-col h-full flex-1">

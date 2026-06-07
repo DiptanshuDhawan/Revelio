@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Revelio — Loading Analysis</title>
+  <style>
+    /* Premium dark palette and structure */
+    :root {
+      --sk-bg: #111318;
+      --sk-base: #1e2230;
+      --sk-emphasis: #232840;
+      --sk-border-dark: #1a1d28;
+      --sk-border-header: #1e2230;
+      --sk-tab-active: #2e3550;
+      --sk-btn-primary-bg: #1a2035;
+      --sk-btn-primary-border: #2e3a5a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 380px;
+      background: var(--sk-bg);
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #94a3b8;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Shimmer Animation with subtle opacity fade */
+    @keyframes shimmer {
+      0%, 100% { opacity: 0.4; }
+      50%       { opacity: 0.85; }
+    }
+
+    /* Skeleton Base Elements */
+    .sk {
+      background: var(--sk-base);
+      border-radius: 4px;
+      animation: shimmer 2s ease-in-out infinite;
+    }
+
+    .sk-pill {
+      background: var(--sk-base);
+      border-radius: 20px;
+      animation: shimmer 2s ease-in-out infinite;
+    }
+
+    .sk-circle {
+      background: var(--sk-base);
+      border-radius: 50%;
+      animation: shimmer 2s ease-in-out infinite;
+    }
+
+    /* Lighter variant for emphasis components */
+    .sk-emphasis {
+      background: var(--sk-emphasis);
+    }
+
+    /* Staggered animation delays for a natural wave effect */
+    .sk-delay-1 { animation-delay: 0.1s; }
+    .sk-delay-2 { animation-delay: 0.2s; }
+    .sk-delay-3 { animation-delay: 0.3s; }
+    .sk-delay-4 { animation-delay: 0.4s; }
+    .sk-delay-5 { animation-delay: 0.5s; }
+
+    /* Header Bar */
+    .sk-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      border-bottom: 0.5px solid var(--sk-border-header);
+      height: 48px;
+    }
+
+    .sk-header-left, .sk-header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sk-header-text-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    /* Score Section */
+    .sk-score-section {
+      display: flex;
+      padding: 16px 14px;
+      border-bottom: 0.5px solid var(--sk-border-dark);
+      gap: 16px;
+      align-items: center;
+    }
+
+    .sk-score-gauge-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90px;
+      gap: 6px;
+      shrink-0;
+    }
+
+    .sk-score-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Tab Bar */
+    .sk-tab-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 14px;
+      border-bottom: 0.5px solid var(--sk-border-dark);
+      height: 36px;
+    }
+
+    .sk-tab-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+
+    .sk-tab-item.active {
+      border-bottom: 2px solid var(--sk-tab-active);
+    }
+
+    /* Content Area */
+    .sk-content-area {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sk-chart-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0;
+    }
+
+    /* Footer button row */
+    .sk-footer {
+      display: flex;
+      gap: 8px;
+      padding: 12px 14px;
+      border-top: 0.5px solid var(--sk-border-dark);
+      margin-top: auto;
+    }
+
+    .sk-btn {
+      flex: 1;
+      height: 32px;
+      border-radius: 6px;
+    }
+
+    .sk-btn-primary {
+      background: var(--sk-btn-primary-bg);
+      border: 1px solid var(--sk-btn-primary-border);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Header bar -->
+  <header class="sk-header">
+    <div class="sk-header-left">
+      <div class="sk sk-circle sk-delay-1" style="width: 30px; height: 30px; border-radius: 7px;"></div>
+      <div class="sk-header-text-stack">
+        <div class="sk sk-delay-2" style="width: 72px; height: 10px;"></div>
+        <div class="sk sk-delay-3" style="width: 110px; height: 6px;"></div>
+      </div>
+    </div>
+    <div class="sk-header-right">
+      <div class="sk-pill sk-delay-4" style="width: 110px; height: 20px;"></div>
+      <div class="sk-circle sk-delay-5" style="width: 18px; height: 18px;"></div>
+      <div class="sk-circle sk-delay-1" style="width: 18px; height: 18px;"></div>
+    </div>
+  </header>
+
+  <!-- 2. Score section -->
+  <section class="sk-score-section">
+    <!-- Left: Ghost gauge semicircle -->
+    <div class="sk-score-gauge-wrap">
+      <svg width="90" height="50" viewBox="0 0 100 50" style="overflow: visible;">
+        <!-- Base arc (darker) -->
+        <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--sk-base)" stroke-width="8" stroke-linecap="round" />
+        <!-- Lighter filled arc segment (half filled) -->
+        <path d="M 10 50 A 40 40 0 0 1 50 10" fill="none" stroke="var(--sk-emphasis)" stroke-width="8" stroke-linecap="round" />
+      </svg>
+      <div class="sk sk-delay-1 sk-emphasis" style="width: 42px; height: 16px; margin-top: 4px;"></div>
+      <div class="sk sk-delay-2" style="width: 28px; height: 8px;"></div>
+    </div>
+    <!-- Right: Badges and Details -->
+    <div class="sk-score-details">
+      <div style="display: flex; gap: 6px;">
+        <div class="sk-pill sk-delay-3" style="width: 78px; height: 16px;"></div>
+        <div class="sk-pill sk-delay-4" style="width: 96px; height: 16px;"></div>
+      </div>
+      <div class="sk sk-delay-5" style="width: 100%; height: 8px;"></div>
+      <div class="sk-pill sk-delay-1" style="width: 60px; height: 14px;"></div>
+      <div class="sk sk-delay-2 sk-emphasis" style="width: 100%; height: 26px; border-radius: 6px;"></div>
+    </div>
+  </section>
+
+  <!-- 3. Tab bar -->
+  <nav class="sk-tab-bar">
+    <!-- Summary Tab (Active) -->
+    <div class="sk-tab-item active" style="width: 52px;">
+      <div class="sk sk-delay-3" style="width: 36px; height: 8px;"></div>
+    </div>
+    <!-- Findings Tab -->
+    <div class="sk-tab-item" style="width: 52px;">
+      <div class="sk sk-delay-4" style="width: 36px; height: 8px;"></div>
+    </div>
+    <!-- URLs Tab -->
+    <div class="sk-tab-item" style="width: 36px;">
+      <div class="sk sk-delay-5" style="width: 24px; height: 8px;"></div>
+    </div>
+    <!-- Headers Tab -->
+    <div class="sk-tab-item" style="width: 52px;">
+      <div class="sk sk-delay-1" style="width: 36px; height: 8px;"></div>
+    </div>
+    <!-- Remediation Tab -->
+    <div class="sk-tab-item" style="width: 80px;">
+      <div class="sk sk-delay-2" style="width: 56px; height: 8px;"></div>
+    </div>
+  </nav>
+
+  <!-- 4. Content area -->
+  <main class="sk-content-area">
+    <div class="sk sk-delay-3" style="width: 45%; height: 10px; margin-bottom: 6px;"></div>
+    
+    <!-- Ghost Radar Chart -->
+    <div class="sk-chart-container">
+      <svg width="160" height="160" viewBox="0 0 160 160">
+        <!-- 4 Concentric Pentagons -->
+        <!-- Center is 80, 80. Radii: 15, 30, 45, 60 -->
+        <!-- Ring 1 (R=15) -->
+        <polygon points="80,65 94.3,75.4 88.8,92.1 71.2,92.1 65.7,75.4" fill="none" stroke="#1a1f2e" stroke-width="1" />
+        <!-- Ring 2 (R=30) -->
+        <polygon points="80,50 108.5,70.7 97.6,104.3 62.4,104.3 51.5,70.7" fill="none" stroke="#1a1f2e" stroke-width="1" />
+        <!-- Ring 3 (R=45) -->
+        <polygon points="80,35 122.8,66.1 106.5,116.4 53.5,116.4 37.2,66.1" fill="none" stroke="#1a1f2e" stroke-width="1" />
+        <!-- Ring 4 (R=60) -->
+        <polygon points="80,20 137.1,61.5 115.3,128.5 44.7,128.5 22.9,61.5" fill="none" stroke="#1a1f2e" stroke-width="1" />
+        
+        <!-- Axis Lines -->
+        <line x1="80" y1="80" x2="80" y2="20" stroke="#1a1f2e" stroke-width="1" />
+        <line x1="80" y1="80" x2="137.1" y2="61.5" stroke="#1a1f2e" stroke-width="1" />
+        <line x1="80" y1="80" x2="115.3" y2="128.5" stroke="#1a1f2e" stroke-width="1" />
+        <line x1="80" y1="80" x2="44.7" y2="128.5" stroke="#1a1f2e" stroke-width="1" />
+        <line x1="80" y1="80" x2="22.9" y2="61.5" stroke="#1a1f2e" stroke-width="1" />
+        
+        <!-- Shimmering Threat Area Polygon -->
+        <polygon points="80,38 128.5,64.2 94.1,99.4 48.2,123.7 51.5,70.7" fill="#1e2535" stroke="#2a3050" stroke-width="1.5" style="opacity: 0.6; animation: shimmer 2s ease-in-out infinite; animation-delay: 0.4s;" />
+        
+        <!-- Vertices labels (approx. placements) -->
+        <text x="80" y="13" text-anchor="middle" font-size="9" fill="#2e3450" font-family="'Inter', sans-serif">Impersonation</text>
+        <text x="142" y="64" text-anchor="start" font-size="9" fill="#2e3450" font-family="'Inter', sans-serif">Urgency</text>
+        <text x="120" y="137" text-anchor="start" font-size="9" fill="#2e3450" font-family="'Inter', sans-serif">Social eng.</text>
+        <text x="40" y="137" text-anchor="end" font-size="9" fill="#2e3450" font-family="'Inter', sans-serif">Tech. dec.</text>
+        <text x="18" y="64" text-anchor="end" font-size="9" fill="#2e3450" font-family="'Inter', sans-serif">AI-gen.</text>
+      </svg>
+    </div>
+  </main>
+
+  <!-- 5. Footer button row -->
+  <footer class="sk-footer">
+    <div class="sk sk-btn sk-delay-4" style="height: 32px; border-radius: 6px;"></div>
+    <div class="sk sk-btn sk-delay-5" style="height: 32px; border-radius: 6px;"></div>
+    <div class="sk sk-btn sk-btn-primary sk-delay-1" style="height: 32px; border-radius: 6px;"></div>
+    <div class="sk sk-btn sk-delay-2" style="height: 32px; border-radius: 6px;"></div>
+  </footer>
+
+</body>
+</html>

@@ -649,8 +649,8 @@ const LOADING_MESSAGES = [
 ];
 
 function startLoadingAnimation() {
-  // Stay on input-view but switch it to 'loading mode'
-  showView('input');
+  // Switch to the skeleton loading view
+  showView('loading');
 
   // Show loading section, hide idle bottom
   const loadingSection = document.getElementById('loading-section');
@@ -722,8 +722,7 @@ function stopLoadingAnimation() {
 
 // ─── View Switching ───────────────────────────────────────────────────────────
 function showView(view) {
-  // 'loading' is no longer a separate view — it's handled in-place by startLoadingAnimation
-  const resolvedView = view === 'loading' ? 'input' : view;
+  const resolvedView = view;
 
   document.querySelectorAll('.view').forEach((v) => {
     v.classList.remove('active');
