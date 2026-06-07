@@ -12,8 +12,6 @@ const DEFAULT_SETTINGS = {
   openaiModel: 'gpt-4o-mini',
   geminiApiKey: '',
   geminiModel: 'gemini-1.5-flash',
-  openrouterApiKey: '',
-  openrouterModel: 'deepseek/deepseek-r1:free',
   sensitivityThreshold: 50,
   autoScanEnabled: true,
   autoSave: true,
