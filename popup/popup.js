@@ -573,54 +573,28 @@ async function handleAnalyze(textToAnalyze) {
   startLoadingAnimation();
 
   try {
-    // Run rule engine locally
-    const { emailData, ruleResult } = await analyzeEmail(emailText);
+    // Trigger background scan and wait for the result
+    const response = await chrome.runtime.sendMessage({
+      type: 'MANUAL_SCAN',
+      emailText: emailText,
+      source: 'manual'
+    });
 
-    // Call LLM via background service worker
-    let llmResult;
-    try {
-      const response = await chrome.runtime.sendMessage({
-        type: 'ANALYZE',
-        emailText,
-        ruleResult, // Pass rule engine findings for LLM context
-        settings: freshSettings,
-      });
-
-      if (response.success) {
-        llmResult = response.data;
-      } else {
-        throw new Error(response.error || 'Analysis failed');
-      }
-    } catch (llmError) {
-      if (llmError.message === 'OLLAMA_OFFLINE') {
-        showToast('Ollama offline - using rule engine only', 'error');
-      } else {
-        showToast(`AI error: ${llmError.message?.slice(0, 120)}`, 'error');
-      }
-      llmResult = generateOfflineFallback(ruleResult, currentSettings?.sensitivityThreshold);
+    if (!response || !response.success) {
+      throw new Error(response ? response.error : 'Background scan failed');
     }
 
-    const finalScore = computeFinalScore(llmResult.llmScore, ruleResult.ruleScore);
-
-    currentResult = { emailData, ruleResult, llmResult, finalScore, settings: freshSettings };
-    currentAnalysisId = null;
-
-    if (freshSettings.autoSave !== false) {
-      const entry = await saveAnalysis(currentResult);
-      if (entry) currentAnalysisId = entry.id;
-    }
-
-    chrome.runtime.sendMessage({ type: 'UPDATE_BADGE', score: finalScore }).catch(() => {});
+    currentResult = response.data;
+    // Inject the settings the popup needs
+    currentResult.settings = freshSettings;
+    currentAnalysisId = null; // Will fetch from history if needed
 
     // Route to offline view if AI was unavailable
-    if (llmResult._offlineMode) {
-      // Don't cache offline results — we want a fresh try when Ollama comes back
-      renderOfflineView(ruleResult, finalScore);
+    if (currentResult.llmResult && currentResult.llmResult._offlineMode) {
+      renderOfflineView(currentResult.ruleResult, currentResult.finalScore);
       showView('offline');
       hideBanner();
     } else {
-      // Cache this result so reopening popup for same email skips re-analysis
-      await cacheResult(emailText, currentResult);
       renderResults(currentResult);
       showView('results');
     }

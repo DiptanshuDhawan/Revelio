@@ -107,6 +107,22 @@ function loadSettingsIntoUI(settings) {
     }
   }
 
+  // OpenRouter
+  if ($('s-openrouter-key')) $('s-openrouter-key').value = settings.openrouterApiKey || '';
+  if ($('s-openrouter-model')) {
+    const orKnown = ['deepseek/deepseek-r1:free', 'meta-llama/llama-3.1-70b-instruct:free', 'qwen/qwen-2.5-coder-32b-instruct:free', 'meta-llama/llama-3-8b-instruct:free'];
+    if (orKnown.includes(settings.openrouterModel) || !settings.openrouterModel) {
+      $('s-openrouter-model').value = settings.openrouterModel || 'deepseek/deepseek-r1:free';
+    } else {
+      $('s-openrouter-model').value = 'custom';
+      if ($('s-openrouter-model-custom')) {
+        $('s-openrouter-model-custom').style.display = 'block';
+        $('s-openrouter-model-custom').value = settings.openrouterModel;
+      }
+    }
+  }
+
+
   // Analysis settings
   if ($('sensitivity')) {
     $('sensitivity').value = settings.sensitivityThreshold || 50;
@@ -156,7 +172,7 @@ function switchProvider(provider) {
     btn.classList.toggle('active', btn.dataset.prov === provider);
   });
 
-  ['ollama', 'openai', 'gemini'].forEach((p) => {
+  ['ollama', 'openai', 'gemini', 'openrouter'].forEach((p) => {
     const el = document.getElementById(`cfg-${p}`);
     if (el) el.style.display = p === provider ? 'flex' : 'none';
   });
@@ -180,6 +196,12 @@ function collectSettings() {
     geminiModel = $('s-gemini-model-custom')?.value || 'gemini-3.5-flash';
   }
 
+  let openrouterModel = $('s-openrouter-model')?.value || 'deepseek/deepseek-r1:free';
+  if (openrouterModel === 'custom') {
+    openrouterModel = $('s-openrouter-model-custom')?.value || 'deepseek/deepseek-r1:free';
+  }
+
+
   return {
     provider: currentProvider,
     ollamaEndpoint: $('s-ollama-endpoint')?.value || 'http://localhost:11434',
@@ -188,6 +210,8 @@ function collectSettings() {
     openaiModel,
     geminiApiKey: $('s-gemini-key')?.value || '',
     geminiModel,
+    openrouterApiKey: $('s-openrouter-key')?.value || '',
+    openrouterModel,
     sensitivityThreshold: parseInt($('sensitivity')?.value) || 50,
     autoScanEnabled: $('auto-scan')?.checked !== false,
     autoSave: $('auto-save')?.checked !== false,
@@ -283,8 +307,14 @@ function attachEventListeners() {
     if (custom) custom.style.display = e.target.value === 'custom' ? 'block' : 'none';
   });
 
-  $('s-gemini-model')?.addEventListener('change', (e) => {
-    const custom = $('s-gemini-model-custom');
+  document.getElementById('s-gemini-model')?.addEventListener('change', (e) => {
+    const custom = document.getElementById('s-gemini-model-custom');
+    if (custom) custom.style.display = e.target.value === 'custom' ? 'block' : 'none';
+  });
+
+
+  $('s-openrouter-model')?.addEventListener('change', (e) => {
+    const custom = $('s-openrouter-model-custom');
     if (custom) custom.style.display = e.target.value === 'custom' ? 'block' : 'none';
   });
 

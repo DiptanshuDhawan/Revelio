@@ -120,6 +120,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Keep message channel open for async response
   }
 
+  if (message.type === 'MANUAL_SCAN') {
+    handlePassiveScan(message.emailText, message.source, sender.tab?.id)
+      .then((result) => sendResponse({ success: true, data: result }))
+      .catch((err) => sendResponse({ success: false, error: err.message }));
+    return true;
+  }
+
   if (message.type === 'CHECK_OLLAMA') {
     checkOllama(message.endpoint)
       .then((online) => sendResponse({ online }))
@@ -214,6 +221,9 @@ async function handleAnalyze({ emailText, settings, ruleResult }) {
     case 'gemini':
       llmResponse = await callGemini(prompt, settings);
       break;
+    case 'openrouter':
+      llmResponse = await callOpenRouter(prompt, settings);
+      break;
     default:
       throw new Error('Unknown AI provider: ' + provider);
   }
@@ -282,6 +292,8 @@ async function handlePassiveScan(emailText, source, tabId) {
         llmResult = await callOpenAI(prompt, settings);
       } else if (settings.provider === 'gemini') {
         llmResult = await callGemini(prompt, settings);
+      } else if (settings.provider === 'openrouter') {
+        llmResult = await callOpenRouter(prompt, settings);
       } else {
         llmResult = generateOfflineFallback(ruleResult, settings.sensitivityThreshold);
       }
