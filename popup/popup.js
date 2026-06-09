@@ -189,11 +189,10 @@ function applyTheme(theme) {
   }
 }
 
-document.getElementById('theme-toggle').addEventListener('click', async () => {
-  const newTheme = currentSettings.theme === 'dark' ? 'light' : 'dark';
-  currentSettings.theme = newTheme;
-  applyTheme(newTheme);
-  await saveSettings({ theme: newTheme });
+document.getElementById('back-btn').addEventListener('click', () => {
+  document.getElementById('idle-status-title').textContent = 'Auto-Scan Active';
+  document.getElementById('idle-status-msg').textContent = 'Open an email in Gmail or Outlook. Revelio will automatically scan it for threats.';
+  showView('input');
 });
 document.getElementById('settings-link').addEventListener('click', (e) => {
   e.preventDefault();
@@ -704,6 +703,11 @@ function stopLoadingAnimation() {
 // ─── View Switching ───────────────────────────────────────────────────────────
 function showView(view) {
   const resolvedView = view;
+  
+  const backBtn = document.getElementById('back-btn');
+  if (backBtn) {
+    backBtn.style.display = resolvedView === 'input' ? 'none' : 'block';
+  }
 
   document.querySelectorAll('.view').forEach((v) => {
     v.classList.remove('active');
