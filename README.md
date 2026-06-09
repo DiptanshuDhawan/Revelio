@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="assets/banner.png" alt="Revelio Banner" width="100%" />
-
-  <br/>
+  <img src="icons/icon128.png" alt="Revelio Logo" width="128" />
+  <h1>🛡️ Revelio: Advanced Threat Intelligence</h1>
+  <p><strong>Clean, AI-Powered Email Security & Phishing Analysis for SOC Teams</strong></p>
 
   [![Version](https://img.shields.io/badge/Version-1.1.0-blue.svg)](https://github.com/DiptanshuDhawan/Revelio)
   [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
@@ -14,9 +14,22 @@
 
 Traditional email security gateways fail against zero-day social engineering and AI-generated phishing. **Revelio** solves this by bringing SOC-level, dual-engine analysis directly into your browser.
 
-<div align="center">
-  <img src="assets/architecture.png" alt="Dual Engine Architecture" width="800" />
-</div>
+```mermaid
+graph TD
+    A[Raw Email Paste/Upload] --> B(Extraction Layer)
+    B -->|Headers & Body| C[Deterministic Rule Engine]
+    B -->|Content & Tone| D[Deep-Context AI Engine]
+    
+    C -->|Header Auth, Link Obfuscation, Executables| E{Rule Score: 40%}
+    D -->|Social Engineering, Urgency, AI-Gen Text| F{LLM Score: 60%}
+    
+    E --> G((Final Threat Score))
+    F --> G
+    
+    G --> H[Interactive Threat Report]
+    H --> I[Threat Fingerprint Radar]
+    H --> J[MITRE ATT&CK Mapping]
+```
 
 <details>
 <summary><b>🔍 How the scoring works (Click to expand)</b></summary>
