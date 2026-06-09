@@ -77,7 +77,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const badgeText = document.getElementById('provider-badge-text');
   if (badgeText) {
     const prov = currentSettings.provider || 'ollama';
-    const provLabel = prov === 'ollama' ? 'Ollama · Local' : prov === 'openai' ? 'OpenAI · Cloud' : 'Gemini · Cloud';
+    let provLabel = '';
+    if (prov === 'ollama') provLabel = currentSettings.ollamaModel || 'llama3';
+    else if (prov === 'openai') provLabel = currentSettings.openaiModel || 'gpt-4o';
+    else if (prov === 'gemini') provLabel = currentSettings.geminiModel || 'gemini-1.5-flash';
+    else if (prov === 'openrouter') provLabel = currentSettings.openrouterModel || 'deepseek/deepseek-r1:free';
+    else provLabel = 'Unknown Model';
     badgeText.textContent = provLabel;
   }
 
@@ -416,7 +421,7 @@ async function autoExtractAndAnalyze() {
   // Request email extraction
   const extracted = await chrome.tabs.sendMessage(tab.id, { type: 'EXTRACT_EMAIL' });
   if (!extracted || !extracted.emailText) {
-    setIdleState('No Email Detected', 'Open a specific email (not just the inbox) and click Force Rescan.', 'error');
+    setIdleState('Standing By', 'Navigate to an email in Gmail or Outlook. Revelio will automatically analyze it in the background.', 'info');
     return;
   }
 
