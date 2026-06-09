@@ -42,6 +42,28 @@
       color: var(--text-primary);
       -webkit-font-smoothing: antialiased;
     }
+    
+    body.theme-safe {
+      --bg-banner: rgba(34,197,94,0.05);
+      --border-banner: rgba(34,197,94,0.2);
+      --text-eyebrow: rgba(34,197,94,0.6);
+      --text-heading: #86efac;
+      --border-divider: rgba(34,197,94,0.15);
+    }
+    body.theme-suspicious {
+      --bg-banner: var(--bg-banner-amber);
+      --border-banner: var(--border-amber);
+      --text-eyebrow: rgba(251,191,36,0.6);
+      --text-heading: var(--amber-soft);
+      --border-divider: rgba(251,191,36,0.15);
+    }
+    body.theme-malicious {
+      --bg-banner: var(--bg-banner-red);
+      --border-banner: var(--border-red);
+      --text-eyebrow: rgba(239,68,68,0.6);
+      --text-heading: var(--red-soft);
+      --border-divider: rgba(239,68,68,0.15);
+    }
 
     topnav {
       position: fixed;
@@ -116,8 +138,8 @@
     verdict-banner {
       display: grid;
       grid-template-columns: 1fr auto;
-      background: var(--bg-banner-red);
-      border: 0.5px solid var(--border-red);
+      background: var(--bg-banner, var(--bg-banner-red));
+      border: 0.5px solid var(--border-banner, var(--border-red));
       border-radius: 14px;
       overflow: hidden;
       margin-bottom: 20px;
@@ -125,10 +147,10 @@
     .vb-left { padding: 24px 28px; }
     .vb-eyebrow {
       font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
-      color: rgba(239,68,68,0.6); margin-bottom: 6px;
+      color: var(--text-eyebrow, rgba(239,68,68,0.6)); margin-bottom: 6px;
     }
     .vb-heading {
-      font-size: 28px; font-weight: 500; color: var(--red-soft);
+      font-size: 28px; font-weight: 500; color: var(--text-heading, var(--red-soft));
       line-height: 1.2; margin-bottom: 4px;
     }
     .vb-sub {
@@ -148,7 +170,7 @@
 
     .vb-right {
       min-width: 180px; padding: 24px 28px; background: #0d0808;
-      border-left: 0.5px solid rgba(239,68,68,0.15);
+      border-left: 0.5px solid var(--border-divider, rgba(239,68,68,0.15));
       display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
     .score-ring-wrap { position: relative; width: 100px; height: 100px; margin-bottom: 12px; }

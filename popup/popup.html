@@ -129,7 +129,7 @@
           </svg>
           Force Rescan
         </button>
-        <button id="history-btn" class="rescan-btn-custom" title="View Scan History">
+        <button id="idle-history-btn" class="rescan-btn-custom" title="View Scan History">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
@@ -157,7 +157,7 @@
         0%, 100% { transform: translateY(0px); }
         50%       { transform: translateY(-3px); }
       }
-      #rescan-btn:active, #history-btn:active { transform: scale(0.97); }
+      #rescan-btn:active, #idle-history-btn:active, #history-btn:active { transform: scale(0.97); }
     
       .rescan-btn-custom {
         display: flex; 
@@ -360,7 +360,7 @@
     <!-- Threat Meter Area -->
     <div class="px-container-padding pt-2 pb-2 shrink-0">
       <div class="bg-surface-container rounded-xl border border-white/5 p-4 flex justify-around items-center relative overflow-hidden shadow-lg" id="threat-card-bg">
-        <div id="threat-glow" class="absolute -top-10 -right-10 w-32 h-32 bg-error/10 blur-[40px] rounded-full pointer-events-none transition-colors duration-1000"></div>
+        <div id="threat-glow" class="absolute -top-10 -right-10 w-32 h-32 blur-[40px] rounded-full pointer-events-none transition-colors duration-1000"></div>
         
         <!-- Gauge -->
         <div class="relative w-32 h-20 flex flex-col items-center justify-end pb-1 shrink-0">
@@ -543,7 +543,7 @@
         <span class="material-symbols-outlined text-[16px]">refresh</span> <span class="text-[11px] font-bold uppercase">New</span>
       </button>
       <button id="history-btn" class="flex-1 bg-surface-variant text-on-surface-variant rounded-lg py-2 flex items-center justify-center gap-1.5 hover:brightness-110 active:scale-95">
-        <span class="material-symbols-outlined text-[16px]">history</span> <span class="text-[11px] font-bold uppercase">Log</span>
+        <span class="material-symbols-outlined text-[16px]">history</span> <span class="text-[11px] font-bold uppercase">History</span>
       </button>
     </footer>
 

@@ -543,6 +543,7 @@ function attachEventListeners() {
   document.getElementById('copy-report-btn')?.addEventListener('click', handleCopyReport);
   document.getElementById('export-pdf-btn')?.addEventListener('click', handleExportPDF);
   document.getElementById('history-btn')?.addEventListener('click', openHistory);
+  document.getElementById('idle-history-btn')?.addEventListener('click', openHistory);
   document.getElementById('history-close-btn')?.addEventListener('click', closeHistory);
   document.getElementById('clear-history-btn')?.addEventListener('click', handleClearHistory);
   document.getElementById('false-positive-btn')?.addEventListener('click', handleFalsePositive);
@@ -876,6 +877,57 @@ function renderGauge(score, llm, ruleResult) {
   const mitreText = document.getElementById('mitre-tag-text');
   const summaryVerdict = document.getElementById('summary-verdict-text');
   const summaryConfidence = document.getElementById('summary-confidence');
+
+  const threatCardBg = document.getElementById('threat-card-bg');
+  const threatGlow = document.getElementById('threat-glow');
+  const gaugeGradient = document.getElementById('gauge-gradient');
+
+  // Determine threat tier
+  let tier = 'safe'; // default
+  if (score >= 40 && score < 80) tier = 'suspicious';
+  else if (score >= 80) tier = 'malicious';
+
+  // Apply dynamic classes
+  if (threatCardBg && threatGlow && scoreText) {
+    // Reset classes
+    threatCardBg.className = 'bg-surface-container rounded-xl border p-4 flex justify-around items-center relative overflow-hidden shadow-lg transition-colors duration-500';
+    threatGlow.className = 'absolute -top-10 -right-10 w-32 h-32 blur-[40px] rounded-full pointer-events-none transition-colors duration-1000';
+    scoreText.className = 'text-[36px] font-display-score leading-none font-bold transition-colors duration-500';
+
+    if (tier === 'safe') {
+      threatCardBg.classList.add('border-emerald-500/20');
+      threatGlow.classList.add('bg-emerald-500/10');
+      scoreText.classList.add('text-emerald-400');
+    } else if (tier === 'suspicious') {
+      threatCardBg.classList.add('border-amber-500/20');
+      threatGlow.classList.add('bg-amber-500/10');
+      scoreText.classList.add('text-amber-400');
+    } else {
+      threatCardBg.classList.add('border-error/30');
+      threatGlow.classList.add('bg-error/10');
+      scoreText.classList.add('text-error');
+    }
+  }
+
+  // Dynamic SVG Gradient
+  if (gaugeGradient) {
+    const stops = gaugeGradient.querySelectorAll('stop');
+    if (stops.length === 3) {
+      if (tier === 'safe') {
+        stops[0].setAttribute('stop-color', '#10b981'); // emerald-500
+        stops[1].setAttribute('stop-color', '#34d399'); // emerald-400
+        stops[2].setAttribute('stop-color', '#6ee7b7'); // emerald-300
+      } else if (tier === 'suspicious') {
+        stops[0].setAttribute('stop-color', '#34d399'); // emerald-400
+        stops[1].setAttribute('stop-color', '#f59e0b'); // amber-500
+        stops[2].setAttribute('stop-color', '#fbbf24'); // amber-400
+      } else {
+        stops[0].setAttribute('stop-color', '#34d399'); // emerald-400
+        stops[1].setAttribute('stop-color', '#fbbf24'); // amber-400
+        stops[2].setAttribute('stop-color', '#ef4444'); // red-500
+      }
+    }
+  }
 
   const circumference = 141.37;
   const offset = circumference - (score / 100) * circumference;

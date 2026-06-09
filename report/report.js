@@ -52,6 +52,12 @@ function renderTopNav(data) {
   document.getElementById('export-pdf-action').addEventListener('click', exportPDF);
 }
 
+function getThemeColors(score) {
+  if (score < 40) return { main: '#22c55e', bg: 'rgba(34,197,94,0.12)', text: 'var(--green-soft, #4ade80)' };
+  if (score < 80) return { main: '#f59e0b', bg: 'rgba(245,158,11,0.12)', text: 'var(--amber-soft, #fbbf24)' };
+  return { main: '#ef4444', bg: 'rgba(239,68,68,0.12)', text: 'var(--red-soft, #f87171)' };
+}
+
 function renderBanner(data) {
   const banner = document.getElementById('verdict-banner');
   banner.innerHTML = `
@@ -99,6 +105,13 @@ function renderBanner(data) {
   
   const finalScore = data.scores?.final || 0;
   document.getElementById('vb-score').textContent = finalScore;
+
+  // Apply theme to body
+  if (finalScore < 40) document.body.className = 'theme-safe';
+  else if (finalScore < 80) document.body.className = 'theme-suspicious';
+  else document.body.className = 'theme-malicious';
+
+  const theme = getThemeColors(finalScore);
   
   if (window.Chart) {
     new Chart(document.getElementById('score-ring'), {
@@ -106,7 +119,7 @@ function renderBanner(data) {
       data: {
         datasets: [{
           data: [finalScore, 100 - finalScore],
-          backgroundColor: ['#ef4444', 'rgba(255,255,255,0.05)'],
+          backgroundColor: [theme.main, 'rgba(255,255,255,0.05)'],
           borderWidth: 0
         }]
       },
@@ -121,10 +134,14 @@ function renderBanner(data) {
   const elAi = document.getElementById('chip-ai');
   elAi.textContent = aiScore;
   if (aiScore >= 70) elAi.classList.add('red');
+  else if (aiScore >= 30) elAi.classList.add('amber');
+  else elAi.classList.add('green');
   
   const elRules = document.getElementById('chip-rules');
   elRules.textContent = rulesScore;
   if (rulesScore >= 70) elRules.classList.add('red');
+  else if (rulesScore >= 30) elRules.classList.add('amber');
+  else elRules.classList.add('green');
   
   const elConf = document.getElementById('chip-conf');
   elConf.textContent = conf;
@@ -134,9 +151,10 @@ function renderBanner(data) {
   else elConf.classList.add('green');
 }
 
-function renderRadarChart(signals) {
+function renderRadarChart(signals, finalScore) {
   if (!window.Chart) return;
   
+  const theme = getThemeColors(finalScore);
   const sigs = signals || {};
   const dataArr = [
     sigs.impersonation || 0,
@@ -153,10 +171,10 @@ function renderRadarChart(signals) {
       labels: ['Impersonation', 'Urgency', 'Social eng.', 'Tech. deception', 'AI-generated'],
       datasets: [{
         data: dataArr,
-        backgroundColor: 'rgba(239,68,68,0.12)',
-        borderColor: '#ef4444',
+        backgroundColor: theme.bg,
+        borderColor: theme.main,
         borderWidth: 1.5,
-        pointBackgroundColor: '#ef4444',
+        pointBackgroundColor: theme.main,
         pointBorderColor: '#07090f',
         pointRadius: 4,
         pointHoverRadius: 6
@@ -178,7 +196,8 @@ function renderRadarChart(signals) {
   });
 }
 
-function renderSignalBars(signals) {
+function renderSignalBars(signals, finalScore) {
+  const theme = getThemeColors(finalScore);
   const sigs = signals || {};
   const config = [
     { key: 'impersonation', icon: 'ti-user-x', label: 'Impersonation' },
@@ -192,8 +211,8 @@ function renderSignalBars(signals) {
   config.forEach(c => {
     const score = sigs[c.key] || 0;
     const fillW = Math.min(100, Math.max(0, score));
-    const fillC = score > 0 ? '#ef4444' : 'rgba(255,255,255,0.15)';
-    const textC = score > 0 ? 'var(--red-soft)' : 'rgba(255,255,255,0.2)';
+    const fillC = score > 0 ? theme.main : 'rgba(255,255,255,0.15)';
+    const textC = score > 0 ? theme.text : 'rgba(255,255,255,0.2)';
     html += `
       <div class="signal-row">
         <i class="ti ${c.icon} sig-icon"></i>
@@ -208,6 +227,7 @@ function renderSignalBars(signals) {
 
 function renderTwoCol(data) {
   const cont = document.getElementById('two-col');
+  const finalScore = data.scores?.final || 0;
   cont.innerHTML = `
     <div class="panel-card">
       <div class="panel-header">
@@ -226,8 +246,8 @@ function renderTwoCol(data) {
       <div id="signal-list"></div>
     </div>
   `;
-  document.getElementById('signal-list').innerHTML = renderSignalBars(data.signals);
-  renderRadarChart(data.signals);
+  document.getElementById('signal-list').innerHTML = renderSignalBars(data.signals, finalScore);
+  renderRadarChart(data.signals, finalScore);
 }
 
 function renderFindings(findings) {
