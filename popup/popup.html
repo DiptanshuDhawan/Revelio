@@ -85,13 +85,23 @@
       </div>
     </div>
 
-    <!-- Status title (idle: "Auto-Scan Active", loading: cycling messages) -->
-    <h2 id="idle-status-title" style="font-size: 16px; font-weight: 700; color: #e2e8f0; margin: 0 0 8px 0; letter-spacing: -0.01em; transition: opacity 0.3s; min-height: 24px;">Auto-Scan Active</h2>
+    <!-- Status title -->
+    <h2 id="idle-status-title" style="font-size: 16px; font-weight: 600; margin: 0 0 12px 0; letter-spacing: 0.03em; transition: opacity 0.3s; min-height: 24px; background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 8px rgba(56,189,248,0.15)); display: flex; align-items: center; justify-content: center; gap: 8px;">
+      Standing By
+      <span style="display: inline-block; width: 6px; height: 6px; background-color: #38bdf8; border-radius: 50%; box-shadow: 0 0 8px #38bdf8; animation: pulse 2s infinite;"></span>
+    </h2>
 
-    <!-- Status message (idle: description, loading: phase) -->
-    <p id="idle-status-msg" style="font-size: 13px; color: #94a3b8; line-height: 1.6; max-width: 256px; margin: 0 0 0 0; transition: opacity 0.3s; min-height: 40px;">
-      Open an email in Gmail or Outlook — Revelio will automatically detect and analyze it for threats.
-    </p>
+    <!-- Status message container -->
+    <div style="display: flex; align-items: flex-start; gap: 10px; background: rgba(56,189,248,0.03); border: 1px solid rgba(56,189,248,0.1); border-radius: 10px; padding: 12px 14px; max-width: 270px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.02); margin: 0;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px; opacity: 0.8;">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      <p id="idle-status-msg" style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0; transition: opacity 0.3s; min-height: 36px; text-align: left;">
+        Open an email in Gmail or Outlook &mdash; Revelio will automatically detect and analyze it for threats.
+      </p>
+    </div>
 
     <!-- ── LOADING SECTION (hidden until analysis starts) ── -->
     <div id="loading-section" style="display: none; flex-direction: column; align-items: center; gap: 0; width: 100%; margin-top: 20px;">
