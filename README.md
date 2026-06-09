@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="icons/icon128.png" alt="Revelio Logo" width="128" />
+  <img src="icons/Revelio%20logo.png" alt="Revelio Logo" width="128" />
   <h1>🛡️ Revelio: Advanced Threat Intelligence</h1>
   <p><strong>Clean, AI-Powered Email Security & Phishing Analysis for SOC Teams</strong></p>
 
