@@ -1,100 +1,29 @@
 <div align="center">
   <img src="icons/Revelio%20logo.png" alt="Revelio Logo" width="128" />
-  <h1>🛡️ Revelio: Advanced Threat Intelligence</h1>
-  <p><strong>Clean, AI-Powered Email Security & Phishing Analysis for SOC Teams</strong></p>
-
-  [![Version](https://img.shields.io/badge/Version-1.1.0-blue.svg)](https://github.com/DiptanshuDhawan/Revelio)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-  [![AI Engine](https://img.shields.io/badge/AI%20Engine-Local%20%7C%20Cloud-purple.svg)](#)
+  <h1>Revelio</h1>
+  <p><strong>Advanced Threat Intelligence & Phishing Analysis</strong></p>
 </div>
 
 ---
 
-## 🚀 The Dual-Engine Architecture
+**Revelio** is a next-generation Chrome Extension built for SOC teams. It catches zero-day social engineering and targeted BEC (Business Email Compromise) attacks that bypass traditional Secure Email Gateways. 
 
-Traditional email security gateways fail against zero-day social engineering and AI-generated phishing. **Revelio** solves this by bringing SOC-level, dual-engine analysis directly into your browser.
+By combining lightning-fast deterministic heuristics with deep-context Large Language Models, Revelio provides enterprise-grade threat analysis directly within your browser.
 
-```mermaid
-graph TD
-    A[Raw Email Paste/Upload] --> B(Extraction Layer)
-    B -->|Headers & Body| C[Deterministic Rule Engine]
-    B -->|Content & Tone| D[Deep-Context AI Engine]
-    
-    C -->|Header Auth, Link Obfuscation, Executables| E{Rule Score: 40%}
-    D -->|Social Engineering, Urgency, AI-Gen Text| F{LLM Score: 60%}
-    
-    E --> G((Final Threat Score))
-    F --> G
-    
-    G --> H[Interactive Threat Report]
-    H --> I[Threat Fingerprint Radar]
-    H --> J[MITRE ATT&CK Mapping]
-```
+## Core Capabilities
 
-<details>
-<summary><b>🔍 How the scoring works (Click to expand)</b></summary>
-<br/>
+* **Dual-Engine Architecture:** Runs 12 strict deterministic checks (Header Auth, URL Lookalikes, Payload Scans) combined with a contextual AI engine (evaluating urgency, authority manipulation, and tone).
+* **Zero-Trust Privacy:** Supports 100% offline analysis via **Ollama**. No sensitive email data ever leaves your machine. (Cloud fallback via OpenAI/Gemini is also supported).
+* **SOC-Ready Reports:** Generates printable, MITRE-mapped threat intelligence reports with a multi-axis Threat Fingerprint Radar.
+* **Instant Forensics:** Automatically unmasks URL shorteners, verifies DKIM/DMARC alignment, and flags display name impersonation.
 
-Revelio scores threats from `0` to `100` using a proprietary algorithm:
-1. **Deterministic Rule Engine (40%):** Runs 12 strict heuristics instantly (Header Auth, URL Lookalikes, Payload Scans).
-2. **Deep-Context LLM (60%):** Evaluates the psychological elements of the email (Fabricated Urgency, Authority Manipulation, AI-generated Syntax).
+## Quick Start
 
-</details>
+1. **Install:** Clone this repo, open `chrome://extensions/`, enable Developer Mode, and "Load unpacked" the `/phishguard-ai` folder.
+2. **Setup AI (Optional but Recommended):** 
+   * Install [Ollama](https://ollama.ai) and pull a model: `ollama pull deepseek-r1:8b`
+   * Start the server: `OLLAMA_ORIGINS=chrome-extension://* ollama serve`
+3. **Analyze:** Click the Revelio icon in your toolbar, paste any raw email (headers + body), and instantly receive your threat report.
 
 ---
-
-## ⚡ Core Features
-
-<div align="center">
-  <table>
-    <tr>
-      <td align="center">🛡️<br/><b>Header Forensics</b><br/>Instant verification of SPF, DKIM, and DMARC alignment.</td>
-      <td align="center">🕵️<br/><b>URL Deobfuscation</b><br/>Detects lookalike domains (<code>paypaI.com</code>) and unmasks shorteners.</td>
-      <td align="center">🤖<br/><b>Impersonation AI</b><br/>Spots when display names contradict the true envelope sender.</td>
-    </tr>
-    <tr>
-      <td align="center">💸<br/><b>Financial Fraud</b><br/>Identifies invoice manipulation and payroll diversion attempts.</td>
-      <td align="center">🔒<br/><b>Local Privacy</b><br/>Supports 100% offline analysis via Ollama. No data leaks.</td>
-      <td align="center">📊<br/><b>SOC Reports</b><br/>Generates printable, MITRE-mapped threat intelligence reports.</td>
-    </tr>
-  </table>
-</div>
-
----
-
-<details>
-<summary><b>🛠️ Quick Start & Installation (Click to expand)</b></summary>
-<br/>
-
-### 1. Install Extension
-1. Clone this repository.
-2. Go to `chrome://extensions/` in Chrome.
-3. Enable **Developer Mode**.
-4. Click **Load unpacked** and select the `/phishguard-ai` folder.
-
-### 2. Configure Local AI (Recommended for 100% Privacy)
-```bash
-# Install Ollama (https://ollama.ai) and pull the recommended reasoning model
-ollama pull deepseek-r1:8b
-
-# Start the server with CORS enabled
-OLLAMA_ORIGINS=chrome-extension://* ollama serve
-```
-
-</details>
-
-<details>
-<summary><b>🤝 For Security Researchers (Click to expand)</b></summary>
-<br/>
-
-Revelio is built to be easily extensible for SOC environments:
-* 🧩 **Rules:** Add custom deterministic triggers in `engine/ruleEngine.js`.
-* 🧠 **Prompts:** Tweak BEC detection chains in `engine/prompts.js`.
-
-</details>
-
----
-
-<p align="center">
-  <i>Built for security professionals who need fast, accurate phishing detection without sacrificing privacy.</i>
-</p>
+*Built for security professionals who demand accuracy without sacrificing privacy. MIT Licensed.*
