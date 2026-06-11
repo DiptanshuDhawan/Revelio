@@ -145,6 +145,14 @@ function loadSettingsIntoUI(settings) {
     if ($('cfg-virustotal')) $('cfg-virustotal').style.display = settings.enableVirusTotal === true ? 'block' : 'none';
   }
   if ($('s-virustotal-key')) $('s-virustotal-key').value = settings.virusTotalApiKey || '';
+
+  // Dashboard
+  if ($('s-dashboard-url')) $('s-dashboard-url').value = settings.dashboardUrl || 'http://localhost:3000';
+  if ($('s-dashboard-key')) $('s-dashboard-key').value = settings.dashboardApiKey || '';
+  if ($('s-user-email')) $('s-user-email').value = settings.userEmail || '';
+  if ($('s-user-name')) $('s-user-name').value = settings.userName || '';
+  if ($('s-department')) $('s-department').value = settings.department || '';
+  if ($('s-hostname')) $('s-hostname').value = settings.hostname || '';
 }
 
 function loadStatsIntoUI(stats) {
@@ -220,6 +228,12 @@ function collectSettings() {
     safeBrowsingApiKey: $('s-safebrowsing-key')?.value || '',
     enableVirusTotal: $('enable-virustotal')?.checked === true,
     virusTotalApiKey: $('s-virustotal-key')?.value || '',
+    dashboardUrl: $('s-dashboard-url')?.value || 'http://localhost:3000',
+    dashboardApiKey: $('s-dashboard-key')?.value || '',
+    userEmail: $('s-user-email')?.value || '',
+    userName: $('s-user-name')?.value || '',
+    department: $('s-department')?.value || '',
+    hostname: $('s-hostname')?.value || '',
   };
 }
 
@@ -289,7 +303,7 @@ function attachEventListeners() {
     });
   }, observerOptions);
 
-  ['sec-ai', 'sec-analysis', 'sec-url', 'sec-context', 'sec-stats', 'sec-about'].forEach(id => {
+  ['sec-ai', 'sec-analysis', 'sec-url', 'sec-context', 'sec-dashboard', 'sec-stats', 'sec-about'].forEach(id => {
     const el = document.getElementById(id);
     if (el) observer.observe(el);
   });
@@ -319,6 +333,7 @@ function attachEventListeners() {
   $('save-btn')?.addEventListener('click', async () => {
     const settings = collectSettings();
     const ok = await saveSettings(settings);
+    if (ok) chrome.runtime.sendMessage({ type: 'FORCE_HEARTBEAT' }).catch(() => {});
     showToast(ok ? '✓ Settings saved!' : '✗ Save failed', ok ? 'success' : 'error');
   });
 

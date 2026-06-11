@@ -124,6 +124,10 @@
     <div>
       <div class="text-[10px] uppercase tracking-[0.1em] text-[rgba(255,255,255,0.25)] mb-2 px-2">System</div>
       <div class="flex flex-col gap-[2px]">
+        <div class="sidebar-item flex items-center gap-2.5 px-2.5 py-2 rounded-[7px] cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.45)]" data-target="sec-dashboard">
+          <svg class="w-[15px] h-[15px] text-[rgba(255,255,255,0.3)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+          <span class="text-[13px]">Dashboard</span>
+        </div>
         <div class="sidebar-item flex items-center gap-2.5 px-2.5 py-2 rounded-[7px] cursor-pointer transition-colors hover:bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.45)]" data-target="sec-stats">
           <svg class="w-[15px] h-[15px] text-[rgba(255,255,255,0.3)] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
           <span class="text-[13px]">Statistics</span>
@@ -388,6 +392,54 @@
             <input type="checkbox" id="context-menu" checked />
             <span class="toggle-knob"></span>
           </label>
+        </div>
+      </section>
+    </div>
+
+    <!-- ─── SECTION 4.5: DASHBOARD ────────────────────────────────────────── -->
+    <div id="sec-dashboard" class="scroll-mt-6">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-[30px] h-[30px] rounded-[8px] bg-[rgba(236,72,153,0.12)] text-[#f472b6] flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+        </div>
+        <h2 class="text-[13px] font-medium text-[rgba(255,255,255,0.85)]">SOC Dashboard Integration</h2>
+      </div>
+
+      <section class="bg-[#161b27] border border-[rgba(255,255,255,0.08)] rounded-[12px] overflow-hidden flex flex-col p-4 gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-dashboard-url">Dashboard URL</label>
+          <input type="text" id="s-dashboard-url" class="glass-input" placeholder="http://localhost:3000" />
+          <div class="text-[11px] text-[rgba(255,255,255,0.25)] italic">The URL where Revelio SOC Dashboard is hosted.</div>
+        </div>
+        
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-dashboard-key">API Key</label>
+          <div class="flex items-center gap-2">
+            <input type="password" id="s-dashboard-key" class="glass-input flex-1" placeholder="API Key..." autocomplete="off" />
+            <button class="toggle-visibility px-3 py-[7px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] rounded-[7px] text-[rgba(255,255,255,0.45)] hover:text-white transition-colors" data-target="s-dashboard-key" aria-label="Toggle key visibility">👁</button>
+          </div>
+        </div>
+
+        <div class="h-[1px] w-full bg-[rgba(255,255,255,0.08)] my-2"></div>
+
+        <div class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider">Endpoint Identity</div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-[rgba(255,255,255,0.25)]" for="s-user-email">User Email</label>
+            <input type="text" id="s-user-email" class="glass-input" placeholder="user@company.com" />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-[rgba(255,255,255,0.25)]" for="s-user-name">User Name</label>
+            <input type="text" id="s-user-name" class="glass-input" placeholder="John Doe" />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-[rgba(255,255,255,0.25)]" for="s-department">Department</label>
+            <input type="text" id="s-department" class="glass-input" placeholder="Finance" />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[11px] text-[rgba(255,255,255,0.25)]" for="s-hostname">Hostname</label>
+            <input type="text" id="s-hostname" class="glass-input" placeholder="PC-001" />
+          </div>
         </div>
       </section>
     </div>

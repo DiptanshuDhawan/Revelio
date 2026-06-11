@@ -6,6 +6,82 @@ import { checkSafeBrowsing, checkVirusTotal } from './utils/urlSafety.js';
 import { buildAnalysisPrompt, generateOfflineFallback } from './engine/prompts.js';
 import { analyzeEmail, computeFinalScore, scoreToVerdict } from './engine/analyzer.js';
 
+// ─── Dashboard Integrations ───────────────────────────────────────────────────
+
+async function sendHeartbeatToDashboard() {
+  try {
+    const settings = await getSettings();
+    const dashboardUrl = (settings.dashboardUrl || 'http://localhost:3000').replace(/\/+$/, '');
+    const apiKey = settings.dashboardApiKey || '';
+    if (!dashboardUrl) return;
+
+    let aiOnline = false;
+    try {
+      const endpoint = settings.ollamaEndpoint || 'http://localhost:11434';
+      const resp = await fetch(`${endpoint}/api/tags`, { method: 'GET' });
+      aiOnline = resp.ok;
+    } catch { aiOnline = false; }
+
+    let activeModel = settings.ollamaModel || '';
+    if (settings.provider === 'openai') activeModel = settings.openaiModel || '';
+    else if (settings.provider === 'gemini') activeModel = settings.geminiModel || '';
+    else if (settings.provider === 'openrouter') activeModel = settings.openrouterModel || '';
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    
+    await fetch(`${dashboardUrl}/api/heartbeat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': apiKey,
+      },
+      body: JSON.stringify({
+        userEmail: settings.userEmail || 'unknown@localhost',
+        userName: settings.userName || '',
+        department: settings.department || '',
+        hostname: settings.hostname || '',
+        extensionVersion: chrome.runtime.getManifest().version,
+        aiProvider: settings.provider || 'ollama',
+        aiModelName: activeModel,
+        aiOnline,
+      }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+  } catch (e) {
+    console.warn('[Revelio] Dashboard heartbeat failed:', e.message);
+  }
+}
+
+async function sendAlertToDashboard(analysisResult, endpointInfo) {
+  try {
+    const settings = await getSettings();
+    const dashboardUrl = (settings.dashboardUrl || 'http://localhost:3000').replace(/\/+$/, '');
+    const apiKey = settings.dashboardApiKey || '';
+    if (!dashboardUrl) return;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    
+    await fetch(`${dashboardUrl}/api/alerts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': apiKey,
+      },
+      body: JSON.stringify({
+        endpointInfo,
+        analysisResult,
+      }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+  } catch (e) {
+    console.warn('[Revelio] Dashboard alert send failed:', e.message);
+  }
+}
+
 // ─── Context Menu Setup ───────────────────────────────────────────────────────
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -40,6 +116,9 @@ chrome.runtime.onInstalled.addListener(() => {
 
   // Setup Ollama health check alarm
   chrome.alarms.create('ollamaHealthCheck', { periodInMinutes: 0.5 });
+  chrome.alarms.create('dashboardHeartbeat', { periodInMinutes: 1 });
+
+  sendHeartbeatToDashboard().catch(console.error);
 });
 
 // ─── Context Menu Click Handler ───────────────────────────────────────────────
@@ -108,11 +187,21 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
     // Broadcast to any open popups
     chrome.runtime.sendMessage({ type: 'OLLAMA_STATUS', online }).catch(() => {});
   }
+  
+  if (alarm.name === 'dashboardHeartbeat') {
+    sendHeartbeatToDashboard().catch(console.error);
+  }
 });
 
 // ─── Message Handler ──────────────────────────────────────────────────────────
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'FORCE_HEARTBEAT') {
+    sendHeartbeatToDashboard().catch(() => {});
+    sendResponse({ success: true });
+    return true;
+  }
+
   if (message.type === 'ANALYZE') {
     handleAnalyze(message)
       .then((result) => sendResponse({ success: true, data: result }))
@@ -278,6 +367,7 @@ async function runAnalysisPipeline(emailText, source, settings, isPassive = fals
   }
 
   const scanPromise = (async () => {
+    sendHeartbeatToDashboard().catch(() => {}); // Ping on scan start
     if (isPassive && tabId) {
       chrome.tabs.sendMessage(tabId, { type: 'SCAN_STARTED' }).catch(() => {});
     }
@@ -338,6 +428,22 @@ async function runAnalysisPipeline(emailText, source, settings, isPassive = fals
     }
     
     await cacheAnalysisResult(emailText, analysisResult);
+
+    let activeModel = settings.ollamaModel || '';
+    if (settings.provider === 'openai') activeModel = settings.openaiModel || '';
+    else if (settings.provider === 'gemini') activeModel = settings.geminiModel || '';
+    else if (settings.provider === 'openrouter') activeModel = settings.openrouterModel || '';
+
+    // Send to SOC Dashboard (silent, non-blocking)
+    const endpointInfo = {
+      userEmail: settings.userEmail || 'unknown@localhost',
+      userName: settings.userName || '',
+      department: settings.department || '',
+      hostname: settings.hostname || '',
+      aiProvider: settings.provider || 'ollama',
+      aiModelName: activeModel,
+    };
+    sendAlertToDashboard(analysisResult, endpointInfo).catch(() => {});
     return analysisResult;
 
   } catch (err) {

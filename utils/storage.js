@@ -19,6 +19,12 @@ const DEFAULT_SETTINGS = {
   maxHistoryEntries: 20,
   contextMenuEnabled: true,
   theme: 'dark',
+  dashboardUrl: 'http://localhost:3000',
+  dashboardApiKey: '',
+  userEmail: '',
+  userName: '',
+  department: '',
+  hostname: '',
 };
 
 // ─── Settings ─────────────────────────────────────────────────────────────────
