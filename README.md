@@ -39,9 +39,7 @@ The extension popup provides a complete breakdown of the analyzed email, includi
 Revelio offers a comprehensive settings panel where you can seamlessly switch between local (Ollama) and cloud AI providers, configure URL safety checks (Google Safe Browsing & VirusTotal), and adjust sensitivity thresholds.
 
 <div align="center">
-  <img src="docs/settings_ai.png" alt="AI Provider Config" width="260">&nbsp;
-  <img src="docs/settings_analysis.png" alt="Analysis Config" width="260">&nbsp;
-  <img src="docs/settings_soc.png" alt="SOC Dashboard Integration" width="260">
+  <img src="docs/settings_ai.png" alt="AI Provider Configuration" width="800">
 </div>
 
 ### PDF Report Generation
