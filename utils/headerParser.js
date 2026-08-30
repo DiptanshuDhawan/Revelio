@@ -1,4 +1,4 @@
-// PhishGuard AI — Email Header Parser
+// Revelio — Email Header Parser
 // Parses raw email headers into structured data with authentication results.
 
 'use strict';
@@ -15,7 +15,7 @@ function extractHeader(rawText, headerName) {
   return match[1].replace(/\n\s+/g, ' ').trim();
 }
 
-// ─── Email Address Extractor ──────────────────────────────────────────────────
+// ─── Email Address Extractor ────────────────────────────────────────────────
 
 function parseEmailAddress(headerValue) {
   if (!headerValue) return { display: '', email: '' };
@@ -100,6 +100,14 @@ function extractFirstHopIP(rawText) {
 
 // ─── Main Export ──────────────────────────────────────────────────────────────
 
+/**
+ * Parses the first block of a raw email into structured header fields.
+ * Returns an object with authentication results (SPF/DKIM/DMARC) and
+ * computed anomaly flags (e.g. replyToDiffersFromFrom).
+ *
+ * @param {string} rawText  Raw email text (headers + body).
+ * @returns {object}        Structured header object.
+ */
 export function parseHeaders(rawText) {
   if (!rawText || typeof rawText !== 'string') {
     return createEmptyHeaders();

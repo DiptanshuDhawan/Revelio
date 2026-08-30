@@ -1,11 +1,13 @@
-// PhishGuard AI — LLM Prompt Templates
-// Centralized prompt management for all AI providers.
+// Revelio — LLM Prompt Templates
+// Centralised prompt management for all AI providers.
+// Keeping prompts in one place makes it easy to tune instructions without
+// touching provider-specific code in background.js.
 
 'use strict';
 
 // ─── System Prompt ────────────────────────────────────────────────────────────
 
-export const SYSTEM_PROMPT = `You are PhishGuard, an expert email security analyst. You analyze emails for phishing threats and return structured JSON results. You have expertise in social engineering, email authentication (SPF/DKIM/DMARC), MITRE ATT&CK (T1566), BEC fraud, AI-generated phishing, spear-phishing, domain spoofing, and urgency manipulation.
+export const SYSTEM_PROMPT = `You are Revelio, an expert email security analyst. You analyze emails for phishing threats and return structured JSON results. You have expertise in social engineering, email authentication (SPF/DKIM/DMARC), MITRE ATT&CK (T1566), BEC fraud, AI-generated phishing, spear-phishing, domain spoofing, and urgency manipulation.
 
 IMPORTANT: You are a JSON API. Your entire response must be a single valid JSON object. No text before or after. No markdown. No explanation.`;
 
@@ -13,6 +15,15 @@ IMPORTANT: You are a JSON API. Your entire response must be a single valid JSON 
 
 import { scoreToVerdict } from './analyzer.js';
 
+/**
+ * Builds the full prompt to send to any LLM provider.
+ * The optional ruleContext injects deterministic pre-analysis results so the
+ * LLM can use them as supporting evidence rather than starting from scratch.
+ *
+ * @param {string} emailText       Raw email text.
+ * @param {object|null} ruleContext  Result object from runRuleEngine(), or null.
+ * @returns {string}               Complete prompt string ready for the LLM.
+ */
 export function buildAnalysisPrompt(emailText, ruleContext = null) {
   const ruleSection = ruleContext
     ? `\n\nRULE ENGINE PRE-ANALYSIS (supporting context only):
@@ -60,6 +71,16 @@ ${emailText}
 
 // ─── Fallback Analysis for Offline Mode ──────────────────────────────────────
 
+/**
+ * Generates a rule-engine-only analysis result when the LLM is unavailable.
+ * The returned object is shaped identically to a real LLM result so the UI
+ * renders without any special-case logic.
+ *
+ * @param {object} ruleResult    Result from runRuleEngine().
+ * @param {number} sensitivity   User sensitivity setting (0-100, default 50).
+ * @param {string} fallbackReason  Human-readable reason the LLM failed.
+ * @returns {object}             LLM-shaped analysis result.
+ */
 export function generateOfflineFallback(ruleResult, sensitivity = 50, fallbackReason = 'Unknown error') {
   const score = ruleResult.ruleScore;
   const findings = ruleResult.findings || [];

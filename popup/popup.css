@@ -24,7 +24,7 @@
 
 /* Layout repair layer for the extension popup shell */
 .pg-shell {
-  width: 440px;
+  width: 400px;
   min-width: 400px;
   max-width: 100vw;
   height: 600px;

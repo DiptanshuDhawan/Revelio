@@ -1,6 +1,11 @@
-// PhishGuard AI — Settings Page Controller
+// Revelio — Settings Page Controller
+// Manages the full settings UI: provider selection, model config,
+// sensitivity thresholds, SOC dashboard integration, and history controls.
 
 import { getSettings, saveSettings, getStats, clearHistory, exportHistory } from '../utils/storage.js';
+
+/** Shorthand for document.getElementById. Available to all functions in this file. */
+const $ = (id) => document.getElementById(id);
 
 let currentProvider = 'ollama';
 
@@ -17,110 +22,23 @@ function loadSettingsIntoUI(settings) {
   currentProvider = settings.provider || 'ollama';
   switchProvider(currentProvider);
 
-  const $ = (id) => document.getElementById(id);
-
   // Ollama
   const endpoint = settings.ollamaEndpoint || 'http://localhost:11434';
   if ($('s-ollama-endpoint')) $('s-ollama-endpoint').value = endpoint;
-  
-  if ($('s-ollama-model')) {
-    const selectEl = $('s-ollama-model');
-    // Save current value before we clear options
-    const savedModel = settings.ollamaModel || '';
-    
-    // Try to fetch real models from Ollama to populate dropdown
-    chrome.runtime.sendMessage({ type: 'GET_OLLAMA_MODELS', endpoint })
-      .then(resp => {
-        if (resp && resp.success && resp.models && resp.models.length > 0) {
-          // Clear current options except "custom"
-          const customOpt = selectEl.querySelector('option[value="custom"]');
-          selectEl.innerHTML = '';
-          
-          let foundSaved = false;
-          resp.models.forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m;
-            opt.textContent = m;
-            selectEl.appendChild(opt);
-            if (m === savedModel) foundSaved = true;
-          });
-          
-          if (customOpt) selectEl.appendChild(customOpt);
-          
-          if (foundSaved) {
-            selectEl.value = savedModel;
-          } else if (savedModel) {
-            selectEl.value = 'custom';
-            if ($('s-ollama-model-custom')) {
-              $('s-ollama-model-custom').style.display = 'block';
-              $('s-ollama-model-custom').value = savedModel;
-            }
-          } else {
-            selectEl.value = resp.models[0];
-            saveSettings({ ollamaModel: resp.models[0] });
-          }
-        } else {
-          // Fallback if offline: just show the saved one
-          const opt = document.createElement('option');
-          opt.value = savedModel;
-          opt.textContent = savedModel + ' (Saved)';
-          selectEl.insertBefore(opt, selectEl.firstChild);
-          selectEl.value = savedModel;
-        }
-      })
-      .catch(() => {
-        const opt = document.createElement('option');
-        opt.value = savedModel;
-        opt.textContent = savedModel + ' (Saved)';
-        selectEl.insertBefore(opt, selectEl.firstChild);
-        selectEl.value = savedModel;
-      });
-  }
+  fetchAndPopulateModels('ollama', { savedModel: settings.ollamaModel || '' });
 
   // OpenAI
   if ($('s-openai-key')) $('s-openai-key').value = settings.openaiApiKey || '';
-  if ($('s-openai-model')) {
-    const openaiKnown = ['gpt-4o-mini', 'gpt-4o', 'o1-mini', 'o1-preview'];
-    if (openaiKnown.includes(settings.openaiModel) || !settings.openaiModel) {
-      $('s-openai-model').value = settings.openaiModel || 'gpt-4o-mini';
-    } else {
-      $('s-openai-model').value = 'custom';
-      if ($('s-openai-model-custom')) {
-        $('s-openai-model-custom').style.display = 'block';
-        $('s-openai-model-custom').value = settings.openaiModel;
-      }
-    }
-  }
+  fetchAndPopulateModels('openai', { savedModel: settings.openaiModel || '' });
 
   // Gemini
   if ($('s-gemini-key')) $('s-gemini-key').value = settings.geminiApiKey || '';
-  if ($('s-gemini-model')) {
-    const geminiKnown = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash-exp'];
-    if (geminiKnown.includes(settings.geminiModel) || !settings.geminiModel) {
-      $('s-gemini-model').value = settings.geminiModel || 'gemini-1.5-flash';
-    } else {
-      $('s-gemini-model').value = 'custom';
-      if ($('s-gemini-model-custom')) {
-        $('s-gemini-model-custom').style.display = 'block';
-        $('s-gemini-model-custom').value = settings.geminiModel;
-      }
-    }
-  }
+  fetchAndPopulateModels('gemini', { savedModel: settings.geminiModel || '' });
 
   // OpenRouter
   if ($('s-openrouter-key')) $('s-openrouter-key').value = settings.openrouterApiKey || '';
-  if ($('s-openrouter-model')) {
-    const orKnown = ['deepseek/deepseek-r1:free', 'meta-llama/llama-3.1-70b-instruct:free'];
-    if (orKnown.includes(settings.openrouterModel) || !settings.openrouterModel) {
-      $('s-openrouter-model').value = settings.openrouterModel || 'deepseek/deepseek-r1:free';
-    } else {
-      $('s-openrouter-model').value = 'custom';
-      if ($('s-openrouter-model-custom')) {
-        $('s-openrouter-model-custom').style.display = 'block';
-        $('s-openrouter-model-custom').value = settings.openrouterModel;
-      }
-    }
-  }
+  fetchAndPopulateModels('openrouter', { savedModel: settings.openrouterModel || '' });
+
 
   // Analysis settings
   if ($('sensitivity')) {
@@ -308,26 +226,92 @@ function attachEventListeners() {
     if (el) observer.observe(el);
   });
 
-  // Ollama model custom input
-  $('s-ollama-model')?.addEventListener('change', (e) => {
-    const custom = $('s-ollama-model-custom');
+  const handleModelChange = (e, customId) => {
+    const custom = $(customId);
     if (custom) custom.style.display = e.target.value === 'custom' ? 'block' : 'none';
+  };
+
+  function attachCustomDropdownListeners(inputId, dropdownId, customInputId) {
+    const input = $(inputId);
+    const dropdown = $(dropdownId);
+    const customBox = $(customInputId);
+    if (!input || !dropdown) return;
+
+    const showDropdown = () => {
+      dropdown.style.display = 'flex';
+      filterDropdown(input.value);
+    };
+
+    const filterDropdown = (query) => {
+      query = query.toLowerCase();
+      Array.from(dropdown.children).forEach(child => {
+        const text = child.textContent.toLowerCase();
+        const val = child.dataset.value.toLowerCase();
+        if (text.includes(query) || val.includes(query) || val === 'custom') {
+          child.style.display = 'block';
+        } else {
+          child.style.display = 'none';
+        }
+      });
+    };
+
+    input.addEventListener('focus', showDropdown);
+    input.addEventListener('click', showDropdown);
+
+    input.addEventListener('input', (e) => {
+      filterDropdown(e.target.value);
+      dropdown.style.display = 'flex';
+      if (customBox) customBox.style.display = e.target.value === 'custom' ? 'block' : 'none';
+    });
+
+    dropdown.addEventListener('mousedown', (e) => {
+      // Prevent the input from losing focus when clicking the scrollbar
+      e.preventDefault();
+      
+      const item = e.target.closest('.custom-dropdown-item');
+      if (item) {
+        input.value = item.dataset.value;
+        dropdown.style.display = 'none';
+        if (customBox) customBox.style.display = input.value === 'custom' ? 'block' : 'none';
+        input.dispatchEvent(new Event('change'));
+      }
+    });
+
+    input.addEventListener('blur', () => {
+      dropdown.style.display = 'none';
+    });
+  }
+
+  ['ollama', 'openai', 'gemini'].forEach(prov => {
+    $('s-' + prov + '-model')?.addEventListener('change', (e) => handleModelChange(e, 's-' + prov + '-model-custom'));
+    $('s-' + prov + '-model')?.addEventListener('input', (e) => handleModelChange(e, 's-' + prov + '-model-custom'));
   });
 
-  $('s-openai-model')?.addEventListener('change', (e) => {
-    const custom = $('s-openai-model-custom');
-    if (custom) custom.style.display = e.target.value === 'custom' ? 'block' : 'none';
-  });
+  attachCustomDropdownListeners('s-openrouter-model', 'openrouter-dropdown', 's-openrouter-model-custom');
 
-  $('s-gemini-model')?.addEventListener('change', (e) => {
-    const custom = $('s-gemini-model-custom');
-    if (custom) custom.style.display = e.target.value === 'custom' ? 'block' : 'none';
-  });
+  // Dynamic Model Fetching Trigger Listeners (debounced input, blur, paste, refresh buttons)
+  const debouncedOpenAIFetch = debounce(() => fetchAndPopulateModels('openai', { isUserTriggered: true }));
+  const debouncedGeminiFetch = debounce(() => fetchAndPopulateModels('gemini', { isUserTriggered: true }));
+  const debouncedOpenRouterFetch = debounce(() => fetchAndPopulateModels('openrouter', { isUserTriggered: true }));
+  const debouncedOllamaFetch = debounce(() => fetchAndPopulateModels('ollama', { isUserTriggered: true }));
 
-  $('s-openrouter-model')?.addEventListener('change', (e) => {
-    const custom = $('s-openrouter-model-custom');
-    if (custom) custom.style.display = e.target.value === 'custom' ? 'block' : 'none';
-  });
+  $('s-openai-key')?.addEventListener('input', debouncedOpenAIFetch);
+  $('s-openai-key')?.addEventListener('blur', () => fetchAndPopulateModels('openai', { isUserTriggered: false }));
+  $('s-openai-key')?.addEventListener('paste', () => setTimeout(() => fetchAndPopulateModels('openai', { isUserTriggered: true }), 100));
+  $('refresh-openai-models')?.addEventListener('click', () => fetchAndPopulateModels('openai', { isUserTriggered: true }));
+
+  $('s-gemini-key')?.addEventListener('input', debouncedGeminiFetch);
+  $('s-gemini-key')?.addEventListener('blur', () => fetchAndPopulateModels('gemini', { isUserTriggered: false }));
+  $('s-gemini-key')?.addEventListener('paste', () => setTimeout(() => fetchAndPopulateModels('gemini', { isUserTriggered: true }), 100));
+  $('refresh-gemini-models')?.addEventListener('click', () => fetchAndPopulateModels('gemini', { isUserTriggered: true }));
+
+  $('s-openrouter-key')?.addEventListener('input', debouncedOpenRouterFetch);
+  $('s-openrouter-key')?.addEventListener('blur', () => fetchAndPopulateModels('openrouter', { isUserTriggered: false }));
+  $('s-openrouter-key')?.addEventListener('paste', () => setTimeout(() => fetchAndPopulateModels('openrouter', { isUserTriggered: true }), 100));
+  $('refresh-openrouter-models')?.addEventListener('click', () => fetchAndPopulateModels('openrouter', { isUserTriggered: true }));
+
+  $('s-ollama-endpoint')?.addEventListener('input', debouncedOllamaFetch);
+  $('refresh-ollama-models')?.addEventListener('click', () => fetchAndPopulateModels('ollama', { isUserTriggered: true }));
 
   // Save button
   $('save-btn')?.addEventListener('click', async () => {
@@ -404,7 +388,7 @@ function attachEventListeners() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `phishguard-history-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `revelio-history-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
     showToast('History exported!', 'success');
@@ -461,3 +445,173 @@ function showToast(msg, type = '') {
   toast.className = `settings-toast ${type} show`;
   toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
 }
+
+// ─── Dynamic Model Discovery ──────────────────────────────────────────────────
+
+function populateModelDropdown(selectEl, customInputEl, models, savedModel) {
+  if (!selectEl || !models || models.length === 0) return;
+
+  const previousSelection = savedModel || selectEl.value;
+  
+  // Check if there is a custom dropdown UI for this selectEl
+  const customDropdownId = selectEl.id.replace('s-', '').replace('-model', '') + '-dropdown';
+  const customDropdownEl = document.getElementById(customDropdownId);
+
+  let targetEl = customDropdownEl || selectEl;
+  targetEl.innerHTML = '';
+
+  let foundMatch = false;
+
+  models.forEach((m) => {
+    const id = typeof m === 'object' ? m.id : m;
+    const name = typeof m === 'object' ? m.name : m;
+
+    if (customDropdownEl) {
+      const div = document.createElement('div');
+      div.className = 'px-3 py-2 text-[12px] text-[rgba(255,255,255,0.85)] hover:bg-[#2563eb] cursor-pointer custom-dropdown-item';
+      div.textContent = name;
+      div.dataset.value = id;
+      targetEl.appendChild(div);
+    } else {
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = name;
+      targetEl.appendChild(opt);
+    }
+
+    if (id === previousSelection) {
+      foundMatch = true;
+    }
+  });
+
+  // Always keep custom model option at the end
+  if (customDropdownEl) {
+    const customDiv = document.createElement('div');
+    customDiv.className = 'px-3 py-2 text-[12px] text-[rgba(255,255,255,0.85)] hover:bg-[#2563eb] cursor-pointer custom-dropdown-item border-t border-[rgba(255,255,255,0.08)]';
+    customDiv.textContent = 'Custom model name...';
+    customDiv.dataset.value = 'custom';
+    targetEl.appendChild(customDiv);
+  } else {
+    const customOpt = document.createElement('option');
+    customOpt.value = 'custom';
+    customOpt.textContent = 'Custom model name...';
+    targetEl.appendChild(customOpt);
+  }
+
+  if (customDropdownEl) {
+    selectEl.value = previousSelection || (typeof models[0] === 'object' ? models[0].id : models[0]);
+    if (customInputEl) {
+      customInputEl.style.display = selectEl.value === 'custom' ? 'block' : 'none';
+    }
+  } else if (foundMatch) {
+    selectEl.value = previousSelection;
+    if (customInputEl) customInputEl.style.display = 'none';
+  } else if (previousSelection && previousSelection !== 'custom') {
+    selectEl.value = 'custom';
+    if (customInputEl) {
+      customInputEl.style.display = 'block';
+      customInputEl.value = previousSelection;
+    }
+  } else if (previousSelection === 'custom') {
+    selectEl.value = 'custom';
+    if (customInputEl) customInputEl.style.display = 'block';
+  } else {
+    const firstVal = typeof models[0] === 'object' ? models[0].id : models[0];
+    selectEl.value = firstVal;
+    if (customInputEl) customInputEl.style.display = 'none';
+  }
+}
+
+async function fetchAndPopulateModels(provider, options = {}) {
+  const { savedModel = '', isUserTriggered = false } = options;
+
+  let selectEl, customEl, statusEl, credential;
+
+  switch (provider) {
+    case 'ollama':
+      selectEl = $('s-ollama-model');
+      customEl = $('s-ollama-model-custom');
+      statusEl = $('s-ollama-model-status');
+      credential = $('s-ollama-endpoint')?.value?.trim() || 'http://localhost:11434';
+      break;
+    case 'openai':
+      selectEl = $('s-openai-model');
+      customEl = $('s-openai-model-custom');
+      statusEl = $('s-openai-model-status');
+      credential = $('s-openai-key')?.value?.trim() || '';
+      break;
+    case 'gemini':
+      selectEl = $('s-gemini-model');
+      customEl = $('s-gemini-model-custom');
+      statusEl = $('s-gemini-model-status');
+      credential = $('s-gemini-key')?.value?.trim() || '';
+      break;
+    case 'openrouter':
+      selectEl = $('s-openrouter-model');
+      customEl = $('s-openrouter-model-custom');
+      statusEl = $('s-openrouter-model-status');
+      credential = $('s-openrouter-key')?.value?.trim() || '';
+      break;
+    default:
+      return;
+  }
+
+  if (!selectEl) return;
+
+  // If no credential provided and not Ollama, clear status and return
+  if (provider !== 'ollama' && (!credential || credential.length < 5)) {
+    if (statusEl) statusEl.textContent = '';
+    return;
+  }
+
+  if (statusEl) {
+    statusEl.textContent = '⏳ Loading models...';
+    statusEl.className = 'text-[11px] text-amber-400/80 animate-pulse';
+  }
+
+  try {
+    const resp = await chrome.runtime.sendMessage({
+      type: 'GET_PROVIDER_MODELS',
+      provider,
+      apiKey: credential,
+      endpoint: credential,
+    });
+
+    if (resp === undefined) {
+      throw new Error('Extension updated. Please reload Revelio in chrome://extensions');
+    }
+
+    if (resp && resp.success && resp.models && resp.models.length > 0) {
+      populateModelDropdown(selectEl, customEl, resp.models, savedModel || selectEl.value);
+      if (statusEl) {
+        statusEl.textContent = `✓ ${resp.models.length} models loaded`;
+        statusEl.className = 'text-[11px] text-emerald-400';
+      }
+      if (provider === 'ollama') {
+        showOllamaModels(resp.models);
+      }
+      if (isUserTriggered) {
+        showToast(`✓ Loaded ${resp.models.length} models for ${provider.toUpperCase()}`, 'success');
+      }
+    } else {
+      throw new Error(resp?.error || 'No models returned');
+    }
+  } catch (err) {
+    if (statusEl) {
+      statusEl.textContent = isUserTriggered ? '⚠️ Could not load models' : '';
+      statusEl.className = 'text-[11px] text-rose-400';
+    }
+    if (isUserTriggered) {
+      showToast(`Failed to fetch models: ${err.message?.slice(0, 80)}`, 'error');
+    }
+  }
+}
+
+function debounce(fn, ms = 600) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), ms);
+  };
+}
+

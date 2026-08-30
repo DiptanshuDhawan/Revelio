@@ -1,11 +1,12 @@
-// PhishGuard AI — Content Script
-// Deep Gmail + Outlook email extractor. Fires automatically when popup asks.
+// Revelio — Content Script
+// Gmail + Outlook email extractor. Fires on message changes and when the popup requests extraction.
+// Also handles passive background scanning and the visual scan indicator overlay.
 
 (function () {
   'use strict';
 
-  if (window.__phishguardInjected) return;
-  window.__phishguardInjected = true;
+  if (window.__revelioInjected) return;
+  window.__revelioInjected = true;
 
   // ─── Message Listener ───────────────────────────────────────────────────────
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -293,6 +294,9 @@
   // ─── Passive Background Scanning ─────────────────────────────────────────────
   let lastScannedHash = 0;
   
+  // Lightweight change-detection hash for DOM mutation debouncing only.
+  // This is intentionally different from the djb2 cache hash in utils/cache.js —
+  // here we just need a fast "did the content change?" check, not a stable cache key.
   function hashCode(str) {
     let hash = 0;
     for (let i = 0, len = str.length; i < len; i++) {

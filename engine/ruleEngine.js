@@ -1,95 +1,21 @@
-// PhishGuard AI — Rule Engine
-// Implements multi-layer rule-based phishing detection.
+// Revelio — Rule Engine
+// Implements 12 deterministic rule-based phishing detection checks.
+// Each rule returns a standardised finding object so the UI can render
+// a consistent breakdown regardless of which rules triggered.
 
 'use strict';
 
-// ─── Brand / Domain Map ───────────────────────────────────────────────────────
-
-const BRAND_DOMAIN_MAP = {
-  paypal: ['paypal.com'],
-  google: ['google.com', 'gmail.com', 'googlemail.com'],
-  microsoft: ['microsoft.com', 'live.com', 'outlook.com', 'hotmail.com', 'office.com', 'microsoftonline.com'],
-  apple: ['apple.com', 'icloud.com'],
-  amazon: ['amazon.com', 'aws.amazon.com'],
-  netflix: ['netflix.com'],
-  facebook: ['facebook.com', 'meta.com', 'fb.com'],
-  instagram: ['instagram.com'],
-  twitter: ['twitter.com', 'x.com'],
-  linkedin: ['linkedin.com'],
-  dropbox: ['dropbox.com'],
-  docusign: ['docusign.com', 'docusign.net'],
-  fedex: ['fedex.com'],
-  ups: ['ups.com'],
-  irs: ['irs.gov'],
-  'bank of america': ['bankofamerica.com', 'bofa.com'],
-  chase: ['chase.com', 'jpmorgan.com'],
-  'wells fargo': ['wellsfargo.com'],
-  dhl: ['dhl.com'],
-  usps: ['usps.com'],
-  stripe: ['stripe.com'],
-  coinbase: ['coinbase.com'],
-  binance: ['binance.com'],
-};
-
-const KNOWN_BRAND_DOMAINS = Object.values(BRAND_DOMAIN_MAP).flat();
-
-// ─── Suspicious TLDs ─────────────────────────────────────────────────────────
-
-const SUSPICIOUS_TLDS = ['.ru', '.cn', '.xyz', '.top', '.click', '.loan', '.work',
-  '.gq', '.tk', '.ml', '.ga', '.cf', '.pw', '.rest', '.buzz', '.icu',
-  '.bar', '.cam', '.monster', '.cyou'];
-
-// ─── URL Shortener Domains ────────────────────────────────────────────────────
-
-const URL_SHORTENERS = ['bit.ly', 'tinyurl.com', 't.co', 'ow.ly', 'goo.gl', 'rb.gy',
-  'is.gd', 'buff.ly', 'cutt.ly', 'shorturl.at', 'tiny.cc', 'tr.im',
-  'lnk.to', 'adf.ly', 'bit.do'];
-
-// ─── Urgency Keywords ─────────────────────────────────────────────────────────
-
-const URGENCY_KEYWORDS = [
-  'urgent', 'immediately', 'action required', 'verify now', 'account suspended',
-  'limited time', 'expires in', '24 hours', '48 hours', '72 hours',
-  'click here now', 'respond immediately', 'unusual activity', 'security alert',
-  'final notice', 'act now', 'time sensitive', 'account will be', 'will be suspended',
-  'will be terminated', 'within 24', 'your account has been', 'immediate action',
-  'failure to respond', 'last chance', 'deadline', 'overdue', 'past due',
-];
-
-// ─── Personal Data Keywords ───────────────────────────────────────────────────
-
-const PERSONAL_DATA_KEYWORDS = [
-  'ssn', 'social security', 'password', 'credit card', 'cvv', 'cvc',
-  'otp', 'one-time password', 'one time password', 'pin number',
-  'bank account', 'routing number', 'date of birth', "mother's maiden",
-  'social security number', 'card number', 'expiry date', 'expiration date',
-  'security code', 'secret question', 'secret answer',
-];
-
-// ─── Generic Greeting Patterns ────────────────────────────────────────────────
-
-const GENERIC_GREETINGS = [
-  /dear customer/i, /dear user/i, /dear account holder/i, /dear member/i,
-  /dear valued/i, /hello user/i, /^greetings[,\s]/im, /to whom it may concern/i,
-  /dear client/i, /dear subscriber/i, /dear sir or madam/i,
-];
-
-// ─── Invoice / Financial Keywords ────────────────────────────────────────────
-
-const FINANCIAL_KEYWORDS = [
-  'invoice', 'payment due', 'wire transfer', 'gift card', 'itunes',
-  'google play', 'purchase order', 'remittance', 'fund transfer', 'bitcoin',
-  'cryptocurrency', 'western union', 'money gram', 'urgent payment',
-  'overdue invoice', 'bank transfer', 'transaction failed',
-];
-
-// ─── Free Email Providers ─────────────────────────────────────────────────────
-
-const FREE_EMAIL_PROVIDERS = [
-  'gmail.com', 'yahoo.com', 'hotmail.com', 'protonmail.com', 'outlook.com',
-  'aol.com', 'ymail.com', 'mail.com', 'inbox.com', 'zoho.com',
-  'guerrillamail.com', 'mailinator.com', 'temp-mail.org',
-];
+import {
+  BRAND_DOMAIN_MAP,
+  KNOWN_BRAND_DOMAINS,
+  SUSPICIOUS_TLDS,
+  URL_SHORTENERS,
+  URGENCY_KEYWORDS,
+  PERSONAL_DATA_KEYWORDS,
+  GENERIC_GREETINGS,
+  FINANCIAL_KEYWORDS,
+  FREE_EMAIL_PROVIDERS,
+} from './constants.js';
 
 // ─── Levenshtein Distance ─────────────────────────────────────────────────────
 
@@ -660,6 +586,12 @@ function calculateRuleScore(findings) {
 
 // ─── Main Export ──────────────────────────────────────────────────────────────
 
+/**
+ * Runs all 12 deterministic phishing detection rules against the parsed email data.
+ *
+ * @param {object} emailData  Parsed email object from `parseEmailData()`.
+ * @returns {{ ruleScore: number, findings: object[], triggeredCount: number, totalChecks: number }}
+ */
 export function runRuleEngine(emailData) {
   const findings = [
     checkUrgencyKeywords(emailData),
@@ -686,4 +618,5 @@ export function runRuleEngine(emailData) {
   };
 }
 
-export { BRAND_DOMAIN_MAP, KNOWN_BRAND_DOMAINS, URL_SHORTENERS, SUSPICIOUS_TLDS, levenshtein };
+// levenshtein is also used by urlScanner.js for lookalike URL detection.
+export { levenshtein };

@@ -1,5 +1,6 @@
-// PhishGuard AI — Storage Wrapper
+// Revelio — Storage Wrapper
 // Async wrappers for chrome.storage.local with defaults and error handling.
+// All settings, analysis history, stats, and feedback are managed here.
 
 'use strict';
 
@@ -34,7 +35,7 @@ export async function getSettings() {
     const data = await chrome.storage.local.get('settings');
     return { ...DEFAULT_SETTINGS, ...(data.settings || {}) };
   } catch (e) {
-    console.error('[PhishGuard] getSettings error:', e);
+    console.error('[Revelio] getSettings error:', e);
     return { ...DEFAULT_SETTINGS };
   }
 }
@@ -45,7 +46,7 @@ export async function saveSettings(settings) {
     await chrome.storage.local.set({ settings: { ...current, ...settings } });
     return true;
   } catch (e) {
-    console.error('[PhishGuard] saveSettings error:', e);
+    console.error('[Revelio] saveSettings error:', e);
     return false;
   }
 }
@@ -105,7 +106,7 @@ export async function saveAnalysis(result) {
     await chrome.storage.local.set({ history: newHistory, stats });
     return entry;
   } catch (e) {
-    console.error('[PhishGuard] saveAnalysis error:', e);
+    console.error('[Revelio] saveAnalysis error:', e);
     return null;
   }
 }
@@ -115,7 +116,7 @@ export async function getHistory() {
     const data = await chrome.storage.local.get('history');
     return Array.isArray(data.history) ? data.history : [];
   } catch (e) {
-    console.error('[PhishGuard] getHistory error:', e);
+    console.error('[Revelio] getHistory error:', e);
     return [];
   }
 }
@@ -124,10 +125,10 @@ export async function clearHistory() {
   try {
     const allData = await chrome.storage.local.get(null);
     const cacheKeys = Object.keys(allData).filter((key) => key.startsWith('phishcache_'));
-    await chrome.storage.local.remove(['history', 'stats', 'phishguard_last_cache_key', ...cacheKeys]);
+    await chrome.storage.local.remove(['history', 'stats', 'revelio_last_cache_key', ...cacheKeys]);
     return true;
   } catch (e) {
-    console.error('[PhishGuard] clearHistory error:', e);
+    console.error('[Revelio] clearHistory error:', e);
     return false;
   }
 }
@@ -151,7 +152,7 @@ export async function exportHistory() {
 
     const exportData = {
       exportedAt: new Date().toISOString(),
-      extensionVersion: '1.0.0',
+      extensionVersion: chrome.runtime.getManifest().version,
       stats,
       settings: { ...settings, openaiApiKey: '[REDACTED]', geminiApiKey: '[REDACTED]' },
       history: history.map((entry) => ({
@@ -162,7 +163,7 @@ export async function exportHistory() {
 
     return JSON.stringify(exportData, null, 2);
   } catch (e) {
-    console.error('[PhishGuard] exportHistory error:', e);
+    console.error('[Revelio] exportHistory error:', e);
     return JSON.stringify({ error: e.message });
   }
 }
@@ -180,7 +181,7 @@ export async function saveFeedback(analysisId, isFalsePositive) {
     await chrome.storage.local.set({ feedback });
     return true;
   } catch (e) {
-    console.error('[PhishGuard] saveFeedback error:', e);
+    console.error('[Revelio] saveFeedback error:', e);
     return false;
   }
 }

@@ -73,7 +73,7 @@
   "web_accessible_resources": [
     {
       "resources": ["icons/*", "popup/*", "settings/*"],
-      "matches": ["<all_urls>"]
+      "matches": ["chrome-extension://*/*"]
     }
   ]
 }

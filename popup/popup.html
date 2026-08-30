@@ -6,8 +6,20 @@
   <title>Revelio — Threat Intelligence</title>
   <link href="../assets/fonts/fonts.css" rel="stylesheet"/>
   <link href="popup-built.css" rel="stylesheet"/>
+  <style>
+    /* Strictly constrain popup window size to prevent Chrome rendering glitch */
+    html, body {
+      width: 400px !important;
+      max-width: 400px !important;
+      height: 600px !important;
+      max-height: 600px !important;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
 </head>
-<body class="pg-shell bg-background text-on-surface min-h-[400px] w-[380px] flex flex-col font-body-md antialiased overflow-hidden border border-outline-variant/30">
+<body class="pg-shell bg-background text-on-surface flex flex-col font-body-md antialiased border border-outline-variant/30">
 
 <!-- Global Header -->
 <header class="pg-header bg-surface border-b border-outline-variant flex justify-between items-center w-full shrink-0 z-40 relative" style="gap: 0.75rem; padding: 0.6rem 0.875rem;">

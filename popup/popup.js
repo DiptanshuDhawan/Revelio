@@ -1,11 +1,14 @@
-// PhishGuard AI — Popup Controller
-// Auto-detects the current Gmail/Outlook email on open and instantly analyzes it.
+// Revelio — Popup Controller
+// Orchestrates the user-facing analysis flow:
+// auto-detects the open email in Gmail/Outlook, checks the cache, fires the
+// background analysis pipeline, and renders the threat report.
 
 import { analyzeEmail, computeFinalScore, scoreToVerdict } from '../engine/analyzer.js';
 import { generateOfflineFallback } from '../engine/prompts.js';
 import { getSettings, saveSettings, saveAnalysis, getHistory, clearHistory, saveFeedback } from '../utils/storage.js';
 import { copyToClipboard, exportPDF } from '../utils/reportExporter.js';
 import { SAMPLE_EMAILS } from '../samples/sampleEmails.js';
+import { getCachedResult, clearCachedResult } from '../utils/cache.js';
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let currentResult = null;
@@ -14,55 +17,16 @@ let currentAnalysisId = null;
 let currentEmailText = '';
 let threatChartInstance = null;
 
-// ─── Email Hash (simple fingerprint for cache keying) ────────────────────────
-function hashEmail(text) {
-  // Fast non-cryptographic hash (djb2-style)
-  let hash = 5381;
-  for (let i = 0; i < Math.min(text.length, 2000); i++) {
-    hash = ((hash << 5) + hash) ^ text.charCodeAt(i);
-    hash = hash & 0xffffffff; // keep 32-bit
-  }
-  return 'phishcache_v2_' + Math.abs(hash).toString(36);
-}
-
-// Save analysis result to cache keyed by email hash
-async function cacheResult(emailText, result) {
-  try {
-    const key = hashEmail(emailText);
-    await chrome.storage.local.set({
-      [key]: { result, cachedAt: Date.now(), emailPreview: emailText.slice(0, 80) },
-      phishguard_last_cache_key: key,
-    });
-  } catch (e) { /* silent */ }
-}
-
-// Restore cached result if available for this email text
-async function getCachedResult(emailText) {
-  try {
-    const key = hashEmail(emailText);
-    const data = await chrome.storage.local.get(key);
-    if (data[key]) {
-      // Only use cache if it's less than 30 minutes old
-      const ageMs = Date.now() - (data[key].cachedAt || 0);
-      if (ageMs < 30 * 60 * 1000) return data[key].result;
-    }
-  } catch (e) { /* silent */ }
-  return null;
-}
-
-// Clear the last cached result (call when user wants a fresh analysis)
-async function clearLastCache(emailText = '') {
-  try {
-    const keys = ['phishguard_last_cache_key'];
-    if (emailText) keys.push(hashEmail(emailText));
-
-    const data = await chrome.storage.local.get('phishguard_last_cache_key');
-    const key = data.phishguard_last_cache_key;
-    if (key) keys.push(key);
-
-    await chrome.storage.local.remove([...new Set(keys)]);
-  } catch (e) { /* silent */ }
-}
+// ─── Icon Fallback Map ────────────────────────────────────────────────────────
+// Maps Material Symbol ligature names → Unicode fallback characters.
+// Used when the Material Symbols font hasn't loaded (e.g. offline, CSP restriction).
+const ICON_FALLBACK_MAP = {
+  shield: '🛡', dark_mode: '◐', settings: '⚙', close: '×',
+  history: '↺', upload: '↑', psychology: '◎', memory: '▣',
+  autorenew: '↻', check_circle: '✓', warning: '!', error: '!',
+  info: 'i', check: '✓', manage_search: '⌕', link_off: '⊘',
+  security: '◆', content_copy: '□', print: '▤', refresh: '↻',
+};
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
@@ -96,60 +60,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function hydrateIconFallbacks(root = document) {
-  const iconMap = {
-    shield: '🛡',
-    dark_mode: '◐',
-    settings: '⚙',
-    close: '×',
-    history: '↺',
-    upload: '↑',
-    psychology: '◎',
-    memory: '▣',
-    autorenew: '↻',
-    check_circle: '✓',
-    warning: '!',
-    error: '!',
-    info: 'i',
-    check: '✓',
-    manage_search: '⌕',
-    link_off: '⊘',
-    security: '◆',
-    content_copy: '□',
-    print: '▤',
-    refresh: '↻',
-  };
-
   root.querySelectorAll?.('.material-symbols-outlined').forEach((el) => {
-    applyIconFallback(el, iconMap);
+    applyIconFallback(el);
   });
 }
 
-function applyIconFallback(el, iconMap = null) {
-  const map = iconMap || {
-    shield: '🛡',
-    dark_mode: '◐',
-    settings: '⚙',
-    close: '×',
-    history: '↺',
-    upload: '↑',
-    psychology: '◎',
-    memory: '▣',
-    autorenew: '↻',
-    check_circle: '✓',
-    warning: '!',
-    error: '!',
-    info: 'i',
-    check: '✓',
-    manage_search: '⌕',
-    link_off: '⊘',
-    security: '◆',
-    content_copy: '□',
-    print: '▤',
-    refresh: '↻',
-  };
+function applyIconFallback(el) {
   const key = el.textContent.trim();
-  if (map[key]) {
-    el.textContent = map[key];
+  if (ICON_FALLBACK_MAP[key]) {
+    el.textContent = ICON_FALLBACK_MAP[key];
     el.classList.add('icon-fallback');
   }
 }
@@ -534,7 +453,7 @@ function attachEventListeners() {
 
   // Action bar
   document.getElementById('analyze-another-btn')?.addEventListener('click', async () => {
-    await clearLastCache(currentEmailText);
+    await clearCachedResult(currentEmailText);
     showView('input');
     // Re-attempt auto-detect when user clicks "New Analysis"
     setTimeout(() => autoExtractAndAnalyze(), 100);
@@ -550,11 +469,11 @@ function attachEventListeners() {
   // Offline view buttons
   document.getElementById('offline-retry-btn')?.addEventListener('click', async () => {
     showView('input');
-    await clearLastCache(currentEmailText);
+    await clearCachedResult(currentEmailText);
     await handleAnalyze(currentEmailText);
   });
   document.getElementById('offline-new-btn')?.addEventListener('click', async () => {
-    await clearLastCache(currentEmailText);
+    await clearCachedResult(currentEmailText);
     showView('input');
     setTimeout(() => autoExtractAndAnalyze(), 100);
   });

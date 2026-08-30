@@ -1,4 +1,4 @@
-// PhishGuard AI — Report Exporter
+// Revelio — Report Exporter
 // Generates formatted clipboard reports and print-ready PDF views.
 
 'use strict';

@@ -1,3 +1,5 @@
+// Chart.js v4.x — Vendored for Manifest V3 CSP compliance (no CDN allowed in extensions).
+// Source: https://github.com/chartjs/Chart.js | License: MIT
 /*!
  * Chart.js v4.4.2
  * https://www.chartjs.org

@@ -1,10 +1,12 @@
-// PhishGuard AI — Background Service Worker (Manifest V3)
-// All external API calls are routed through here to avoid CORS issues in the popup.
+// Revelio — Background Service Worker (Manifest V3)
+// All external API calls (LLM providers, Safe Browsing, VirusTotal, Dashboard)
+// are routed through here to avoid CORS issues in the popup.
 
 import { getSettings, saveSettings, saveAnalysis } from './utils/storage.js';
 import { checkSafeBrowsing, checkVirusTotal } from './utils/urlSafety.js';
 import { buildAnalysisPrompt, generateOfflineFallback } from './engine/prompts.js';
 import { analyzeEmail, computeFinalScore, scoreToVerdict } from './engine/analyzer.js';
+import { hashEmail, cacheAnalysisResult } from './utils/cache.js';
 
 // ─── Dashboard Integrations ───────────────────────────────────────────────────
 
@@ -86,8 +88,8 @@ async function sendAlertToDashboard(analysisResult, endpointInfo) {
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
-    id: 'phishguard-analyze',
-    title: '🛡️ Analyze with PhishGuard AI',
+    id: 'revelio-analyze',
+    title: '🛡️ Analyze with Revelio',
     contexts: ['selection'],
   });
 
@@ -124,7 +126,7 @@ chrome.runtime.onInstalled.addListener(() => {
 // ─── Context Menu Click Handler ───────────────────────────────────────────────
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (info.menuItemId !== 'phishguard-analyze') return;
+  if (info.menuItemId !== 'revelio-analyze') return;
 
   const selectedText = info.selectionText || '';
   if (!selectedText.trim()) return;
@@ -271,7 +273,117 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .catch((err) => sendResponse({ success: false, error: err.message }));
     return true;
   }
+
+  if (message.type === 'GET_PROVIDER_MODELS') {
+    const { provider, apiKey, endpoint } = message;
+    let promise;
+    switch (provider) {
+      case 'ollama':
+        promise = getOllamaModels(endpoint);
+        break;
+      case 'openai':
+        promise = getOpenAIModels(apiKey);
+        break;
+      case 'gemini':
+        promise = getGeminiModels(apiKey);
+        break;
+      case 'openrouter':
+        promise = getOpenRouterModels(apiKey);
+        break;
+      default:
+        promise = Promise.reject(new Error(`Unknown provider: ${provider}`));
+    }
+    promise
+      .then((models) => sendResponse({ success: true, models }))
+      .catch((err) => sendResponse({ success: false, error: err.message }));
+    return true;
+  }
 });
+
+// ─── Provider Model Discovery ─────────────────────────────────────────────────
+
+async function getOpenAIModels(apiKey) {
+  if (!apiKey) throw new Error('OpenAI API key is required');
+  const response = await fetch('https://api.openai.com/v1/models', {
+    headers: { Authorization: `Bearer ${apiKey.trim()}` },
+  });
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(errData?.error?.message || `HTTP ${response.status}: Failed to fetch OpenAI models`);
+  }
+  const data = await response.json();
+  const models = (data.data || [])
+    .map((m) => m.id)
+    .filter((id) => {
+      const isExcluded = /^(text-embedding|tts|whisper|dall-e|babbage|davinci|canary|text-moderation|omni-moderation|audio-|realtime)/i.test(id);
+      const isKnownGood = /^(gpt-|o1|o3|chatgpt-)/i.test(id);
+      return !isExcluded && isKnownGood;
+    });
+
+  const priority = ['gpt-4o', 'gpt-4o-mini', 'o1-mini', 'o1-preview', 'o1', 'o3-mini', 'gpt-4-turbo', 'gpt-3.5-turbo'];
+  models.sort((a, b) => {
+    const aIdx = priority.indexOf(a);
+    const bIdx = priority.indexOf(b);
+    if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+    if (aIdx !== -1) return -1;
+    if (bIdx !== -1) return 1;
+    return a.localeCompare(b);
+  });
+
+  return models;
+}
+
+async function getGeminiModels(apiKey) {
+  if (!apiKey) throw new Error('Gemini API key is required');
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey.trim())}`);
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(errData?.error?.message || `HTTP ${response.status}: Failed to fetch Gemini models`);
+  }
+  const data = await response.json();
+  const models = (data.models || [])
+    .filter((m) => (m.supportedGenerationMethods || []).includes('generateContent'))
+    .map((m) => ({
+      id: m.name.replace(/^models\//, ''),
+      name: m.displayName ? `${m.displayName} (${m.name.replace(/^models\//, '')})` : m.name.replace(/^models\//, ''),
+    }));
+
+  const priority = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-2.0-flash-lite-preview-02-05', 'gemini-2.5-pro', 'gemini-2.5-flash'];
+  models.sort((a, b) => {
+    const aIdx = priority.indexOf(a.id);
+    const bIdx = priority.indexOf(b.id);
+    if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+    if (aIdx !== -1) return -1;
+    if (bIdx !== -1) return 1;
+    return a.id.localeCompare(b.id);
+  });
+
+  return models;
+}
+
+async function getOpenRouterModels(apiKey = '') {
+  const headers = {};
+  if (apiKey && apiKey.trim()) headers['Authorization'] = `Bearer ${apiKey.trim()}`;
+  const response = await fetch('https://openrouter.ai/api/v1/models', { headers });
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw new Error(errData?.error?.message || `HTTP ${response.status}: Failed to fetch OpenRouter models`);
+  }
+  const data = await response.json();
+  const models = (data.data || []).map((m) => ({
+    id: m.id,
+    name: m.name ? `${m.name} (${m.id})` : m.id,
+    isFree: m.id.endsWith(':free') || m.pricing?.prompt === '0',
+  }));
+
+  models.sort((a, b) => {
+    if (a.isFree && !b.isFree) return -1;
+    if (!a.isFree && b.isFree) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  return models;
+}
 
 // ─── Ollama Health Check ──────────────────────────────────────────────────────
 
@@ -302,6 +414,7 @@ async function handleAnalyze({ emailText, settings, ruleResult }) {
 
   let llmResponse;
 
+  // NOTE: All four provider cases must be kept in sync with runAnalysisPipeline() below.
   switch (provider) {
     case 'ollama':
       llmResponse = await callOllama(prompt, settings);
@@ -312,6 +425,9 @@ async function handleAnalyze({ emailText, settings, ruleResult }) {
     case 'gemini':
       llmResponse = await callGemini(prompt, settings);
       break;
+    case 'openrouter':
+      llmResponse = await callOpenRouter(prompt, settings);
+      break;
     default:
       throw new Error('Unknown AI provider: ' + provider);
   }
@@ -321,28 +437,8 @@ async function handleAnalyze({ emailText, settings, ruleResult }) {
 
 // ─── Passive Scanning ─────────────────────────────────────────────────────────
 
-
-// —— Shared Cache Utilities (Sync with popup.js) ———————————————————————————————
-
-function hashEmail(text) {
-  let hash = 5381;
-  for (let i = 0; i < Math.min(text.length, 2000); i++) {
-    hash = ((hash << 5) + hash) ^ text.charCodeAt(i);
-    hash = hash & 0xffffffff;
-  }
-  return 'phishcache_v2_' + Math.abs(hash).toString(36);
-}
-
-async function cacheAnalysisResult(emailText, result) {
-  try {
-    const key = hashEmail(emailText);
-    await chrome.storage.local.set({
-      [key]: { result, cachedAt: Date.now(), emailPreview: emailText.slice(0, 80) },
-      phishguard_last_cache_key: key,
-    });
-  } catch (e) { /* silent */ }
-}
-
+// In-flight passive scan promises, keyed by email hash.
+// Prevents duplicate concurrent scans for the same email.
 const activePassiveScans = new Map();
 
 async function handlePassiveScan(emailText, source, tabId) {
@@ -393,7 +489,7 @@ async function runAnalysisPipeline(emailText, source, settings, isPassive = fals
         llmResult = generateOfflineFallback(ruleResult, settings.sensitivityThreshold, 'Unknown provider');
       }
     } catch (llmError) {
-      console.warn('[PhishGuard] Passive scan LLM failed, using fallback:', llmError);
+      console.warn('[Revelio] Passive scan LLM failed, using fallback:', llmError);
       llmResult = generateOfflineFallback(ruleResult, settings.sensitivityThreshold, llmError.message);
     }
 
@@ -447,7 +543,7 @@ async function runAnalysisPipeline(emailText, source, settings, isPassive = fals
     return analysisResult;
 
   } catch (err) {
-    console.error('[PhishGuard] Pipeline error:', err);
+    console.error('[Revelio] Pipeline error:', err);
     throw err;
   } finally {
     if (isPassive && tabId) {

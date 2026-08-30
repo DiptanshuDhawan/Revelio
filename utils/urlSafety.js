@@ -1,4 +1,8 @@
-'use strict';
+// Revelio — External URL Safety Checks
+// Layer 2: Google Safe Browsing (heuristic) and Layer 3: VirusTotal (deep scan).
+// Both are optional — they require user-supplied API keys in Settings.
+// URLs are stripped of query params/fragments before submission to protect privacy.
+
 
 /**
  * Strips query parameters and fragments from a URL for privacy before external submission.
@@ -29,8 +33,8 @@ export async function checkSafeBrowsing(url, apiKey) {
   const endpoint = `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${apiKey}`;
   const payload = {
     client: {
-      clientId: "phishguard-ai",
-      clientVersion: "1.0.0"
+      clientId: 'revelio',
+      clientVersion: chrome.runtime.getManifest().version,
     },
     threatInfo: {
       threatTypes: ["MALWARE", "SOCIAL_ENGINEERING", "UNWANTED_SOFTWARE", "POTENTIALLY_HARMFUL_APPLICATION"],

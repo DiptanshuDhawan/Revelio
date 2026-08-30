@@ -1,9 +1,11 @@
-// PhishGuard AI — URL Scanner
-// Extracts and analyzes URLs from email text for phishing indicators.
+// Revelio — URL Scanner
+// Extracts all URLs from raw email text and scores each one for phishing indicators.
+// Results are sorted by risk score (highest first) for the UI to render.
 
 'use strict';
 
-import { KNOWN_BRAND_DOMAINS, URL_SHORTENERS, SUSPICIOUS_TLDS, levenshtein } from '../engine/ruleEngine.js';
+import { KNOWN_BRAND_DOMAINS, URL_SHORTENERS, SUSPICIOUS_TLDS, BRAND_DOMAIN_MAP } from '../engine/constants.js';
+import { levenshtein } from '../engine/ruleEngine.js';
 import { detectHomoglyphAttack } from './homoglyphMap.js';
 
 const PHISHING_KEYWORDS = ['login', 'verify', 'account', 'secure', 'update', 'confirm', 'signin'];
@@ -66,24 +68,15 @@ function analyzeURL(href, displayText) {
   for (const knownDomain of KNOWN_BRAND_DOMAINS) {
     const knownRoot = extractRootDomain(knownDomain);
     if (rootDomain === knownRoot) {
-      // Exact match — legitimate, not lookalike
+      // Exact match — legitimate domain, not a lookalike
       isLookalike = false;
       break;
     }
     const dist = levenshtein(rootDomain, knownRoot);
     if (dist > 0 && dist <= 2 && rootDomain.length >= 4) {
       isLookalike = true;
-      // Find the brand name for this domain
-      for (const [brand, domains] of Object.entries(
-        // Import inline to avoid circular ref issues
-        {
-          paypal: ['paypal.com'], google: ['google.com', 'gmail.com'],
-          microsoft: ['microsoft.com', 'live.com', 'outlook.com'],
-          apple: ['apple.com'], amazon: ['amazon.com'], netflix: ['netflix.com'],
-          facebook: ['facebook.com', 'meta.com'], fedex: ['fedex.com'], ups: ['ups.com'],
-          irs: ['irs.gov'], docusign: ['docusign.com'], chase: ['chase.com'],
-        }
-      )) {
+      // Find the brand name for this domain using the imported map
+      for (const [brand, domains] of Object.entries(BRAND_DOMAIN_MAP)) {
         if (domains.some((d) => extractRootDomain(d) === knownRoot)) {
           lookalikeBrand = brand;
           break;
@@ -189,6 +182,14 @@ function analyzeURL(href, displayText) {
 
 // ─── Main Export ──────────────────────────────────────────────────────────────
 
+/**
+ * Extracts every URL from raw email text (both href attributes and plain-text URLs)
+ * and runs heuristic risk analysis on each one.
+ *
+ * @param {string} emailText  Raw email text (headers + body).
+ * @returns {object[]}        Array of URL analysis objects, sorted by riskScore descending.
+ *                            Capped at 50 URLs.
+ */
 export function extractAndAnalyzeURLs(emailText) {
   const text = emailText || '';
   const urlMap = new Map(); // href → displayText

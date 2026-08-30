@@ -153,7 +153,7 @@
         <h2 class="text-[13px] font-medium text-[rgba(255,255,255,0.85)]">AI Provider</h2>
       </div>
 
-      <section class="bg-[#161b27] border border-[rgba(255,255,255,0.08)] rounded-[12px] overflow-hidden flex flex-col">
+      <section class="bg-[#161b27] border border-[rgba(255,255,255,0.08)] rounded-[12px] flex flex-col">
         <div class="flex gap-1.5 pt-4 px-4" id="provider-selector">
           <button class="prov-btn active" data-prov="ollama">Ollama (local)</button>
           <button class="prov-btn" data-prov="openai">OpenAI</button>
@@ -182,10 +182,16 @@
             <div id="ollama-test-result" class="test-result" style="display:none;"></div>
 
             <div class="flex flex-col gap-1.5">
-              <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-ollama-model">Model</label>
-              <select id="s-ollama-model" class="glass-input cursor-pointer">
-                <option value="custom">Custom model name...</option>
-              </select>
+              <div class="flex justify-between items-center">
+                <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-ollama-model">Model</label>
+                <span id="s-ollama-model-status" class="text-[11px] text-[rgba(255,255,255,0.4)]"></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <select id="s-ollama-model" class="glass-input cursor-pointer flex-1">
+                  <option value="custom">Custom model name...</option>
+                </select>
+                <button id="refresh-ollama-models" type="button" class="px-2.5 py-[7px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] rounded-[7px] text-[rgba(255,255,255,0.5)] hover:text-white transition-colors text-[12px]" title="Refresh installed models">↻</button>
+              </div>
               <input type="text" id="s-ollama-model-custom" class="glass-input mt-1" placeholder="Enter model name (e.g. llama3:8b)" style="display:none;" />
             </div>
 
@@ -205,17 +211,24 @@
               </div>
             </div>
             <div class="flex flex-col gap-1.5">
-              <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-openai-model">Model</label>
-              <select id="s-openai-model" class="glass-input cursor-pointer">
-                <option value="gpt-4o">gpt-4o</option>
-                <option value="gpt-4o-mini">gpt-4o-mini</option>
-                <option value="gpt-4-turbo">gpt-4-turbo</option>
-                <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-                <option value="custom">Custom model name...</option>
-              </select>
+              <div class="flex justify-between items-center">
+                <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-openai-model">Model</label>
+                <span id="s-openai-model-status" class="text-[11px] text-[rgba(255,255,255,0.4)]"></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <select id="s-openai-model" class="glass-input cursor-pointer flex-1">
+                  <option value="gpt-4o-mini">gpt-4o-mini</option>
+                  <option value="gpt-4o">gpt-4o</option>
+                  <option value="o1-mini">o1-mini</option>
+                  <option value="o3-mini">o3-mini</option>
+                  <option value="gpt-4-turbo">gpt-4-turbo</option>
+                  <option value="custom">Custom model name...</option>
+                </select>
+                <button id="refresh-openai-models" type="button" class="px-2.5 py-[7px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] rounded-[7px] text-[rgba(255,255,255,0.5)] hover:text-white transition-colors text-[12px]" title="Fetch models from OpenAI API">↻</button>
+              </div>
               <input type="text" id="s-openai-model-custom" class="glass-input mt-1" placeholder="Enter custom model (e.g. gpt-5)" style="display:none;" />
             </div>
-            <div class="text-[11px] text-[rgba(255,255,255,0.25)] italic mt-1">Data is sent to OpenAI servers for processing.</div>
+            <div class="text-[11px] text-[rgba(255,255,255,0.25)] italic mt-1">Data is sent to OpenAI servers for processing. Models are fetched dynamically via your API key.</div>
           </div>
 
           <!-- Gemini Config -->
@@ -228,16 +241,22 @@
               </div>
             </div>
             <div class="flex flex-col gap-1.5">
-              <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-gemini-model">Model</label>
-              <select id="s-gemini-model" class="glass-input cursor-pointer">
-                <option value="gemini-1.5-pro">gemini-1.5-pro</option>
-                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-                <option value="gemini-pro">gemini-pro</option>
-                <option value="custom">Custom model name...</option>
-              </select>
+              <div class="flex justify-between items-center">
+                <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-gemini-model">Model</label>
+                <span id="s-gemini-model-status" class="text-[11px] text-[rgba(255,255,255,0.4)]"></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <select id="s-gemini-model" class="glass-input cursor-pointer flex-1">
+                  <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+                  <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+                  <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+                  <option value="custom">Custom model name...</option>
+                </select>
+                <button id="refresh-gemini-models" type="button" class="px-2.5 py-[7px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] rounded-[7px] text-[rgba(255,255,255,0.5)] hover:text-white transition-colors text-[12px]" title="Fetch models from Google Gemini API">↻</button>
+              </div>
               <input type="text" id="s-gemini-model-custom" class="glass-input mt-1" placeholder="Enter custom model" style="display:none;" />
             </div>
-            <div class="text-[11px] text-[rgba(255,255,255,0.25)] italic mt-1">Data is sent to Google servers for processing.</div>
+            <div class="text-[11px] text-[rgba(255,255,255,0.25)] italic mt-1">Data is sent to Google servers for processing. Models are fetched dynamically via your API key.</div>
           </div>
 
           <!-- OpenRouter Config -->
@@ -250,17 +269,21 @@
               </div>
             </div>
             <div class="flex flex-col gap-1.5">
-              <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-openrouter-model">Model</label>
-              <select id="s-openrouter-model" class="glass-input cursor-pointer">
-                <option value="deepseek/deepseek-r1:free">DeepSeek R1 (Free)</option>
-                <option value="meta-llama/llama-3.1-70b-instruct:free">Llama 3.1 70B (Free)</option>
-                <option value="qwen/qwen-2.5-coder-32b-instruct:free">Qwen 2.5 Coder (Free)</option>
-                <option value="meta-llama/llama-3-8b-instruct:free">Llama 3 8B (Free)</option>
-                <option value="custom">Custom model name...</option>
-              </select>
-              <input type="text" id="s-openrouter-model-custom" class="glass-input mt-1" placeholder="Enter custom model" style="display:none;" />
+              <div class="flex justify-between items-center">
+                <label class="text-[11px] uppercase text-[rgba(255,255,255,0.25)] font-bold tracking-wider" for="s-openrouter-model">Model</label>
+                <span id="s-openrouter-model-status" class="text-[11px] text-[rgba(255,255,255,0.4)]"></span>
+              </div>
+              <div class="flex items-center gap-2 relative" style="position: relative; width: 100%;">
+                <input type="text" id="s-openrouter-model" class="glass-input flex-1 cursor-pointer" style="padding-right: 32px;" placeholder="Search or select model..." autocomplete="off" />
+                <div class="absolute top-1/2 -translate-y-1/2 pointer-events-none text-[rgba(255,255,255,0.3)] text-[10px]" style="right: 46px;">▼</div>
+                <div id="openrouter-dropdown" class="absolute left-0 top-full mt-1 bg-[#161b27] border border-[rgba(255,255,255,0.15)] rounded-[7px] shadow-2xl overflow-y-auto hidden flex-col" style="right: 40px; max-height: 180px; z-index: 100;">
+                  <!-- JS populated -->
+                </div>
+                <button id="refresh-openrouter-models" type="button" class="px-2.5 py-[7px] bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] rounded-[7px] text-[rgba(255,255,255,0.5)] hover:text-white transition-colors text-[12px]" title="Fetch models from OpenRouter API">↻</button>
+              </div>
+              <input type="text" id="s-openrouter-model-custom" class="glass-input mt-1" placeholder="Enter custom model (e.g. meta-llama/llama-3-8b)" style="display:none;" />
             </div>
-            <div class="text-[11px] text-[rgba(255,255,255,0.25)] italic mt-1">Data is sent to OpenRouter API for processing.</div>
+            <div class="text-[11px] text-[rgba(255,255,255,0.25)] italic mt-1">Data is sent to OpenRouter API for processing. Models are fetched dynamically via your API key.</div>
           </div>
         </div>
       </section>
