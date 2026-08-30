@@ -62,7 +62,7 @@ Traditional Secure Email Gateways often miss zero-day social engineering and tar
 
 Revelio operates entirely within the browser using Manifest V3 architecture.
 
-\\\mermaid
+```mermaid
 graph TD
     User([User Email Client]) -->|Opens Email| Content[Content Script]
     
@@ -79,7 +79,7 @@ graph TD
     
     Evaluator -->|Displays Report| Popup[Chrome Popup UI]
     Evaluator -.->|Persists History| Storage[(Local Storage)]
-\\\
+```
 
 ## Quick Start
 
