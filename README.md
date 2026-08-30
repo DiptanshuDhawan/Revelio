@@ -85,37 +85,40 @@ graph TD
 
 ### Prerequisites
 
-- Google Chrome, Microsoft Edge, or a Chromium-based browser
-- Node.js (for compiling Tailwind CSS)
-- **(Optional)** [Ollama](https://ollama.com/) for fully offline, zero-trust local analysis.
+- Google Chrome, Microsoft Edge, or any Chromium-based browser
+- Node.js & npm (for building CSS)
+- **(Optional)** [Ollama](https://ollama.com/) for fully offline, zero-trust local analysis
 
 ### 1. Clone the repository
 
-\\\ash
+```bash
 git clone https://github.com/DiptanshuDhawan/Revelio.git
 cd Revelio
-\\\
+```
 
 ### 2. Build the styles
 
-Revelio uses Tailwind CSS. Install the dependencies and compile the popup styling:
+Revelio uses Tailwind CSS. Install dependencies and compile the stylesheet:
 
-\\\ash
+```bash
 npm install
 npm run build:css
-\\\
+```
 
 ### 3. Load the extension
 
-1. Open your browser and navigate to chrome://extensions/.
+1. Open your browser and navigate to `chrome://extensions/`.
 2. Enable **Developer mode** using the toggle in the top right corner.
-3. Click **Load unpacked** and select the Revelio folder you just cloned.
+3. Click **Load unpacked** and select the `Revelio` directory.
 
 ### 4. Configure AI Providers (Settings)
 
-Click the Revelio extension icon, open the **Settings**, and navigate to the **AI Provider** tab.
-- **Local (Ollama)**: Ensure your Ollama server is running with CORS enabled (\OLLAMA_ORIGINS="chrome-extension://*" ollama serve\).
-- **Cloud**: Input your API key for OpenAI, Gemini, or OpenRouter. The extension will automatically fetch and display available models.
+Click the Revelio extension icon, open the **Settings**, and navigate to the **AI Provider** tab:
+- **Local (Ollama)**: Ensure Ollama is running with CORS enabled:
+  ```bash
+  OLLAMA_ORIGINS="chrome-extension://*" ollama serve
+  ```
+- **Cloud**: Input your API key for OpenAI, Gemini, or OpenRouter. Available models are fetched dynamically.
 
 ## Development & Contributing
 
@@ -127,4 +130,4 @@ Revelio is currently in active beta. The core heuristic engine, popup UI, dynami
 
 ## License
 
-Distributed under the MIT License. See \LICENSE\ for details.
+Distributed under the MIT License. See `LICENSE` for details.
