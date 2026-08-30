@@ -1,5 +1,6 @@
 <div align="center">
   <img src="docs/hero_banner.png" alt="Revelio Banner" width="100%">
+  <br><br>
 
   <p>
     <a href="https://developer.chrome.com/docs/extensions/"><img src="https://img.shields.io/badge/Chrome_Extension-4285F4?logo=googlechrome&logoColor=white" alt="Chrome Extension"></a>
