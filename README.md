@@ -27,7 +27,12 @@
 The extension popup provides a complete breakdown of the analyzed email, including a Threat Radar, MITRE ATT&CK mapping, and specific AI-driven findings.
 
 <div align="center">
-  <img src="docs/popup.png" alt="Revelio Analysis Dashboard" width="450">
+  <img src="docs/popup.png" alt="Threat Radar" width="260">&nbsp;
+  <img src="docs/popup_analysis.png" alt="AI Analysis" width="260">&nbsp;
+  <img src="docs/popup_rules.png" alt="Rule Checks" width="260">
+  <br><br>
+  <img src="docs/popup_urls.png" alt="URL Scanning" width="260">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="docs/popup_remediation.png" alt="Remediation" width="260">
 </div>
 
 ### Extensive Configuration
