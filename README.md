@@ -29,8 +29,6 @@
   <img src="docs/settings.png" alt="Revelio Settings Panel" width="400">
 </div>
 
-*Note: Create a docs folder and add popup.png and settings.png for these images to display.*
-
 Traditional Secure Email Gateways often miss zero-day social engineering and targeted Business Email Compromise (BEC) attacks. Revelio solves this by bringing enterprise-grade, AI-driven threat analysis directly into your browser. 
 
 - **Dual-Engine Architecture**: Combines lightning-fast deterministic heuristics (URL lookalikes, header spoofing) with deep-context Large Language Models (evaluating urgency, manipulation, and tone).
