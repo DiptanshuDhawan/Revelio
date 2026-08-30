@@ -1,47 +1,110 @@
 <div align="center">
-  <img src="icons/Revelio%20logo.png" alt="Revelio Logo" width="128" />
-  <h1>Revelio</h1>
+  <img src="icons/Revelio logo.png" alt="Revelio Logo" width="128" />
+  <h1>REVELIO</h1>
   <p><strong>Advanced Threat Intelligence & Phishing Analysis</strong></p>
+
   <p>
-    <a href="https://github.com/DiptanshuDhawan/Revelio/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
-    <img src="https://img.shields.io/badge/Version-1.0.0-green.svg" alt="Version">
+    <a href="https://developer.chrome.com/docs/extensions/"><img src="https://img.shields.io/badge/Chrome_Extension-4285F4?logo=googlechrome&logoColor=white" alt="Chrome Extension"></a>
+    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript"><img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black" alt="JavaScript"></a>
+    <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css&logoColor=white" alt="Tailwind CSS"></a>
+    <a href="https://github.com/DiptanshuDhawan/Revelio/commits/main"><img src="https://img.shields.io/github/last-commit/DiptanshuDhawan/Revelio.svg?style=flat&color=blue" alt="Last Commit"></a>
+    <a href="https://github.com/DiptanshuDhawan/Revelio/commits/main"><img src="https://img.shields.io/github/commit-activity/m/DiptanshuDhawan/Revelio.svg?style=flat&color=brightgreen" alt="Commits per month"></a>
+    <br>
+    <a href="https://github.com/DiptanshuDhawan/Revelio"><img src="https://img.shields.io/github/languages/top/DiptanshuDhawan/Revelio.svg?style=flat&color=yellow" alt="Top Language"></a>
+    <a href="https://github.com/DiptanshuDhawan/Revelio"><img src="https://img.shields.io/github/languages/code-size/DiptanshuDhawan/Revelio.svg?style=flat&color=orange" alt="Code Size"></a>
+    <a href="https://github.com/DiptanshuDhawan/Revelio"><img src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" alt="Maintained"></a>
+    <a href="#license"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+    <a href="https://github.com/DiptanshuDhawan/Revelio/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
+    <a href="#project-status"><img src="https://img.shields.io/badge/Status-Beta-orange.svg" alt="Status"></a>
   </p>
 </div>
 
 ---
 
-**Revelio** is a next-generation Chrome Extension built for SOC teams. It catches zero-day social engineering and targeted BEC (Business Email Compromise) attacks that bypass traditional Secure Email Gateways. 
+## Overview
 
-By combining lightning-fast deterministic heuristics with deep-context Large Language Models, Revelio provides enterprise-grade threat analysis directly within your browser for Gmail and Outlook.
+<div align="center">
+  <img src="docs/popup.png" alt="Revelio Analysis Dashboard" width="400">
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="docs/settings.png" alt="Revelio Settings Panel" width="400">
+</div>
 
-## Core Capabilities
+*Note: Create a docs folder and add popup.png and settings.png for these images to display.*
 
-* **Dual-Engine Architecture:** Runs 12 strict deterministic checks (Header Auth, URL Lookalikes, Payload Scans) combined with a contextual AI engine (evaluating urgency, authority manipulation, and tone).
-* **Zero-Trust Privacy:** Supports 100% offline analysis via **Ollama**. No sensitive email data ever leaves your machine. (Cloud APIs like OpenAI, Gemini, and OpenRouter are also supported).
-* **SOC-Ready Reports:** Generates printable, MITRE-mapped threat intelligence reports with a multi-axis Threat Fingerprint Radar.
-* **Instant Forensics:** Automatically unmasks URL shorteners, verifies DKIM/DMARC alignment, and flags display name impersonation.
-* **Passive Auto-Scan:** Scans emails in the background the moment you open them.
+Traditional Secure Email Gateways often miss zero-day social engineering and targeted Business Email Compromise (BEC) attacks. Revelio solves this by bringing enterprise-grade, AI-driven threat analysis directly into your browser. 
+
+- **Dual-Engine Architecture**: Combines lightning-fast deterministic heuristics (URL lookalikes, header spoofing) with deep-context Large Language Models (evaluating urgency, manipulation, and tone).
+- **Zero-Trust Privacy**: Supports 100% offline analysis via Ollama. No sensitive email data ever leaves your machine unless you explicitly configure a cloud provider.
+- **Dynamic AI Integrations**: Plugs seamlessly into local models (Ollama) or leading cloud providers (OpenAI, Google Gemini, OpenRouter) with automatic, dynamic model discovery.
+- **Passive Auto-Scan**: Scans emails seamlessly in the background the moment you open them, generating MITRE-mapped threat intelligence reports.
 
 ## Architecture
 
-Revelio uses a Manifest V3 Service Worker (`background.js`) as a central hub to avoid CORS issues and orchestrate analysis safely.
+Revelio operates entirely within the browser using Manifest V3 architecture.
 
-* **`content.js`** extracts email DOM from Gmail/Outlook and signals the background worker.
-* **`engine/analyzer.js`** coordinates the `ruleEngine.js` (12 deterministic checks) and `prompts.js` (LLM instructions), calculating the blended score.
-* **`utils/urlScanner.js` & `urlSafety.js`** perform deep URL heuristics, Google Safe Browsing, and VirusTotal lookups.
-* **`popup.js`** acts as the frontend controller, visualizing the results via Chart.js.
+\\\mermaid
+graph TD
+    User([User Email Client]) -->|Opens Email| Content[Content Script]
+    
+    Content -->|Extracts DOM| Worker[Background Service Worker]
+    
+    Worker -->|Heuristic Checks| Rules[Rule Engine]
+    Worker -->|Prompt Injection| AI[AI Provider Router]
+    
+    AI -.->|Local Inference| Ollama[(Local Ollama)]
+    AI -.->|Cloud Inference| Cloud[(OpenAI / Gemini / OpenRouter)]
+    
+    Rules --> Evaluator[Threat Evaluator]
+    AI --> Evaluator
+    
+    Evaluator -->|Displays Report| Popup[Chrome Popup UI]
+    Evaluator -.->|Persists History| Storage[(Local Storage)]
+\\\
 
 ## Quick Start
 
-1. **Install:** Clone this repo, open `chrome://extensions/`, enable **Developer mode** (top right), and click **Load unpacked**. Select the `Revelio` folder (not `phishguard-ai`).
-2. **Setup AI (Optional but Recommended):** 
-   * Install [Ollama](https://ollama.com) and pull a model: `ollama pull llama3.1` (or your preferred model).
-   * Start the server with CORS enabled: `OLLAMA_ORIGINS="chrome-extension://*" ollama serve`
-3. **Analyze:** Open an email in Gmail or Outlook and click the Revelio extension icon.
+### Prerequisites
+
+- Google Chrome, Microsoft Edge, or a Chromium-based browser
+- Node.js (for compiling Tailwind CSS)
+- **(Optional)** [Ollama](https://ollama.com/) for fully offline, zero-trust local analysis.
+
+### 1. Clone the repository
+
+\\\ash
+git clone https://github.com/DiptanshuDhawan/Revelio.git
+cd Revelio
+\\\
+
+### 2. Build the styles
+
+Revelio uses Tailwind CSS. Install the dependencies and compile the popup styling:
+
+\\\ash
+npm install
+npm run build:css
+\\\
+
+### 3. Load the extension
+
+1. Open your browser and navigate to chrome://extensions/.
+2. Enable **Developer mode** using the toggle in the top right corner.
+3. Click **Load unpacked** and select the Revelio folder you just cloned.
+
+### 4. Configure AI Providers (Settings)
+
+Click the Revelio extension icon, open the **Settings**, and navigate to the **AI Provider** tab.
+- **Local (Ollama)**: Ensure your Ollama server is running with CORS enabled (\OLLAMA_ORIGINS="chrome-extension://*" ollama serve\).
+- **Cloud**: Input your API key for OpenAI, Gemini, or OpenRouter. The extension will automatically fetch and display available models.
 
 ## Development & Contributing
 
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on setting up the dev environment, building Tailwind CSS (`npm run build:css`), and our coding standards.
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on setting up the dev environment and our coding standards. 
 
----
-*Built for security professionals who demand accuracy without sacrificing privacy. MIT Licensed.*
+## Project Status
+
+Revelio is currently in active beta. The core heuristic engine, popup UI, dynamic AI provider system, and background orchestration are fully functional. Current work focuses on expanding deterministic rules and refining LLM prompts for newer models.
+
+## License
+
+Distributed under the MIT License. See \LICENSE\ for details.
