@@ -1,7 +1,5 @@
 <div align="center">
-  <img src="icons/Revelio logo.png" alt="Revelio Logo" width="128" />
-  <h1>REVELIO</h1>
-  <p><strong>Advanced Threat Intelligence & Phishing Analysis</strong></p>
+  <img src="docs/banner.png" alt="Revelio Banner" width="100%">
 
   <p>
     <a href="https://developer.chrome.com/docs/extensions/"><img src="https://img.shields.io/badge/Chrome_Extension-4285F4?logo=googlechrome&logoColor=white" alt="Chrome Extension"></a>
