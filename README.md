@@ -21,13 +21,30 @@
 
 ---
 
-## Overview
+## Features & Interface
+
+### Threat Intelligence Dashboard
+The extension popup provides a complete breakdown of the analyzed email, including a Threat Radar, MITRE ATT&CK mapping, and specific AI-driven findings.
 
 <div align="center">
-  <img src="docs/popup.png" alt="Revelio Analysis Dashboard" width="400">
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="docs/settings.png" alt="Revelio Settings Panel" width="400">
+  <img src="docs/popup.png" alt="Revelio Analysis Dashboard" width="450">
 </div>
+
+### Extensive Configuration
+Revelio offers a comprehensive settings panel where you can seamlessly switch between local (Ollama) and cloud AI providers, configure URL safety checks (Google Safe Browsing & VirusTotal), and adjust sensitivity thresholds.
+
+<div align="center">
+  <img src="docs/settings.png" alt="Revelio Settings Panel" width="800">
+</div>
+
+### PDF Report Generation
+Generate SOC-ready PDF reports with a single click to document and escalate confirmed threats.
+
+<div align="center">
+  <img src="docs/report_pdf.png" alt="Revelio PDF Report" width="600">
+</div>
+
+---
 
 Traditional Secure Email Gateways often miss zero-day social engineering and targeted Business Email Compromise (BEC) attacks. Revelio solves this by bringing enterprise-grade, AI-driven threat analysis directly into your browser. 
 
