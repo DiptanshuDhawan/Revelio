@@ -23,15 +23,16 @@
 ## Features & Interface
 
 ### Threat Intelligence Dashboard
-The extension popup provides a complete breakdown of the analyzed email, including a Threat Radar, MITRE ATT&CK mapping, and specific AI-driven findings.
+The extension popup provides a complete breakdown of analyzed emails, including a Threat Radar, MITRE ATT&CK mapping, and specific AI-driven findings for both confirmed phishing and legitimate emails.
 
 <div align="center">
-  <img src="docs/popup.png" alt="Threat Radar" width="260">&nbsp;
-  <img src="docs/popup_analysis.png" alt="AI Analysis" width="260">&nbsp;
-  <img src="docs/popup_rules.png" alt="Rule Checks" width="260">
+  <img src="docs/popup.png" alt="Phishing Threat Radar (Score 100)" width="260">&nbsp;
+  <img src="docs/popup_urls.png" alt="Malicious URL Detection" width="260">&nbsp;
+  <img src="docs/popup_remediation.png" alt="Remediation Actions" width="260">
   <br><br>
-  <img src="docs/popup_urls.png" alt="URL Scanning" width="260">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="docs/popup_remediation.png" alt="Remediation" width="260">
+  <img src="docs/popup_safe_radar.png" alt="Safe Email Radar (Score 6)" width="260">&nbsp;
+  <img src="docs/popup_safe_analysis.png" alt="Safe AI Analysis" width="260">&nbsp;
+  <img src="docs/popup_rules.png" alt="Deterministic Rule Engine" width="260">
 </div>
 
 ### Extensive Configuration
